@@ -1,0 +1,51 @@
+// Copyright (c) 2019-2020 The Open-Transactions developers
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include "profilealias.hpp"  // IWYU pragma: associated
+
+#include <QPlainTextEdit>
+#include <QToolButton>
+
+#include "ui_profilealias.h"
+#include "util/resizer.hpp"
+
+namespace metier::widget
+{
+ProfileAlias::ProfileAlias(QWidget* parent)
+    : QDialog(parent)
+    , ui_(std::make_unique<Ui::ProfileAlias>())
+{
+    ui_->setupUi(this);
+    auto* alias = ui_->alias;
+    alias->setMaximumHeight(util::line_height(*alias, {3, 2}));
+    util::set_minimum_size(*alias, 10, 1, {3, 2});
+    connect(alias, &QPlainTextEdit::textChanged, [this]() { check(); });
+    connect(ui_->confirm, &QToolButton::clicked, [this]() { confirm(); });
+    connect(this, &ProfileAlias::gotAlias, [this]() { hide(); });
+}
+
+auto ProfileAlias::check() noexcept -> void
+{
+    auto& alias = *ui_->alias;
+    auto& confirm = *ui_->confirm;
+    auto text = alias.toPlainText();
+    confirm.setEnabled(!text.isEmpty());
+    auto done{false};
+
+    if (text.contains('\n')) {
+        text.remove('\n');
+        done = true;
+    }
+
+    if (done) { this->confirm(); }
+}
+
+auto ProfileAlias::confirm() noexcept -> void
+{
+    emit gotAlias(ui_->alias->toPlainText().remove('\n'));
+}
+
+ProfileAlias::~ProfileAlias() = default;
+}  // namespace metier::widget

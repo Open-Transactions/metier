@@ -1,0 +1,6 @@
+[submodule "cmake"]
+	path = cmake
+	url = https://github.com/open-transactions/opentxs-cmake
+[submodule "QR-Code-generator"]
+	path = deps/QR-Code-generator
+	url = git@github.com:nayuki/QR-Code-generator.git
