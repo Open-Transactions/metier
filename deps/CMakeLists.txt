@@ -22,3 +22,26 @@ endif()
 target_include_directories(
   qr-code-generator SYSTEM INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}"
 )
+
+if(METIER_BUNDLED_OPENTXS)
+  set(CMAKE_C_FLAGS "${METIER_ORIGINAL_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${METIER_ORIGINAL_CXX_FLAGS}")
+  set(OPENTXS_BUILD_TESTS
+      OFF
+      CACHE BOOL "" FORCE
+  )
+  set(OPENTXS_PEDANTIC_BUILD
+      ${METIER_PEDANTIC_BUILD}
+      CACHE BOOL "" FORCE
+  )
+  set(OT_WITH_BLOCKCHAIN
+      ON
+      CACHE BOOL "" FORCE
+  )
+  set(OT_WITH_QT
+      ON
+      CACHE BOOL "" FORCE
+  )
+
+  add_subdirectory(opentxs)
+endif()

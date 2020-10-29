@@ -30,10 +30,13 @@ endif()
 
 option(METIER_PEDANTIC_BUILD "Treat compiler warnings as errors."
        ${METIER_PEDANTIC_DEFAULT})
+option(METIER_BUNDLED_OPENTXS "Use submodule version of libopentxs" OFF)
 
 # -----------------------------------------------------------------------------
 # Set compiler options
 
+set(METIER_ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
+set(METIER_ORIGINAL_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set_compiler_flags(17 ${METIER_PEDANTIC_BUILD})
 
 if(${CMAKE_CXX_COMPILER_ID} MATCHES Clang)
@@ -75,7 +78,11 @@ find_package(OpenSSL 1.0.1 REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(Qt5 COMPONENTS Core Network Qml Widgets REQUIRED)
 find_package(ZLIB REQUIRED)
+
+if(NOT METIER_BUNDLED_OPENTXS)
 find_package(opentxs REQUIRED)
+endif()
+
 find_package(lmdb REQUIRED)
 find_package(unofficial-sodium REQUIRED)
 find_package(unofficial-zeromq REQUIRED)
