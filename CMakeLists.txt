@@ -25,12 +25,22 @@ else()
   set(METIER_PEDANTIC_DEFAULT OFF)
 endif()
 
+if(WIN32)
+  set(OT_USE_VCPKG_TARGETS_DEFAULT ON)
+else()
+  set(OT_USE_VCPKG_TARGETS_DEFAULT OFF)
+endif()
+
 # -----------------------------------------------------------------------------
 # Options
 
 option(METIER_PEDANTIC_BUILD "Treat compiler warnings as errors."
        ${METIER_PEDANTIC_DEFAULT})
 option(METIER_BUNDLED_OPENTXS "Use submodule version of libopentxs" OFF)
+option(
+  OT_USE_VCPKG_TARGETS "Assume dependencies are managed by vcpkg"
+  ${OT_USE_VCPKG_TARGETS_DEFAULT}
+)
 
 # -----------------------------------------------------------------------------
 # Set compiler options
@@ -65,7 +75,7 @@ print_build_details(METIER_PEDANTIC_BUILD METIER_BUILD_TESTS)
 find_system_libraries()
 
 find_package(
-  Boost 1.72.0 REQUIRED
+  Boost 1.73.0 REQUIRED
   COMPONENTS
     system
     filesystem
@@ -85,7 +95,13 @@ endif()
 
 find_package(lmdb REQUIRED)
 find_package(unofficial-sodium REQUIRED)
-find_package(unofficial-zeromq REQUIRED)
+
+if(OT_USE_VCPKG_TARGETS)
+  find_package(ZeroMQ REQUIRED)
+else()
+  find_package(unofficial-zeromq REQUIRED)
+endif()
+
 find_package(unofficial-secp256k1 REQUIRED)
 
 # -----------------------------------------------------------------------------

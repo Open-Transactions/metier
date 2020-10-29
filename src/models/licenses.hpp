@@ -20,7 +20,7 @@ public:
     auto rowCount(const QModelIndex& parent) const -> int final;
     auto suggestedWidthInCharacters() const noexcept -> int;
 
-    Licenses() noexcept = default;
+    Licenses() = default;
 
 private:
     using ot_super = QAbstractListModel;

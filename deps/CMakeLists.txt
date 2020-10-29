@@ -42,6 +42,10 @@ if(METIER_BUNDLED_OPENTXS)
       ON
       CACHE BOOL "" FORCE
   )
+  set(OT_ENABLE_RPC
+      OFF
+      CACHE BOOL "" FORCE
+  )
 
   add_subdirectory(opentxs)
 endif()

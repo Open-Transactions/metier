@@ -41,5 +41,9 @@ add_library(
 target_link_libraries(
   metier-widgets
   PUBLIC Qt5::Core Qt5::Network Qt5::Widgets
-  PRIVATE metier-ui qr-code-generator opentxs
+  PRIVATE
+    metier-ui
+    qr-code-generator
+    opentxs
+    protobuf::libprotobuf-lite
 )

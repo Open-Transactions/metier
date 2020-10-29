@@ -7,3 +7,6 @@
 [submodule "deps/opentxs"]
 	path = deps/opentxs
 	url = https://github.com/open-transactions/opentxs
+[submodule "deps/vcpkg"]
+	path = deps/vcpkg
+	url = https://github.com/microsoft/vcpkg
