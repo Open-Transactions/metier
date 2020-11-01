@@ -17,7 +17,7 @@ jobs:
             cmake_extra: ''
             zip_command: 'zip metier.zip metier'
           - platform: 'windows-2019'
-            vcpkg_triplet: 'x64-windows'
+            vcpkg_triplet: 'x64-windows-static'
             cmake_extra: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded'
             zip_command: '7z a -tzip metier.zip metier.exe'
     runs-on: ${{ matrix.platform }}
@@ -42,7 +42,7 @@ jobs:
       uses: lukka/run-vcpkg@v4
       if: matrix.platform != 'ubuntu-20.04'
       with:
-        vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports qt5-base qt5-declarative'
+        vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports qt5-base'
         vcpkgDirectory: '${{ github.workspace }}/deps/vcpkg'
     - name: 'Compile'
       uses: lukka/run-cmake@v3

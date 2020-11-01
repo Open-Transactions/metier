@@ -3,7 +3,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15)
+cmake_policy(SET CMP0091 NEW)
 project(metier)
 list(APPEND CMAKE_MODULE_PATH "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
 include(open-transactions-common)
@@ -86,7 +87,7 @@ find_package(
 )
 find_package(OpenSSL 1.0.1 REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(Qt5 COMPONENTS Core Network Qml Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Network Widgets REQUIRED)
 find_package(ZLIB REQUIRED)
 
 if(NOT METIER_BUNDLED_OPENTXS)

@@ -37,6 +37,7 @@ target_link_libraries(
     qr-code-generator
     protobuf::libprotobuf-lite
     Qt5::Core
+    Qt5::Network
     Qt5::Widgets
     Threads::Threads
     ${Boost_LIBRARIES}
