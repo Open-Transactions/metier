@@ -1,0 +1,66 @@
+name: Compile
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-20.04, macos-10.15, windows-2019]
+        include:
+          - platform: 'ubuntu-20.04'
+            vcpkg_triplet: 'x64-linux'
+            cmake_extra: ''
+            zip_command: 'zip metier.zip metier'
+          - platform: 'macos-10.15'
+            vcpkg_triplet: 'x64-osx'
+            cmake_extra: ''
+            zip_command: 'zip metier.zip metier'
+          - platform: 'windows-2019'
+            vcpkg_triplet: 'x64-windows'
+            cmake_extra: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded'
+            zip_command: '7z a -tzip metier.zip metier.exe'
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+        submodules: 'recursive'
+    - name: Install Qt (system package)
+      if: matrix.platform == 'ubuntu-20.04'
+      run: 'sudo apt-get install -y qtbase5-dev qtdeclarative5-dev'
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.4
+      with:
+        cmake-version: '3.18.4'
+    - name: Run vcpkg
+      uses: lukka/run-vcpkg@v4
+      with:
+        vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports @${{ github.workspace }}/deps/vcpkg.txt'
+        vcpkgDirectory: '${{ github.workspace }}/deps/vcpkg'
+    - name: Install Qt (vcpkg)
+      uses: lukka/run-vcpkg@v4
+      if: matrix.platform != 'ubuntu-20.04'
+      with:
+        vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports qt5-base qt5-declarative'
+        vcpkgDirectory: '${{ github.workspace }}/deps/vcpkg'
+    - name: 'Compile'
+      uses: lukka/run-cmake@v3
+      with:
+        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+        useVcpkgToolchainFile: true
+        vcpkgTriplet: '${{ matrix.vcpkg_triplet }}'
+        buildDirectory: '${{ github.workspace }}/build'
+        cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Release -DOT_USE_VCPKG_TARGETS=ON -DMETIER_BUNDLED_OPENTXS=ON ${{ matrix.cmake_extra }}'
+        buildWithCMake: true
+        buildWithCMakeArgs: '-- -k 0'
+    - name: 'Package'
+      run: |
+        cd ${{ github.workspace }}/build
+        cd src
+        ${{ matrix.zip_command }}
+    - uses: actions/upload-artifact@v2
+      with:
+        name: metier-${{ matrix.platform }}.zip
+        path: ${{ github.workspace }}/build/src/metier.zip

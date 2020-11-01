@@ -10,20 +10,40 @@
 #include <iterator>
 #include <string>
 
+#include "boost.h"
+#include "libzmq.h"
+#include "lmdb.h"
+#include "metier.h"
+#include "openssl.h"
+#include "qt.h"
+#include "secp256k1.h"
+#include "sodium.h"
+
 auto width_ = std::size_t{0};
 
 auto make_vector() noexcept -> LicenseData;
 auto make_vector() noexcept -> LicenseData
 {
     auto output = LicenseData{
-        {"Metier", R"~!~(@METIER_LICENSE_TEXT@)~!~"},
-        {"Boost", R"~!~(@BOOST_LICENSE_TEXT@)~!~"},
-        {"libsecp256k1", R"~!~(@SECP256K1_LICENSE_TEXT@)~!~"},
-        {"libsodium", R"~!~(@SODIUM_LICENSE_TEXT@)~!~"},
-        {"LMDB", R"~!~(@LMDB_LICENSE_TEXT@)~!~"},
-        {"OpenSSL", R"~!~(@OPENSSL_LICENSE_TEXT@)~!~"},
-        {"Qt", R"~!~(@QT_LICENSE_TEXT@)~!~"},
-        {"ZeroMQ", R"~!~(@ZMQ_LICENSE_TEXT@)~!~"},
+        {"Metier",
+         std::string{reinterpret_cast<const char*>(LICENSE), LICENSE_len}},
+        {"Boost",
+         std::string{reinterpret_cast<const char*>(boost_txt), boost_txt_len}},
+        {"libsecp256k1",
+         std::string{
+             reinterpret_cast<const char*>(secp256k1_txt), secp256k1_txt_len}},
+        {"libsodium",
+         std::string{
+             reinterpret_cast<const char*>(sodium_txt), sodium_txt_len}},
+        {"LMDB",
+         std::string{reinterpret_cast<const char*>(lmdb_txt), lmdb_txt_len}},
+        {"OpenSSL",
+         std::string{
+             reinterpret_cast<const char*>(openssl_txt), openssl_txt_len}},
+        {"Qt", std::string{reinterpret_cast<const char*>(qt_txt), qt_txt_len}},
+        {"ZeroMQ",
+         std::string{
+             reinterpret_cast<const char*>(libzmq_txt), libzmq_txt_len}},
     };
     const auto& ot = opentxs::LicenseData();
     std::copy(ot.begin(), ot.end(), std::back_inserter(output));

@@ -17,6 +17,6 @@ add_library(
 )
 target_link_libraries(
   metier-models
-  PUBLIC Qt5::Core Qt5::Widgets
+  PUBLIC Qt5::Core Qt5::Widgets protobuf::libprotobuf-lite
   PRIVATE metier-license opentxs
 )
