@@ -35,7 +35,6 @@ target_link_libraries(
     metier-ui
     opentxs
     qr-code-generator
-    protobuf::libprotobuf-lite
     Qt5::Core
     Qt5::Network
     Qt5::Widgets
@@ -43,12 +42,18 @@ target_link_libraries(
     ${Boost_LIBRARIES}
 )
 
-if(CMAKE_DL_LIBS)
-  target_link_libraries(metier PRIVATE ${CMAKE_DL_LIBS})
-endif()
+if(METIER_BUNDLED_OPENTXS)
+  opentxs_link_target("metier")
+else()
+  target_link_libraries(metier PRIVATE protobuf::libprotobuf-lite)
 
-if(LIB_RT)
-  target_link_libraries(metier PRIVATE ${LIB_RT})
+  if(CMAKE_DL_LIBS)
+    target_link_libraries(metier PRIVATE ${CMAKE_DL_LIBS})
+  endif()
+
+  if(LIB_RT)
+    target_link_libraries(metier PRIVATE ${LIB_RT})
+  endif()
 endif()
 
 install(TARGETS metier)
