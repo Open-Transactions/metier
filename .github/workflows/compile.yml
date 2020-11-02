@@ -18,7 +18,7 @@ jobs:
             zip_command: 'zip metier.zip metier'
           - platform: 'windows-2019'
             vcpkg_triplet: 'x64-windows-static'
-            cmake_extra: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded'
+            cmake_extra: '-DCMAKE_MSVC_RUNTIME_LIBRARY="" -DCMAKE_C_FLAGS="/MTd /Zi" -DCMAKE_CXX_FLAGS="/MTd /EHsc /Zi" -DCMAKE_EXE_LINKER_FLAGS="/NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:msvcrtd.lib" -DCMAKE_STATIC_LINKER_FLAGS="/NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:msvcrtd.lib"'
             zip_command: '7z a -tzip metier.zip metier.exe'
     runs-on: ${{ matrix.platform }}
     steps:
@@ -34,12 +34,12 @@ jobs:
       with:
         cmake-version: '3.18.4'
     - name: Run vcpkg
-      uses: lukka/run-vcpkg@v4
+      uses: lukka/run-vcpkg@v5
       with:
         vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports @${{ github.workspace }}/deps/vcpkg.txt'
         vcpkgDirectory: '${{ github.workspace }}/deps/vcpkg'
     - name: Install Qt (vcpkg)
-      uses: lukka/run-vcpkg@v4
+      uses: lukka/run-vcpkg@v5
       if: matrix.platform != 'ubuntu-20.04'
       with:
         vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports qt5-base'
@@ -52,7 +52,7 @@ jobs:
         useVcpkgToolchainFile: true
         vcpkgTriplet: '${{ matrix.vcpkg_triplet }}'
         buildDirectory: '${{ github.workspace }}/build'
-        cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Release -DOT_USE_VCPKG_TARGETS=ON -DMETIER_BUNDLED_OPENTXS=ON ${{ matrix.cmake_extra }}'
+        cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Debug -DMETIER_PEDANTIC_BUILD=OFF -DOT_USE_VCPKG_TARGETS=ON -DMETIER_BUNDLED_OPENTXS=ON ${{ matrix.cmake_extra }}'
         buildWithCMake: true
         buildWithCMakeArgs: '-- -k 0'
     - name: 'Package'
