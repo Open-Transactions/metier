@@ -46,7 +46,7 @@ BlockchainChooser::BlockchainChooser(QWidget* parent, OTWrap& ot)
         const auto width = util::line_width(
             *this, longestBlockchainName + enabled_column_width_ + 8);
         const auto height = util::line_height(*this);
-        setMinimumSize(width, height * 20);
+        setMinimumSize(width, height * 24);
     }
 
     auto* ok = ui_->buttons->button(QDialogButtonBox::Ok);
