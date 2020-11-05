@@ -12,7 +12,9 @@
 #include "widgets/blockchainchooser.hpp"
 #include "widgets/firstrun.hpp"
 #include "widgets/mainwindow.hpp"
+#include "widgets/newseed.hpp"
 #include "widgets/profilealias.hpp"
+#include "widgets/recoverwallet.hpp"
 
 namespace metier
 {
@@ -22,6 +24,8 @@ struct App::Imp {
     std::atomic_bool first_run_complete_;
     std::unique_ptr<OTWrap> ot_;
     std::unique_ptr<widget::FirstRun> first_run_;
+    std::unique_ptr<widget::NewSeed> new_seed_;
+    std::unique_ptr<widget::RecoverWallet> recover_wallet_;
     std::unique_ptr<widget::ProfileAlias> profile_alias_;
     std::unique_ptr<widget::BlockchainChooser> blockchains_;
     std::unique_ptr<widget::MainWindow> main_window_;
@@ -30,6 +34,8 @@ struct App::Imp {
         : first_run_complete_(false)
         , ot_(std::make_unique<OTWrap>(parent))
         , first_run_(std::make_unique<widget::FirstRun>(nullptr))
+        , new_seed_(std::make_unique<widget::NewSeed>(*ot_))
+        , recover_wallet_(std::make_unique<widget::RecoverWallet>(*ot_))
         , profile_alias_(std::make_unique<widget::ProfileAlias>(nullptr))
         , blockchains_(
               std::make_unique<widget::BlockchainChooser>(nullptr, *ot_))

@@ -11,7 +11,7 @@
 #include <utility>
 
 #include "models/blockchainchooser.hpp"
-#include "otwrap_imp.hpp"
+#include "otwrap/imp.hpp"
 #include "util/convertblockchain.hpp"
 
 namespace metier
@@ -102,15 +102,15 @@ auto OTWrap::convertBlockchainAccountID(const QString& id) -> int
     return static_cast<int>(imp_.api_.UI().BlockchainAccountToChain(accountID));
 }
 
+auto OTWrap::createNewSeed(const int type, const int lang, const int strength)
+    -> QStringList
+{
+    return imp_.createNewSeed(type, lang, strength);
+}
+
 auto OTWrap::createNym(QString alias) -> void
 {
     imp_.createNym(alias);
-    checkStartupConditions();
-}
-
-auto OTWrap::createSeed() -> void
-{
-    imp_.createNewSeed();
     checkStartupConditions();
 }
 
@@ -124,9 +124,42 @@ auto OTWrap::enabledCurrencyCount() -> int
     return imp_.scanBlockchains().first;
 }
 
+auto OTWrap::importSeed(int type, int lang, QString words) -> void
+{
+    imp_.importSeed(type, lang, words);
+    checkStartupConditions();
+}
+
 auto OTWrap::longestBlockchainName() -> int
 {
     return imp_.scanBlockchains().second;
+}
+
+auto OTWrap::longestSeedWord() -> int { return imp_.longest_seed_word_; }
+
+auto OTWrap::seedLanguageModel(const int type) -> model::SeedLanguage*
+{
+    return imp_.seedLanguageModel(type);
+}
+
+auto OTWrap::seedSizeModel(const int type) -> model::SeedSize*
+{
+    return imp_.seedSizeModel(type);
+}
+
+auto OTWrap::seedTypeModel() -> model::SeedType*
+{
+    return imp_.seed_type_.get();
+}
+
+auto OTWrap::seedWordValidator(const int type, const int lang) -> QValidator*
+{
+    return imp_.seedWordValidator(type, lang);
+}
+
+auto OTWrap::wordCount(const int type, const int strength) -> int
+{
+    return imp_.wordCount(type, strength);
 }
 
 OTWrap::~OTWrap() = default;

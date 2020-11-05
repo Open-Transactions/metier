@@ -9,15 +9,19 @@ set(cxx-sources
     "firstrun.cpp"
     "licenses.cpp"
     "mainwindow.cpp"
+    "newseed.cpp"
     "profilealias.cpp"
     "qrtoolbutton.cpp"
     "receivingaddress.cpp"
+    "recoverwallet.cpp"
 )
 set(cxx-headers
     "blockchainsend/imp.hpp"
     "mainwindow/chaintoolboxmanager.hpp"
     "mainwindow/imp.hpp"
     "mainwindow/syncprogress.hpp"
+    "newseed/imp.hpp"
+    "recoverwallet/imp.hpp"
 )
 set(moc-headers
     "blockchainchooser.hpp"
@@ -25,9 +29,11 @@ set(moc-headers
     "firstrun.hpp"
     "licenses.hpp"
     "mainwindow.hpp"
+    "newseed.hpp"
     "profilealias.hpp"
     "qrtoolbutton.hpp"
     "receivingaddress.hpp"
+    "recoverwallet.hpp"
 )
 qt5_wrap_cpp(moc-sources "${moc-headers}")
 

@@ -24,6 +24,7 @@ private slots:
     void displayFirstRun();
     void displayMainWindow();
     void displayNamePrompt();
+    void displayNewSeed();
     void displayRecovery();
 
 public:

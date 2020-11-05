@@ -7,8 +7,11 @@
 
 #include <opentxs/opentxs.hpp>
 #include <algorithm>
+#include <cctype>
 #include <iterator>
+#include <map>
 #include <string>
+#include <type_traits>
 
 #include "boost.h"
 #include "libzmq.h"

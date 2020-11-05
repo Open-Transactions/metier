@@ -20,6 +20,10 @@
 
 #include "models/accountactivity.hpp"
 #include "models/blockchainchooser.hpp"
+#include "models/seedlang.hpp"
+#include "models/seedsize.hpp"
+#include "models/seedtype.hpp"
+#include "otwrap/validateseed.hpp"
 #include "util/scopeguard.hpp"
 
 namespace ot = opentxs;
@@ -92,13 +96,37 @@ struct OTWrap::Imp {
     const opentxs::ui::BlockchainSelection& selector_model_native_;
     const std::string seed_id_;
     const ot::OTNymID nym_id_;
+    const int longest_seed_word_;
     mutable std::mutex lock_;
     mutable EnabledChains enabled_chains_;
+    std::unique_ptr<model::SeedType> seed_type_;
+    std::map<int, std::unique_ptr<model::SeedLanguage>> seed_language_;
+    std::map<int, std::unique_ptr<model::SeedSize>> seed_size_;
     std::unique_ptr<model::BlockchainChooser> blockchain_chooser_mainnet_;
     std::unique_ptr<model::BlockchainChooser> blockchain_chooser_testnet_;
     std::map<ot::OTIdentifier, std::unique_ptr<model::AccountActivity>>
         account_activity_proxy_models_;
+    std::map<
+        ot::crypto::SeedStyle,
+        std::map<ot::crypto::Language, std::unique_ptr<validate::SeedWord>>>
+        seed_validators_;
 
+    template <typename OutputType, typename InputType>
+    static auto transform(const InputType& data) noexcept -> OutputType
+    {
+        auto output = OutputType{};
+        std::transform(
+            data.begin(), data.end(), std::back_inserter(output), [
+            ](const auto& in) -> auto {
+                return std::make_pair(in.second, static_cast<int>(in.first));
+            });
+        std::sort(output.begin(), output.end());
+
+        return output;
+    }
+
+    auto needNym() const noexcept { return 0 == api_.Wallet().LocalNymCount(); }
+    auto needSeed() const noexcept { return api_.Storage().SeedList().empty(); }
     auto scanBlockchains() const noexcept -> std::pair<int, int>
     {
         auto enabledVector = EnabledChains::Vector{};
@@ -126,8 +154,6 @@ struct OTWrap::Imp {
 
         return output;
     }
-    auto needNym() const noexcept { return 0 == api_.Wallet().LocalNymCount(); }
-    auto needSeed() const noexcept { return api_.Storage().SeedList().empty(); }
     auto validateBlockchains() const noexcept
     {
         auto enabledVector = EnabledChains::Vector{};
@@ -315,7 +341,10 @@ struct OTWrap::Imp {
 
         id.Assign(nym.ID());
     }
-    auto createNewSeed() noexcept -> void
+    auto createNewSeed(
+        const int type,
+        const int lang,
+        const int strength) noexcept -> QStringList
     {
         ot::Lock lock(lock_);
         auto success{false};
@@ -323,14 +352,71 @@ struct OTWrap::Imp {
         auto postcondition = ScopeGuard{[&]() {
             if (false == success) { id = {}; }
         }};
+        const auto& seeds = api_.Seeds();
+
+        OT_ASSERT(id.empty());
+        OT_ASSERT(seeds.DefaultSeed().empty());
+
+        const auto invalid = [](const int in) -> auto
+        {
+            return (0 > in) || (std::numeric_limits<std::uint8_t>::max() < in);
+        };
+
+        if (invalid(type) || invalid(lang) || invalid(strength)) { return {}; }
+
         auto reason =
             api_.Factory().PasswordPrompt("Generate a new Metier wallet seed");
-        auto index = std::uint32_t{0};
+        id = seeds.NewSeed(
+            static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type)),
+            static_cast<ot::crypto::Language>(static_cast<std::uint8_t>(lang)),
+            static_cast<ot::crypto::SeedStrength>(
+                static_cast<std::size_t>(strength)),
+            reason);
+
+        if (id.empty()) { return {}; }
+
         auto notUsed{false};
-        api_.Seeds().Seed(id, index, reason);
+        const auto config = api_.Config().Set_str(
+            ot::String::Factory(QApplication::applicationName().toStdString()),
+            ot::String::Factory(seed_id_key),
+            ot::String::Factory(id),
+            notUsed);
+
+        if (false == config) { return {}; }
+        if (false == api_.Config().Save()) { return {}; }
+
+        success = true;
+        const auto words = QString{seeds.Words(reason, id).c_str()};
+
+        return words.split(' ', Qt::SkipEmptyParts);
+    }
+    auto importSeed(int type, int lang, QString input) -> void
+    {
+        ot::Lock lock(lock_);
+        auto success{false};
+        auto& id = const_cast<std::string&>(seed_id_);
+        auto postcondition = ScopeGuard{[&]() {
+            if (false == success) { id = {}; }
+        }};
+        const auto& seeds = api_.Seeds();
+
+        OT_ASSERT(id.empty());
+        OT_ASSERT(seeds.DefaultSeed().empty());
+
+        auto reason =
+            api_.Factory().PasswordPrompt("Import a Metier wallet seed");
+        const auto words = api_.Factory().SecretFromText(input.toStdString());
+        const auto passphrase = api_.Factory().Secret(0);
+        id = seeds.ImportSeed(
+            words,
+            passphrase,
+            static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type)),
+            static_cast<ot::crypto::Language>(static_cast<std::uint8_t>(lang)),
+            reason);
 
         if (id.empty()) { return; }
 
+        auto notUsed{false};
         const auto config = api_.Config().Set_str(
             ot::String::Factory(QApplication::applicationName().toStdString()),
             ot::String::Factory(seed_id_key),
@@ -342,6 +428,80 @@ struct OTWrap::Imp {
 
         success = true;
     }
+    auto seedLanguageModel(const int type) -> model::SeedLanguage*
+    {
+        ot::Lock lock(lock_);
+        {
+            auto it = seed_language_.find(type);
+
+            if (seed_language_.end() != it) { return it->second.get(); }
+        }
+
+        if ((0 > type) || (std::numeric_limits<std::uint8_t>::max() < type)) {
+
+            return nullptr;
+        }
+
+        const auto style =
+            static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type));
+
+        auto [it, added] = seed_language_.try_emplace(
+            type,
+            std::make_unique<model::SeedLanguage>(
+                transform<model::SeedLanguage::Data>(
+                    api_.Seeds().AllowedLanguages(style))));
+
+        return it->second.get();
+    }
+    auto seedSizeModel(const int type) -> model::SeedSize*
+    {
+        ot::Lock lock(lock_);
+        {
+            auto it = seed_size_.find(type);
+
+            if (seed_size_.end() != it) { return it->second.get(); }
+        }
+
+        if ((0 > type) || (std::numeric_limits<std::uint8_t>::max() < type)) {
+
+            return nullptr;
+        }
+
+        const auto style =
+            static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type));
+
+        auto [it, added] = seed_size_.try_emplace(
+            type,
+            std::make_unique<model::SeedSize>(transform<model::SeedSize::Data>(
+                api_.Seeds().AllowedSeedStrength(style))));
+
+        return it->second.get();
+    }
+    auto seedWordValidator(const int type, const int lang) -> QValidator*
+    {
+        const auto style =
+            static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type));
+        const auto language =
+            static_cast<ot::crypto::Language>(static_cast<std::uint8_t>(lang));
+        ot::Lock lock(lock_);
+        auto& output = seed_validators_[style][language];
+
+        if (false == bool(output)) {
+            output =
+                std::make_unique<validate::SeedWord>(api_, style, language);
+        }
+
+        return output.get();
+    }
+    auto wordCount(const int type, const int strength) -> int
+    {
+        const auto output = api_.Seeds().WordCount(
+            static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type)),
+            static_cast<ot::crypto::SeedStrength>(
+                static_cast<std::size_t>(strength)));
+
+        return static_cast<int>(output);
+    }
 
     Imp(QApplication& parent, OTWrap& me)
         : ot_(ot::InitContext(make_args(parent)))
@@ -349,13 +509,35 @@ struct OTWrap::Imp {
         , selector_model_native_(api_.UI().BlockchainSelection())
         , seed_id_()
         , nym_id_(api_.Factory().NymID())
+        , longest_seed_word_([&]() -> auto {
+            const auto& api = api_.Seeds();
+            auto output = int{};
+            const auto types = api.AllowedSeedTypes();
+
+            for (const auto& [style, description] : types) {
+                const auto langs = api.AllowedLanguages(style);
+
+                for (const auto& [lang, name] : langs) {
+                    output = std::max(
+                        output, static_cast<int>(api.LongestWord(style, lang)));
+                }
+            }
+
+            return output;
+        }())
         , lock_()
         , enabled_chains_()
+        , seed_type_(std::make_unique<model::SeedType>(
+              transform<model::SeedType::Data>(
+                  api_.Seeds().AllowedSeedTypes())))
+        , seed_language_()
+        , seed_size_()
         , blockchain_chooser_mainnet_(
               std::make_unique<model::BlockchainChooser>(me, false))
         , blockchain_chooser_testnet_(
               std::make_unique<model::BlockchainChooser>(me, true))
         , account_activity_proxy_models_()
+        , seed_validators_()
     {
         auto* blockchainChooser = api_.UI().BlockchainSelectionQt();
         blockchain_chooser_mainnet_->setSourceModel(blockchainChooser);

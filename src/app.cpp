@@ -14,7 +14,9 @@
 #include "widgets/blockchainchooser.hpp"
 #include "widgets/firstrun.hpp"
 #include "widgets/mainwindow.hpp"
+#include "widgets/newseed.hpp"
 #include "widgets/profilealias.hpp"
+#include "widgets/recoverwallet.hpp"
 
 namespace metier
 {
@@ -33,7 +35,7 @@ App::App(int& argc, char** argv) noexcept
     connect(ot, &OTWrap::needProfileName, this, &App::displayNamePrompt);
     connect(ot, &OTWrap::needBlockchain, this, &App::displayBlockchainChooser);
     connect(ot, &OTWrap::readyForMainWindow, this, &App::displayMainWindow);
-    connect(first, &widget::FirstRun::wantNew, ot, &OTWrap::createSeed);
+    connect(first, &widget::FirstRun::wantNew, this, &App::displayNewSeed);
     connect(first, &widget::FirstRun::wantOld, this, &App::displayRecovery);
     connect(alias, &widget::ProfileAlias::gotAlias, ot, &OTWrap::createNym);
     connect(ok, &QPushButton::clicked, this, &App::startup);
@@ -63,9 +65,14 @@ auto App::displayNamePrompt() -> void
     util::Focuser(imp_.profile_alias_.get()).show();
 }
 
+auto App::displayNewSeed() -> void
+{
+    util::Focuser(imp_.new_seed_.get()).show();
+}
+
 auto App::displayRecovery() -> void
 {
-    // TODO show a dialog that collects the 12 - 24 word recovery seed
+    util::Focuser(imp_.recover_wallet_.get()).show();
 }
 
 auto App::Get(int argc, char* argv[]) noexcept -> App*
