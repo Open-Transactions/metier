@@ -3,9 +3,23 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-set(cxx-sources "accountactivity.cpp" "blockchainchooser.cpp" "licenses.cpp")
+set(cxx-sources
+    "accountactivity.cpp"
+    "blockchainchooser.cpp"
+    "licenses.cpp"
+    "seedlang.cpp"
+    "seedsize.cpp"
+    "seedtype.cpp"
+)
 set(cxx-headers "")
-set(moc-headers "accountactivity.hpp" "blockchainchooser.hpp" "licenses.hpp")
+set(moc-headers
+    "accountactivity.hpp"
+    "blockchainchooser.hpp"
+    "licenses.hpp"
+    "seedlang.hpp"
+    "seedsize.hpp"
+    "seedtype.hpp"
+)
 qt5_wrap_cpp(moc-sources "${moc-headers}")
 
 add_library(

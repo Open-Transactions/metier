@@ -10,9 +10,11 @@ qt5_wrap_ui(
   "firstrun.ui"
   "licenses.ui"
   "mainwindow.ui"
+  "newseed.ui"
   "profilealias.ui"
   "qrtoolbutton.ui"
   "receivingaddress.ui"
+  "recoverwallet.ui"
 )
 
 add_custom_target(metier-ui-generated ALL SOURCES "${METIER_UI}")

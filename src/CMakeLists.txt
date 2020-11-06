@@ -11,7 +11,12 @@ add_subdirectory(util)
 add_subdirectory(widgets)
 
 set(cxx-sources "app.cpp" "main.cpp" "otwrap.cpp")
-set(cxx-headers "app_imp.hpp" "otwrap_imp.hpp" "util/scopeguard.hpp")
+set(cxx-headers
+    "app_imp.hpp"
+    "otwrap/imp.hpp"
+    "otwrap/validateseed.hpp"
+    "util/scopeguard.hpp"
+)
 set(moc-headers "app.hpp" "otwrap.hpp")
 qt5_wrap_cpp(moc-sources "${moc-headers}")
 qt5_add_resources(rcc-sources "resources.qrc")

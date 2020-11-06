@@ -7,17 +7,22 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QVector>
 #include <memory>
 
 class QAbstractItemModel;
 class QApplication;
+class QValidator;
 
 namespace metier
 {
 namespace model
 {
 class AccountActivity;
+class SeedLanguage;
+class SeedSize;
+class SeedType;
 }  // namespace model
 }  // namespace metier
 
@@ -40,7 +45,7 @@ public slots:
     void checkChainCount();
     void checkStartupConditions();
     void createNym(QString alias);
-    void createSeed();
+    void importSeed(int type, int lang, QString words);
 
 public:
     using EnabledBlockchains = QVector<int>;
@@ -52,9 +57,17 @@ public:
     Q_INVOKABLE QAbstractItemModel* accountListModel();
     Q_INVOKABLE QAbstractItemModel* blockchainChooserModel(const bool testnet);
     Q_INVOKABLE int convertBlockchainAccountID(const QString& id);
+    Q_INVOKABLE QStringList
+    createNewSeed(const int type, const int lang, const int strength);
     Q_INVOKABLE int enabledCurrencyCount();
     Q_INVOKABLE EnabledBlockchains enabledBlockchains();
     Q_INVOKABLE int longestBlockchainName();
+    Q_INVOKABLE int longestSeedWord();
+    Q_INVOKABLE model::SeedLanguage* seedLanguageModel(const int type);
+    Q_INVOKABLE model::SeedSize* seedSizeModel(const int type);
+    Q_INVOKABLE model::SeedType* seedTypeModel();
+    Q_INVOKABLE QValidator* seedWordValidator(const int type, const int lang);
+    Q_INVOKABLE int wordCount(const int type, const int strength);
 
     explicit OTWrap(QApplication& parent);
 
