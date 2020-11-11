@@ -23,6 +23,7 @@
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
+#include "otwrap/metiercallback.hpp"
 #include "otwrap/validateseed.hpp"
 #include "util/scopeguard.hpp"
 
@@ -91,6 +92,8 @@ struct OTWrap::Imp {
         Vector enabled_{};
     };
 
+    MetierCallback callback_;
+    opentxs::OTCaller caller_;
     const opentxs::api::Context& ot_;
     const opentxs::api::client::Manager& api_;
     const opentxs::ui::BlockchainSelection& selector_model_native_;
@@ -504,7 +507,11 @@ struct OTWrap::Imp {
     }
 
     Imp(QApplication& parent, OTWrap& me)
-        : ot_(ot::InitContext(make_args(parent)))
+        : callback_()
+        , caller_()
+        , ot_(ot::InitContext(make_args(parent),
+          [this]() -> auto { caller_.SetCallback(&callback_);
+                             return &caller_; }()))
         , api_(ot_.StartClient(ot_args_, 0))
         , selector_model_native_(api_.UI().BlockchainSelection())
         , seed_id_()

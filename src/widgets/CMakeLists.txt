@@ -6,6 +6,7 @@
 set(cxx-sources
     "blockchainchooser.cpp"
     "blockchainsend.cpp"
+    "enterpassphrase.cpp"
     "firstrun.cpp"
     "licenses.cpp"
     "mainwindow.cpp"
@@ -17,6 +18,7 @@ set(cxx-sources
 )
 set(cxx-headers
     "blockchainsend/imp.hpp"
+    "enterpassphrase/imp.hpp"
     "mainwindow/chaintoolboxmanager.hpp"
     "mainwindow/imp.hpp"
     "mainwindow/syncprogress.hpp"
@@ -26,6 +28,7 @@ set(cxx-headers
 set(moc-headers
     "blockchainchooser.hpp"
     "blockchainsend.hpp"
+    "enterpassphrase.hpp"
     "firstrun.hpp"
     "licenses.hpp"
     "mainwindow.hpp"

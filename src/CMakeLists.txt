@@ -10,10 +10,11 @@ add_subdirectory(ui)
 add_subdirectory(util)
 add_subdirectory(widgets)
 
-set(cxx-sources "app.cpp" "main.cpp" "otwrap.cpp")
+set(cxx-sources "app.cpp" "main.cpp" "otwrap.cpp" "otwrap/metiercallback.cpp")
 set(cxx-headers
     "app_imp.hpp"
     "otwrap/imp.hpp"
+    "otwrap/metiercallback.hpp"
     "otwrap/validateseed.hpp"
     "util/scopeguard.hpp"
 )
