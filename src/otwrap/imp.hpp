@@ -25,6 +25,7 @@
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
+#include "otwrap/metiercallback.hpp"
 #include "util/claim.hpp"
 #include "util/convertblockchain.hpp"
 #include "util/scopeguard.hpp"
@@ -137,6 +138,8 @@ struct OTWrap::Imp {
         Vector enabled_{};
     };
 
+    MetierCallback callback_;
+    opentxs::OTCaller caller_;
     const opentxs::api::Context& ot_;
     const opentxs::api::client::Manager& api_;
     const std::string seed_id_;
@@ -584,7 +587,14 @@ struct OTWrap::Imp {
     }
 
     Imp(QGuiApplication& parent, OTWrap& me, int& argc, char** argv)
-        : ot_(ot::InitContext(make_args(parent, argc, argv)))
+        : callback_()
+        , caller_()
+        , ot_(ot::InitContext(
+              make_args(parent, argc, argv),
+              [this]() -> auto {
+                  caller_.SetCallback(&callback_);
+                  return &caller_;
+              }()))
         , api_(ot_.StartClient(ot_args_, 0))
         , seed_id_()
         , nym_id_(api_.Factory().NymID())

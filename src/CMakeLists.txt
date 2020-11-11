@@ -14,8 +14,13 @@ if(NOT METIER_QML_INTERFACE)
   add_subdirectory(widgets)
 endif()
 
-set(cxx-sources "main.cpp" "otwrap.cpp")
-set(cxx-headers "otwrap/imp.hpp")
+set(cxx-sources
+    "main.cpp"
+    "otwrap.cpp"
+    "otwrap/metiercallback.cpp"
+)
+set(cxx-headers "otwrap/imp.hpp" "otwrap/metiercallback.hpp")
+
 set(moc-headers "app.hpp" "otwrap.hpp")
 qt5_wrap_cpp(moc-sources "${moc-headers}")
 set(object-deps
