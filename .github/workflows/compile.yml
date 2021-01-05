@@ -22,9 +22,11 @@ jobs:
       with:
         fetch-depth: '0'
         submodules: 'recursive'
-    - name: Install Qt (system package)
+    - name: Install extra dependencies
       if: matrix.platform == 'ubuntu-20.04'
-      run: 'sudo apt-get install -y qtbase5-dev qtdeclarative5-dev'
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y autoconf autopoint curl g++ git gperf libgl1-mesa-dev libglu1-mesa-dev libtool libx11-dev libx11-xcb-dev libxcb-glx0-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-shape0-dev libxcb-shm0-dev libxcb-sync0-dev libxcb-xfixes0-dev libxcb-xinerama0-dev libxext-dev libxi-dev libxkbcommon-x11-dev libxrender-dev make pkg-config python3 tar unzip zip
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.4
       with:
@@ -32,13 +34,7 @@ jobs:
     - name: Run vcpkg
       uses: lukka/run-vcpkg@v5
       with:
-        vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports @${{ github.workspace }}/deps/vcpkg.txt'
-        vcpkgDirectory: '${{ github.workspace }}/deps/vcpkg'
-    - name: Install Qt (vcpkg)
-      uses: lukka/run-vcpkg@v5
-      if: matrix.platform != 'ubuntu-20.04'
-      with:
-        vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports qt5-base'
+        vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports  --overlay-triplets=${{ github.workspace }}/deps/opentxs/vcpkg/triplets @${{ github.workspace }}/deps/vcpkg.txt'
         vcpkgDirectory: '${{ github.workspace }}/deps/vcpkg'
     - name: 'Compile'
       uses: lukka/run-cmake@v3
