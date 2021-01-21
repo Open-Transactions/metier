@@ -12,6 +12,11 @@
 
 class QModelIndex;
 
+namespace opentxs::api::client
+{
+class UI;
+}
+
 namespace metier::model
 {
 class BlockchainChooser final : public QSortFilterProxyModel
@@ -33,7 +38,10 @@ public:
     auto setData(const QModelIndex& index, const QVariant& value, int role)
         -> bool final;
 
-    BlockchainChooser(QObject& parent, const bool testnetMode);
+    BlockchainChooser(
+        QObject& parent,
+        const opentxs::api::client::UI& ui,
+        const bool testnetMode);
 
 private:
     using ot_super = QSortFilterProxyModel;
@@ -43,8 +51,6 @@ private:
     auto filterAcceptsColumn(
         int source_column,
         const QModelIndex& source_parent) const -> bool final;
-    auto filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
-        -> bool final;
 
     BlockchainChooser(const BlockchainChooser&) = delete;
     BlockchainChooser(BlockchainChooser&&) = delete;

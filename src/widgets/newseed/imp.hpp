@@ -173,5 +173,9 @@ struct NewSeed::Imp {
 
         reflowDialog(4);
     }
+    Imp(const Imp&) = delete;
+    Imp(Imp&&) = delete;
+    auto operator=(const Imp&) -> Imp& = delete;
+    auto operator=(Imp&&) -> Imp& = delete;
 };
 }  // namespace metier::widget

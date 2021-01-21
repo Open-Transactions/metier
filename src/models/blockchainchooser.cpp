@@ -12,10 +12,16 @@ using OTModel = opentxs::ui::BlockchainSelectionQt;
 
 namespace metier::model
 {
-BlockchainChooser::BlockchainChooser(QObject& parent, const bool testnetMode)
+BlockchainChooser::BlockchainChooser(
+    QObject& parent,
+    const opentxs::api::client::UI& ui,
+    const bool testnetMode)
     : ot_super(&parent)
     , testnetMode_(testnetMode)
 {
+    const auto type = testnetMode ? opentxs::ui::Blockchains::Test
+                                  : opentxs::ui::Blockchains::Main;
+    setSourceModel(ui.BlockchainSelectionQt(type));
 }
 
 auto BlockchainChooser::data(const QModelIndex& index, int role) const
@@ -59,23 +65,6 @@ auto BlockchainChooser::filterAcceptsColumn(
     return (
         source_column == OTModel::NameColumn ||
         source_column == OTModel::EnabledColumn);
-}
-
-auto BlockchainChooser::filterAcceptsRow(
-    int sourceRow,
-    const QModelIndex& sourceParent) const -> bool
-{
-    const auto* pSourceModel = sourceModel();
-
-    OT_ASSERT(nullptr != pSourceModel)
-
-    const auto indexTestnet =
-        pSourceModel->index(sourceRow, OTModel::TestnetColumn, sourceParent);
-    const auto qvarTestnet = pSourceModel->data(indexTestnet, Qt::DisplayRole);
-    const auto testnetMode =
-        qvarTestnet.isValid() ? qvarTestnet.toBool() : false;
-
-    return (testnetMode == testnetMode_);
 }
 
 auto BlockchainChooser::flags(const QModelIndex& index) const -> Qt::ItemFlags

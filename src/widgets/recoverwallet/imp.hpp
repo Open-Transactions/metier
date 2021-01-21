@@ -196,6 +196,7 @@ struct RecoverWallet::Imp {
     Imp(QDialog* parent, OTWrap& ot) noexcept
         : ot_(ot)
         , parent_(parent)
+        , lock_()
         , ui_(std::make_unique<Ui::RestoreSeed>())
         , labels_()
         , texts_()
@@ -248,5 +249,9 @@ struct RecoverWallet::Imp {
                 &OTWrap::checkStartupConditions);
         }
     }
+    Imp(const Imp&) = delete;
+    Imp(Imp&&) = delete;
+    auto operator=(const Imp&) -> Imp& = delete;
+    auto operator=(Imp&&) -> Imp& = delete;
 };
 }  // namespace metier::widget
