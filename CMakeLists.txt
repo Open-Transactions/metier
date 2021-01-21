@@ -88,6 +88,7 @@ find_package(
 find_package(OpenSSL 1.0.1 REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(Qt5 COMPONENTS Core Network Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Qml)
 find_package(ZLIB REQUIRED)
 
 if(NOT METIER_BUNDLED_OPENTXS)

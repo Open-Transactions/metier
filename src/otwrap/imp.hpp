@@ -506,7 +506,8 @@ struct OTWrap::Imp {
     Imp(QApplication& parent, OTWrap& me)
         : ot_(ot::InitContext(make_args(parent)))
         , api_(ot_.StartClient(ot_args_, 0))
-        , selector_model_native_(api_.UI().BlockchainSelection())
+        , selector_model_native_(
+              api_.UI().BlockchainSelection(ot::ui::Blockchains::All))
         , seed_id_()
         , nym_id_(api_.Factory().NymID())
         , longest_seed_word_([&]() -> auto {
@@ -533,17 +534,13 @@ struct OTWrap::Imp {
         , seed_language_()
         , seed_size_()
         , blockchain_chooser_mainnet_(
-              std::make_unique<model::BlockchainChooser>(me, false))
+              std::make_unique<model::BlockchainChooser>(me, api_.UI(), false))
         , blockchain_chooser_testnet_(
-              std::make_unique<model::BlockchainChooser>(me, true))
+              std::make_unique<model::BlockchainChooser>(me, api_.UI(), true))
         , account_activity_proxy_models_()
         , seed_validators_()
     {
-        auto* blockchainChooser = api_.UI().BlockchainSelectionQt();
-        blockchain_chooser_mainnet_->setSourceModel(blockchainChooser);
-        blockchain_chooser_testnet_->setSourceModel(blockchainChooser);
         selector_model_native_.SetCallback([&me]() { me.checkChainCount(); });
-        // TODO clear the above callback in the destructor for this class
     }
 };
 }  // namespace metier

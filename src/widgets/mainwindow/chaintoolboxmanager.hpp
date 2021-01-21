@@ -246,6 +246,6 @@ private:
     ChainToolboxManager(const ChainToolboxManager&) = delete;
     ChainToolboxManager(ChainToolboxManager&&) = delete;
     auto operator=(const ChainToolboxManager&) -> ChainToolboxManager& = delete;
-    auto operator=(ChainToolboxManager &&) -> ChainToolboxManager& = delete;
+    auto operator=(ChainToolboxManager&&) -> ChainToolboxManager& = delete;
 };
 }  // namespace metier::widget
