@@ -12,7 +12,7 @@
 #include <memory>
 
 class QAbstractItemModel;
-class QApplication;
+class QGuiApplication;
 class QValidator;
 
 namespace metier
@@ -69,7 +69,7 @@ public:
     Q_INVOKABLE QValidator* seedWordValidator(const int type, const int lang);
     Q_INVOKABLE int wordCount(const int type, const int strength);
 
-    explicit OTWrap(QApplication& parent);
+    explicit OTWrap(QGuiApplication& parent);
 
     ~OTWrap() final;
 

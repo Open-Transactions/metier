@@ -28,7 +28,7 @@ public:
     void dialog();
 
     ReceivingAddress(QWidget* parent, QString address);
-    ~ReceivingAddress();
+    ~ReceivingAddress() final;
 
 private:
     std::unique_ptr<Ui::receivingAddress> ui_;

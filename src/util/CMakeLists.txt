@@ -4,7 +4,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 set(cxx-sources "focuser.cpp" "resizer.cpp")
-set(cxx-headers "focuser.hpp" "resizer.hpp" "scopeguard.hpp")
+set(cxx-headers
+    "convertblockchain.hpp"
+    "focuser.hpp"
+    "resizer.hpp"
+    "scopeguard.hpp"
+)
 
 add_library(metier-util OBJECT "${cxx-sources}" "${cxx-headers}")
 target_link_libraries(metier-util PRIVATE Qt5::Widgets)

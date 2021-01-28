@@ -6,39 +6,23 @@
 #include "app.hpp"  // IWYU pragma: associated
 
 #include <otwrap.hpp>
-#include <QPushButton>
 #include <mutex>
 
-#include "app_imp.hpp"
-#include "util/focuser.hpp"
-#include "widgets/blockchainchooser.hpp"
-#include "widgets/firstrun.hpp"
-#include "widgets/mainwindow.hpp"
-#include "widgets/newseed.hpp"
-#include "widgets/profilealias.hpp"
-#include "widgets/recoverwallet.hpp"
+#include "app/imp.hpp"
 
 namespace metier
 {
 std::unique_ptr<App> App::Imp::singleton_{};
 
 App::App(int& argc, char** argv) noexcept
-    : QApplication(argc, argv)
-    , imp_p_(std::make_unique<Imp>(*this))
+    : imp_p_(Imp::factory(*this, argc, argv))
     , imp_(*imp_p_)
 {
-    auto* ot = imp_.ot_.get();
-    auto* first = imp_.first_run_.get();
-    auto* alias = imp_.profile_alias_.get();
-    auto* ok = imp_.blockchains_->Ok();
+    auto* ot = imp_.otwrap();
     connect(ot, &OTWrap::needSeed, this, &App::displayFirstRun);
     connect(ot, &OTWrap::needProfileName, this, &App::displayNamePrompt);
     connect(ot, &OTWrap::needBlockchain, this, &App::displayBlockchainChooser);
     connect(ot, &OTWrap::readyForMainWindow, this, &App::displayMainWindow);
-    connect(first, &widget::FirstRun::wantNew, this, &App::displayNewSeed);
-    connect(first, &widget::FirstRun::wantOld, this, &App::displayRecovery);
-    connect(alias, &widget::ProfileAlias::gotAlias, ot, &OTWrap::createNym);
-    connect(ok, &QPushButton::clicked, this, &App::startup);
     connect(this, &App::startup, ot, &OTWrap::checkStartupConditions);
     emit startup();
 }
@@ -47,33 +31,16 @@ auto App::Cleanup() noexcept -> void { Imp::singleton_.reset(); }
 
 auto App::displayBlockchainChooser() -> void
 {
-    util::Focuser(imp_.blockchains_.get()).show();
+    imp_.displayBlockchainChooser();
 }
 
-auto App::displayFirstRun() -> void
-{
-    util::Focuser(imp_.first_run_.get()).show();
-}
+auto App::displayFirstRun() -> void { imp_.displayFirstRun(); }
 
-auto App::displayMainWindow() -> void
-{
-    util::Focuser(imp_.main_window_.get()).show();
-}
+auto App::displayMainWindow() -> void { imp_.displayMainWindow(); }
 
-auto App::displayNamePrompt() -> void
-{
-    util::Focuser(imp_.profile_alias_.get()).show();
-}
+auto App::displayNamePrompt() -> void { imp_.displayNamePrompt(); }
 
-auto App::displayNewSeed() -> void
-{
-    util::Focuser(imp_.new_seed_.get()).show();
-}
-
-auto App::displayRecovery() -> void
-{
-    util::Focuser(imp_.recover_wallet_.get()).show();
-}
+auto App::run() -> int { return imp_.run(); }
 
 auto App::Get(int argc, char* argv[]) noexcept -> App*
 {

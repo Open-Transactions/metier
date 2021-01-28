@@ -8,9 +8,9 @@
 #include "otwrap.hpp"  // IWYU pragma: associated
 
 #include <opentxs/opentxs.hpp>
-#include <QApplication>
 #include <QDebug>
 #include <QDir>
+#include <QGuiApplication>
 #include <QStandardPaths>
 #include <algorithm>
 #include <map>
@@ -30,8 +30,8 @@ namespace ot = opentxs;
 
 static const auto ot_args_ = ot::ArgList{};
 
-auto make_args(QApplication& parent) noexcept -> const ot::ArgList&;
-auto make_args(QApplication& parent) noexcept -> const ot::ArgList&
+auto make_args(QGuiApplication& parent) noexcept -> const ot::ArgList&;
+auto make_args(QGuiApplication& parent) noexcept -> const ot::ArgList&
 {
     parent.setOrganizationDomain("opentransactions.org");
     parent.setApplicationName("metier");
@@ -209,7 +209,8 @@ struct OTWrap::Imp {
         auto id = ot::String::Factory();
         bool notUsed{false};
         api_.Config().Check_str(
-            ot::String::Factory(QApplication::applicationName().toStdString()),
+            ot::String::Factory(
+                QGuiApplication::applicationName().toStdString()),
             ot::String::Factory(nym_id_key),
             id,
             notUsed);
@@ -227,7 +228,7 @@ struct OTWrap::Imp {
             id->Set(firstID->str().c_str());
             const auto config = api_.Config().Set_str(
                 ot::String::Factory(
-                    QApplication::applicationName().toStdString()),
+                    QGuiApplication::applicationName().toStdString()),
                 ot::String::Factory(nym_id_key),
                 id,
                 notUsed);
@@ -253,7 +254,8 @@ struct OTWrap::Imp {
         auto id = ot::String::Factory();
         bool notUsed{false};
         api_.Config().Check_str(
-            ot::String::Factory(QApplication::applicationName().toStdString()),
+            ot::String::Factory(
+                QGuiApplication::applicationName().toStdString()),
             ot::String::Factory(seed_id_key),
             id,
             notUsed);
@@ -271,7 +273,7 @@ struct OTWrap::Imp {
             id->Set(firstID.c_str());
             const auto config = api_.Config().Set_str(
                 ot::String::Factory(
-                    QApplication::applicationName().toStdString()),
+                    QGuiApplication::applicationName().toStdString()),
                 ot::String::Factory(seed_id_key),
                 id,
                 notUsed);
@@ -334,7 +336,8 @@ struct OTWrap::Imp {
         const auto& nym = *pNym;
         bool notUsed{false};
         const auto config = api_.Config().Set_str(
-            ot::String::Factory(QApplication::applicationName().toStdString()),
+            ot::String::Factory(
+                QGuiApplication::applicationName().toStdString()),
             ot::String::Factory(nym_id_key),
             ot::String::Factory(nym.ID().str()),
             notUsed);
@@ -380,7 +383,8 @@ struct OTWrap::Imp {
 
         auto notUsed{false};
         const auto config = api_.Config().Set_str(
-            ot::String::Factory(QApplication::applicationName().toStdString()),
+            ot::String::Factory(
+                QGuiApplication::applicationName().toStdString()),
             ot::String::Factory(seed_id_key),
             ot::String::Factory(id),
             notUsed);
@@ -421,7 +425,8 @@ struct OTWrap::Imp {
 
         auto notUsed{false};
         const auto config = api_.Config().Set_str(
-            ot::String::Factory(QApplication::applicationName().toStdString()),
+            ot::String::Factory(
+                QGuiApplication::applicationName().toStdString()),
             ot::String::Factory(seed_id_key),
             ot::String::Factory(id),
             notUsed);
@@ -506,7 +511,7 @@ struct OTWrap::Imp {
         return static_cast<int>(output);
     }
 
-    Imp(QApplication& parent, OTWrap& me)
+    Imp(QGuiApplication& parent, OTWrap& me)
         : ot_(ot::InitContext(make_args(parent)))
         , api_(ot_.StartClient(ot_args_, 0))
         , selector_model_native_(

@@ -35,13 +35,16 @@ endif()
 # -----------------------------------------------------------------------------
 # Options
 
-option(METIER_PEDANTIC_BUILD "Treat compiler warnings as errors."
-       ${METIER_PEDANTIC_DEFAULT})
+option(
+  METIER_PEDANTIC_BUILD "Treat compiler warnings as errors."
+  ${METIER_PEDANTIC_DEFAULT}
+)
 option(METIER_BUNDLED_OPENTXS "Use submodule version of libopentxs" OFF)
 option(
   OT_USE_VCPKG_TARGETS "Assume dependencies are managed by vcpkg"
   ${OT_USE_VCPKG_TARGETS_DEFAULT}
 )
+option(METIER_QML_INTERFACE "Use Qt Quick interface instead of Qt Widgets" OFF)
 
 # -----------------------------------------------------------------------------
 # Set compiler options
@@ -51,18 +54,13 @@ set(METIER_ORIGINAL_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set_compiler_flags(17 ${METIER_PEDANTIC_BUILD})
 
 if(${CMAKE_CXX_COMPILER_ID} MATCHES Clang)
-  set(
-    CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} -Wno-redundant-parens -Wno-extra-semi-stmt"
+  set(CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} -Wno-redundant-parens -Wno-extra-semi-stmt"
   )
 endif()
 
-
 if(NOT MSVC)
-  set(
-    CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} -Wno-noexcept"
-  )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept")
 endif()
 
 # -----------------------------------------------------------------------------
@@ -76,6 +74,13 @@ if("${METIER_DEFAULT_SYNC_SERVER}" STREQUAL "")
 else()
   set(METIER_USE_SYNC_SERVER ON)
   message(STATUS "Default sync server:      ${METIER_DEFAULT_SYNC_SERVER}")
+endif()
+
+
+if(METIER_QML_INTERFACE)
+  message(STATUS "Interface type:           Qml")
+else()
+  message(STATUS "Interface type:           Widgets")
 endif()
 
 # -----------------------------------------------------------------------------
@@ -95,12 +100,30 @@ find_package(
 )
 find_package(OpenSSL 1.0.1 REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(Qt5 COMPONENTS Core Network Widgets REQUIRED)
-find_package(Qt5 COMPONENTS Qml)
+find_package(
+  Qt5
+  COMPONENTS Core Network Gui
+  REQUIRED
+)
+
+if(METIER_QML_INTERFACE)
+  find_package(
+    Qt5
+    COMPONENTS Qml
+    REQUIRED
+  )
+else()
+  find_package(
+    Qt5
+    COMPONENTS Widgets
+    REQUIRED
+  )
+endif()
+
 find_package(ZLIB REQUIRED)
 
 if(NOT METIER_BUNDLED_OPENTXS)
-find_package(opentxs REQUIRED)
+  find_package(opentxs REQUIRED)
 endif()
 
 find_package(lmdb REQUIRED)
