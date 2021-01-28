@@ -47,6 +47,12 @@ target_link_libraries(
     ${Boost_LIBRARIES}
 )
 
+if(METIER_USE_SYNC_SERVER)
+  target_compile_definitions(
+    metier PRIVATE DEFAULT_SYNC_SERVER="${METIER_DEFAULT_SYNC_SERVER}"
+  )
+endif()
+
 if(METIER_BUNDLED_OPENTXS)
   opentxs_link_target("metier")
 else()

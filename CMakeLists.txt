@@ -70,6 +70,14 @@ endif()
 
 print_build_details(METIER_PEDANTIC_BUILD METIER_BUILD_TESTS)
 
+if("${METIER_DEFAULT_SYNC_SERVER}" STREQUAL "")
+  set(METIER_USE_SYNC_SERVER OFF)
+  message(STATUS "Default sync server:      not defined")
+else()
+  set(METIER_USE_SYNC_SERVER ON)
+  message(STATUS "Default sync server:      ${METIER_DEFAULT_SYNC_SERVER}")
+endif()
+
 # -----------------------------------------------------------------------------
 # Dependencies
 

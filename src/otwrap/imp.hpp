@@ -52,6 +52,9 @@ auto make_args(QApplication& parent) noexcept -> const ot::ArgList&
     auto& args = const_cast<ot::ArgList&>(ot_args_);
     args["qt"].emplace("true");
     args[OPENTXS_ARG_HOME].emplace(absolute.toStdString());
+#ifdef DEFAULT_SYNC_SERVER
+    args[OPENTXS_ARG_BLOCKCHAIN_SYNC].emplace(DEFAULT_SYNC_SERVER);
+#endif
 
     return ot_args_;
 }
