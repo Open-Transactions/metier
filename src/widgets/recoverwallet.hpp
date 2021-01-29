@@ -17,13 +17,13 @@ class OTWrap;
 
 namespace metier::widget
 {
-class RecoverWallet : public QDialog
+class RecoverWallet final : public QDialog
 {
     Q_OBJECT
 public:
     RecoverWallet(OTWrap& ot) noexcept;
 
-    ~RecoverWallet();
+    ~RecoverWallet() final;
 
 private:
     struct Imp;

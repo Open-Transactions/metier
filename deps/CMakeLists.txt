@@ -43,7 +43,7 @@ if(METIER_BUNDLED_OPENTXS)
       CACHE BOOL "" FORCE
   )
   set(OT_WITH_QML
-      OFF
+      ${METIER_QML_INTERFACE}
       CACHE BOOL "" FORCE
   )
   set(OT_ENABLE_RPC

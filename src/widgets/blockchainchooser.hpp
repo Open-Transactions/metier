@@ -26,7 +26,7 @@ class QPushButton;
 
 namespace metier::widget
 {
-class BlockchainChooser : public QDialog
+class BlockchainChooser final : public QDialog
 {
     Q_OBJECT
 
@@ -35,7 +35,7 @@ public:
 
     BlockchainChooser(QWidget* parent, OTWrap& ot);
 
-    ~BlockchainChooser();
+    ~BlockchainChooser() final;
 
 private:
     OTWrap& ot_;

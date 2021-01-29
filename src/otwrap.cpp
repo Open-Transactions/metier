@@ -6,8 +6,8 @@
 #include "otwrap.hpp"  // IWYU pragma: associated
 
 #include <opentxs/opentxs.hpp>
-#include <QApplication>
 #include <QDebug>
+#include <QGuiApplication>
 #include <utility>
 
 #include "models/blockchainchooser.hpp"
@@ -16,7 +16,7 @@
 
 namespace metier
 {
-OTWrap::OTWrap(QApplication& parent)
+OTWrap::OTWrap(QGuiApplication& parent)
     : QObject(&parent)
     , imp_p_(std::make_unique<Imp>(parent, *this))
     , imp_(*imp_p_)

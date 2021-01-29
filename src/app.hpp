@@ -5,37 +5,36 @@
 
 #pragma once
 
-#include <QApplication>
 #include <QObject>
 #include <QString>
 #include <memory>
 
 namespace metier
 {
-class App final : public QApplication
+class App final : public QObject
 {
     Q_OBJECT
 
 signals:
     void startup();
 
-private slots:
-    void displayBlockchainChooser();
+public slots:
     void displayFirstRun();
-    void displayMainWindow();
     void displayNamePrompt();
-    void displayNewSeed();
-    void displayRecovery();
+    void displayBlockchainChooser();
+    void displayMainWindow();
 
 public:
+    struct Imp;
+
     static App* Get(int argc = 0, char* argv[] = nullptr) noexcept;
     static void Cleanup() noexcept;
 
-    ~App();
+    auto run() -> int;
+
+    ~App() final;
 
 private:
-    struct Imp;
-
     std::unique_ptr<Imp> imp_p_;
     Imp& imp_;
 

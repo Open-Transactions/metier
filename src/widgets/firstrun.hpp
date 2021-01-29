@@ -19,7 +19,7 @@ class FirstRunDialog;
 
 namespace metier::widget
 {
-class FirstRun : public QDialog
+class FirstRun final : public QDialog
 {
     Q_OBJECT
 
@@ -30,7 +30,7 @@ signals:
 public:
     FirstRun(QWidget* parent) noexcept;
 
-    ~FirstRun();
+    ~FirstRun() final;
 
 private:
     std::unique_ptr<Ui::FirstRunDialog> ui;

@@ -17,13 +17,13 @@ class OTWrap;
 
 namespace metier::widget
 {
-class NewSeed : public QDialog
+class NewSeed final : public QDialog
 {
     Q_OBJECT
 public:
     NewSeed(OTWrap& ot) noexcept;
 
-    ~NewSeed();
+    ~NewSeed() final;
 
 private:
     struct Imp;

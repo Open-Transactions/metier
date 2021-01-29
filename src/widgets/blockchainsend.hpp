@@ -23,13 +23,13 @@ class QWidget;
 
 namespace metier::widget
 {
-class BlockchainSend : public QDialog
+class BlockchainSend final : public QDialog
 {
     Q_OBJECT
 
 public:
     BlockchainSend(QWidget* parent, model::AccountActivity* model);
-    ~BlockchainSend();
+    ~BlockchainSend() final;
 
 private:
     struct Imp;

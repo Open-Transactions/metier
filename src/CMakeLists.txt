@@ -5,28 +5,41 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
+add_subdirectory(app)
 add_subdirectory(models)
-add_subdirectory(ui)
-add_subdirectory(util)
-add_subdirectory(widgets)
 
-set(cxx-sources "app.cpp" "main.cpp" "otwrap.cpp")
-set(cxx-headers
-    "app_imp.hpp"
-    "otwrap/imp.hpp"
-    "otwrap/validateseed.hpp"
-    "util/scopeguard.hpp"
-)
+if(NOT METIER_QML_INTERFACE)
+  add_subdirectory(ui)
+  add_subdirectory(util)
+  add_subdirectory(widgets)
+endif()
+
+set(cxx-sources "main.cpp" "otwrap.cpp")
+set(cxx-headers "otwrap/imp.hpp" "otwrap/validateseed.hpp")
 set(moc-headers "app.hpp" "otwrap.hpp")
 qt5_wrap_cpp(moc-sources "${moc-headers}")
-qt5_add_resources(rcc-sources "resources.qrc")
+set(object-deps
+    $<TARGET_OBJECTS:metier-app>
+    $<TARGET_OBJECTS:metier-license>
+    $<TARGET_OBJECTS:metier-models>
+    $<TARGET_OBJECTS:qr-code-generator>
+)
+
+if(METIER_QML_INTERFACE)
+  qt5_add_resources(rcc-sources "skin/qml/resources.qrc")
+else()
+  qt5_add_resources(rcc-sources "skin/default/resources.qrc")
+  list(
+    APPEND
+    object-deps
+    $<TARGET_OBJECTS:metier-util>
+    $<TARGET_OBJECTS:metier-widgets>
+  )
+endif()
+
 add_executable(
   metier
-  $<TARGET_OBJECTS:metier-license>
-  $<TARGET_OBJECTS:metier-models>
-  $<TARGET_OBJECTS:metier-util>
-  $<TARGET_OBJECTS:metier-widgets>
-  $<TARGET_OBJECTS:qr-code-generator>
+  "${object-deps}"
   "${cxx-sources}"
   "${cxx-headers}"
   "${moc-sources}"
@@ -37,15 +50,26 @@ add_executable(
 target_link_libraries(
   metier
   PRIVATE
-    metier-ui
     opentxs
     qr-code-generator
     Qt5::Core
     Qt5::Network
-    Qt5::Widgets
+    Qt5::Gui
     Threads::Threads
     ${Boost_LIBRARIES}
 )
+
+if(METIER_QML_INTERFACE)
+  target_link_libraries(metier PRIVATE Qt5::Qml)
+else()
+  target_link_libraries(metier PRIVATE metier-ui Qt5::Widgets)
+endif()
+
+if(METIER_USE_SYNC_SERVER)
+  target_compile_definitions(
+    metier PRIVATE DEFAULT_SYNC_SERVER="${METIER_DEFAULT_SYNC_SERVER}"
+  )
+endif()
 
 if(METIER_BUNDLED_OPENTXS)
   opentxs_link_target("metier")

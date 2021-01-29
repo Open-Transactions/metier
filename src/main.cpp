@@ -7,7 +7,7 @@
 
 int main(int argc, char* argv[])
 {
-    const auto output = metier::App::Get(argc, argv)->exec();
+    const auto output = metier::App::Get(argc, argv)->run();
     metier::App::Cleanup();
 
     return output;

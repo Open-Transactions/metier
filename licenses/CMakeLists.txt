@@ -22,10 +22,5 @@ target_include_directories(
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 target_link_libraries(
-  metier-license
-  PRIVATE
-    opentxs
-    protobuf::libprotobuf-lite
-    Qt5::Core
-    Qt5::Widgets
+  metier-license PRIVATE opentxs protobuf::libprotobuf-lite Qt5::Core
 )
