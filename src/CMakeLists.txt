@@ -53,14 +53,14 @@ target_link_libraries(
     opentxs
     qr-code-generator
     Qt5::Core
-    Qt5::Network
     Qt5::Gui
+    Qt5::Network
     Threads::Threads
     ${Boost_LIBRARIES}
 )
 
 if(METIER_QML_INTERFACE)
-  target_link_libraries(metier PRIVATE Qt5::Qml)
+  target_link_libraries(metier PRIVATE Qt5::Qml Qt5::Quick)
 else()
   target_link_libraries(metier PRIVATE metier-ui Qt5::Widgets)
 endif()

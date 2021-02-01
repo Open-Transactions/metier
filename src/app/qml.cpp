@@ -9,6 +9,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickView>
 #include <QStringLiteral>
 #include <QUrl>
 
@@ -19,7 +20,7 @@ struct QmlApp final : public App::Imp, public QGuiApplication {
 
     App& parent_;
     std::unique_ptr<OTWrap> ot_;
-    QQmlApplicationEngine qml_;
+    QQuickView qml_;
 
     auto displayBlockchainChooser() -> void final
     {
@@ -56,13 +57,15 @@ struct QmlApp final : public App::Imp, public QGuiApplication {
             QQmlEngine::setObjectOwnership(ot, QQmlEngine::CppOwnership);
             qml_.rootContext()->setContextProperty("otwrap", ot);
         }
-        {
-            auto* app = &parent_;
-            QQmlEngine::setObjectOwnership(app, QQmlEngine::CppOwnership);
-            qml_.rootContext()->setContextProperty("app", app);
-        }
 
-        qml_.load(QUrl(QStringLiteral("qrc:/main.qml")));
+        qml_.connect(
+            qml_.engine(), &QQmlEngine::quit, this, &QCoreApplication::quit);
+        qml_.setSource(QUrl("qrc:/main.qml"));
+
+        if (qml_.status() == QQuickView::Error) { abort(); }
+
+        qml_.setResizeMode(QQuickView::SizeRootObjectToView);
+        qml_.show();
     }
 
     ~QmlApp() final = default;
