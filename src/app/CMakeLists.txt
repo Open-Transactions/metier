@@ -16,7 +16,7 @@ add_library(metier-app OBJECT "${cxx-sources}" "${cxx-headers}")
 target_link_libraries(metier-app PRIVATE Qt5::Core Qt5::Gui opentxs)
 
 if(METIER_QML_INTERFACE)
-  target_link_libraries(metier-app PRIVATE Qt5::Qml)
+  target_link_libraries(metier-app PRIVATE Qt5::Qml Qt5::Quick)
 else()
   target_link_libraries(metier-app PRIVATE Qt5::Widgets)
 endif()

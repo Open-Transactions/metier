@@ -102,14 +102,14 @@ find_package(OpenSSL 1.0.1 REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(
   Qt5
-  COMPONENTS Core Network Gui
+  COMPONENTS Core Gui Network
   REQUIRED
 )
 
 if(METIER_QML_INTERFACE)
   find_package(
     Qt5
-    COMPONENTS Qml
+    COMPONENTS Qml Quick
     REQUIRED
   )
 else()
