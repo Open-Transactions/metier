@@ -105,6 +105,11 @@ find_package(
   COMPONENTS Core Gui Network
   REQUIRED
 )
+find_package(
+  Qt5
+  COMPONENTS Qml Quick Widgets
+  QUIET
+)
 
 if(METIER_QML_INTERFACE)
   find_package(

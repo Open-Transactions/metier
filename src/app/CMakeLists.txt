@@ -8,11 +8,21 @@ set(cxx-headers "imp.hpp")
 
 if(METIER_QML_INTERFACE)
   list(APPEND cxx-sources "qml.cpp")
+  set(moc-headers "qml.hpp")
+  qt5_wrap_cpp(moc-sources "${moc-headers}")
 else()
   list(APPEND cxx-sources "legacy.cpp")
+  set(moc-headers "")
+  set(moc-sources "")
 endif()
 
-add_library(metier-app OBJECT "${cxx-sources}" "${cxx-headers}")
+add_library(
+  metier-app OBJECT
+  "${cxx-sources}"
+  "${cxx-headers}"
+  "${moc-sources}"
+  "${moc-headers}"
+)
 target_link_libraries(metier-app PRIVATE Qt5::Core Qt5::Gui opentxs)
 
 if(METIER_QML_INTERFACE)
