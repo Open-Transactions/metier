@@ -13,6 +13,8 @@
 #include <QStringLiteral>
 #include <QUrl>
 
+#include "qml.hpp"
+
 namespace metier
 {
 struct QmlApp final : public App::Imp, public QGuiApplication {
@@ -21,25 +23,47 @@ struct QmlApp final : public App::Imp, public QGuiApplication {
     App& parent_;
     std::unique_ptr<OTWrap> ot_;
     QQuickView qml_;
+    QmlInterface interface_;
 
     auto displayBlockchainChooser() -> void final
     {
-        // TODO
+        // NOTE when the app.displayBlockchainChooser signal is received the
+        // user must enable at least one blockchain Use
+        // otwrap.BlockchainChooserModel to populate a control which allows the
+        // user to enable a blockchain Do not allow the user to proceed until
+        // the otwrap.chainsChanged signal has been received with a value
+        // greater than zero. Call otwrap.checkStartupConditions() once the user
+        // has selected at least one blockchain and is ready to move on.
+        interface_.doDisplayBlockchainChooser();
     }
 
     auto displayFirstRun() -> void final
     {
-        // TODO
+        // NOTE when the app.displayFirstRun signal is received the user must
+        // choose to either create a new seed or recover an existing seed.
+        //
+        // If the user wants to create a new seed, call otwrap.createNewSeed()
+        // then display the words for the user to write down. Once the user is
+        // ready to move on, call otwrap.checkStartupConditions()
+        //
+        // If the user wants to import an existing seed, collect his input then
+        // call otwrap.importSeed()
+        interface_.doDisplayFirstRun();
     }
 
     auto displayMainWindow() -> void final
     {
-        // TODO
+        // NOTE once the app.displayMainWindow signal is received the startup
+        // process is complete. Display the main screen.
+        interface_.doDisplayMainWindow();
     }
 
     auto displayNamePrompt() -> void final
     {
-        // TODO
+        // NOTE when the app.displayNamePrompt signal is received the user must
+        // provide a profile name. call otwrap.createNym() with the name the
+        // user provides
+        interface_.doDisplayNamePrompt();
     }
 
     auto run() -> int final { return exec(); }
@@ -51,11 +75,17 @@ struct QmlApp final : public App::Imp, public QGuiApplication {
         , parent_(parent)
         , ot_(std::make_unique<OTWrap>(*this))
         , qml_()
+        , interface_()
     {
         {
             auto* ot = ot_.get();
             QQmlEngine::setObjectOwnership(ot, QQmlEngine::CppOwnership);
             qml_.rootContext()->setContextProperty("otwrap", ot);
+        }
+        {
+            auto* app = &interface_;
+            QQmlEngine::setObjectOwnership(app, QQmlEngine::CppOwnership);
+            qml_.rootContext()->setContextProperty("app", app);
         }
 
         qml_.connect(
@@ -76,4 +106,17 @@ auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept
 {
     return std::make_unique<QmlApp>(parent, argc, argv);
 }
+
+auto QmlInterface::doDisplayBlockchainChooser() -> void
+{
+    emit displayBlockchainChooser();
+}
+
+auto QmlInterface::doDisplayFirstRun() -> void { emit displayFirstRun(); }
+
+auto QmlInterface::doDisplayMainWindow() -> void { emit displayMainWindow(); }
+
+auto QmlInterface::doDisplayNamePrompt() -> void { emit displayNamePrompt(); }
+
+QmlInterface::~QmlInterface() = default;
 }  // namespace metier
