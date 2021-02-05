@@ -8,9 +8,9 @@
 #include <opentxs/opentxs.hpp>
 #include <QDebug>
 #include <QGuiApplication>
+#include <algorithm>
 #include <utility>
 
-#include "models/blockchainchooser.hpp"
 #include "otwrap/imp.hpp"
 #include "util/convertblockchain.hpp"
 
@@ -35,14 +35,15 @@ auto OTWrap::accountActivityModel(const int chain) -> model::AccountActivity*
         imp_.api_.UI().BlockchainAccountID(util::convert(chain)));
 }
 
-auto OTWrap::accountListModel() -> QAbstractItemModel*
+auto OTWrap::accountListModel() -> model::AccountList*
 {
-    // TODO return a proxy model instead maybe
+    OT_ASSERT(imp_.account_list_);
 
-    return imp_.api_.UI().AccountListQt(imp_.nym_id_);
+    return imp_.account_list_.get();
 }
 
-auto OTWrap::blockchainChooserModel(const bool testnet) -> QAbstractItemModel*
+auto OTWrap::blockchainChooserModel(const bool testnet)
+    -> model::BlockchainChooser*
 {
     return (testnet ? imp_.blockchain_chooser_testnet_
                     : imp_.blockchain_chooser_mainnet_)
@@ -114,7 +115,7 @@ auto OTWrap::createNym(QString alias) -> void
     checkStartupConditions();
 }
 
-auto OTWrap::enabledBlockchains() -> EnabledBlockchains
+auto OTWrap::enabledBlockchains() -> BlockchainList
 {
     return imp_.enabled_chains_.get();
 }
@@ -155,6 +156,19 @@ auto OTWrap::seedTypeModel() -> model::SeedType*
 auto OTWrap::seedWordValidator(const int type, const int lang) -> QValidator*
 {
     return imp_.seedWordValidator(type, lang);
+}
+
+auto OTWrap::validBlockchains() -> BlockchainList
+{
+    auto output = BlockchainList{};
+    const auto& input = ot::blockchain::SupportedChains();
+    std::transform(
+        input.begin(),
+        input.end(),
+        std::back_inserter(output),
+        [](const auto chain) { return util::convert(chain); });
+
+    return output;
 }
 
 auto OTWrap::wordCount(const int type, const int strength) -> int

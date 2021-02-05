@@ -12,18 +12,33 @@
 #include <QQuickView>
 #include <QStringLiteral>
 #include <QUrl>
+#include <atomic>
+#include <future>
 
+#include "models/accountactivity.hpp"
+#include "models/accountlist.hpp"
+#include "models/blockchainchooser.hpp"
+#include "models/seedlang.hpp"
+#include "models/seedsize.hpp"
+#include "models/seedtype.hpp"
 #include "qml.hpp"
+#include "util/claim.hpp"
 
 namespace metier
 {
 struct QmlApp final : public App::Imp, public QGuiApplication {
+private:
+    std::promise<void> model_promise_;
+
+public:
     static std::unique_ptr<App> singleton_;
 
     App& parent_;
     std::unique_ptr<OTWrap> ot_;
     QQuickView qml_;
     QmlInterface interface_;
+    std::atomic<bool> model_init_;
+    std::shared_future<void> models_set_;
 
     auto displayBlockchainChooser() -> void final
     {
@@ -34,6 +49,7 @@ struct QmlApp final : public App::Imp, public QGuiApplication {
         // the otwrap.chainsChanged signal has been received with a value
         // greater than zero. Call otwrap.checkStartupConditions() once the user
         // has selected at least one blockchain and is ready to move on.
+        models_set_.get();
         interface_.doDisplayBlockchainChooser();
     }
 
@@ -63,6 +79,7 @@ struct QmlApp final : public App::Imp, public QGuiApplication {
         // NOTE when the app.displayNamePrompt signal is received the user must
         // provide a profile name. call otwrap.createNym() with the name the
         // user provides
+        models_set_.get();
         interface_.doDisplayNamePrompt();
     }
 
@@ -72,19 +89,23 @@ struct QmlApp final : public App::Imp, public QGuiApplication {
 
     QmlApp(App& parent, int& argc, char** argv) noexcept
         : QGuiApplication(argc, argv)
+        , model_promise_()
         , parent_(parent)
         , ot_(std::make_unique<OTWrap>(*this))
         , qml_()
         , interface_()
+        , model_init_(false)
+        , models_set_(model_promise_.get_future())
     {
         {
             auto* ot = ot_.get();
-            QQmlEngine::setObjectOwnership(ot, QQmlEngine::CppOwnership);
+            ot->connect(ot, &OTWrap::nymReady, this, &QmlApp::nymReady);
+            Ownership::Claim(ot);
             qml_.rootContext()->setContextProperty("otwrap", ot);
         }
         {
             auto* app = &interface_;
-            QQmlEngine::setObjectOwnership(app, QQmlEngine::CppOwnership);
+            Ownership::Claim(app);
             qml_.rootContext()->setContextProperty("app", app);
         }
 
@@ -99,6 +120,38 @@ struct QmlApp final : public App::Imp, public QGuiApplication {
     }
 
     ~QmlApp() final = default;
+
+private:
+    auto nymReady() noexcept -> void
+    {
+        const auto init = model_init_.exchange(true);
+
+        if (init) { return; }
+
+        for (const auto chain : ot_->validBlockchains()) {
+            auto name =
+                std::string{"accountActivityModel"} + std::to_string(chain);
+            auto* model = ot_->accountActivityModel(chain);
+            qml_.rootContext()->setContextProperty(name.c_str(), model);
+        }
+
+        {
+            auto* model = ot_->accountListModel();
+            qml_.rootContext()->setContextProperty("accountListModel", model);
+        }
+        {
+            auto* model = ot_->blockchainChooserModel(true);
+            qml_.rootContext()->setContextProperty(
+                "testnetBlockchainsModel", model);
+        }
+        {
+            auto* model = ot_->blockchainChooserModel(false);
+            qml_.rootContext()->setContextProperty(
+                "testnetBlockchainsModel", model);
+        }
+
+        model_promise_.set_value();
+    }
 };
 
 auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept

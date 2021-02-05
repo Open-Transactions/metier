@@ -26,6 +26,7 @@ public:
     auto suggestedWidthInCharacters() const noexcept -> int { return max_; }
 
     SeedLanguage(Data&& data) noexcept;
+    ~SeedLanguage() final = default;
 
 private:
     using ot_super = QAbstractListModel;

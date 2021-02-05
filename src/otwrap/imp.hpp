@@ -19,11 +19,14 @@
 #include <string>
 
 #include "models/accountactivity.hpp"
+#include "models/accountlist.hpp"
 #include "models/blockchainchooser.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
 #include "otwrap/validateseed.hpp"
+#include "util/claim.hpp"
+#include "util/convertblockchain.hpp"
 #include "util/scopeguard.hpp"
 
 namespace ot = opentxs;
@@ -70,7 +73,7 @@ struct OTWrap::Imp {
 
         auto get() const noexcept
         {
-            auto output = EnabledBlockchains{};
+            auto output = BlockchainList{};
             auto copy = Vector{};
             {
                 ot::Lock lock(lock_);
@@ -107,6 +110,7 @@ struct OTWrap::Imp {
     std::map<int, std::unique_ptr<model::SeedSize>> seed_size_;
     std::unique_ptr<model::BlockchainChooser> blockchain_chooser_mainnet_;
     std::unique_ptr<model::BlockchainChooser> blockchain_chooser_testnet_;
+    std::unique_ptr<model::AccountList> account_list_;
     std::map<ot::OTIdentifier, std::unique_ptr<model::AccountActivity>>
         account_activity_proxy_models_;
     std::map<
@@ -202,6 +206,19 @@ struct OTWrap::Imp {
     auto validateNym() const noexcept
     {
         ot::Lock lock(lock_);
+        auto postcondition = ScopeGuard{[this] {
+            auto& pointer =
+                const_cast<std::unique_ptr<model::AccountList>&>(account_list_);
+
+            if (pointer || nym_id_->empty()) { return; }
+
+            pointer = std::make_unique<model::AccountList>(
+                api_.UI().AccountListQt(nym_id_));
+
+            OT_ASSERT(pointer);
+
+            Ownership::Claim(pointer.get());
+        }};
 
         if (false == nym_id_->empty()) { return true; }
 
@@ -312,8 +329,10 @@ struct OTWrap::Imp {
 
         auto& model = *(it->second);
         model.setSourceModel(api_.UI().AccountActivityQt(nym_id_, id));
+        auto* output = pModel.get();
+        Ownership::Claim(output);
 
-        return pModel.get();
+        return output;
     }
     auto createNym(QString alias) noexcept -> void
     {
@@ -458,8 +477,14 @@ struct OTWrap::Imp {
             std::make_unique<model::SeedLanguage>(
                 transform<model::SeedLanguage::Data>(
                     api_.Seeds().AllowedLanguages(style))));
+        auto& pModel = it->second;
 
-        return it->second.get();
+        OT_ASSERT(pModel);
+
+        auto output = pModel.get();
+        Ownership::Claim(output);
+
+        return output;
     }
     auto seedSizeModel(const int type) -> model::SeedSize*
     {
@@ -482,8 +507,14 @@ struct OTWrap::Imp {
             type,
             std::make_unique<model::SeedSize>(transform<model::SeedSize::Data>(
                 api_.Seeds().AllowedSeedStrength(style))));
+        auto& pModel = it->second;
 
-        return it->second.get();
+        OT_ASSERT(pModel);
+
+        auto output = pModel.get();
+        Ownership::Claim(output);
+
+        return output;
     }
     auto seedWordValidator(const int type, const int lang) -> QValidator*
     {
@@ -545,10 +576,23 @@ struct OTWrap::Imp {
               std::make_unique<model::BlockchainChooser>(me, api_.UI(), false))
         , blockchain_chooser_testnet_(
               std::make_unique<model::BlockchainChooser>(me, api_.UI(), true))
+        , account_list_()
         , account_activity_proxy_models_()
         , seed_validators_()
     {
         selector_model_native_.SetCallback([&me]() { me.checkChainCount(); });
+
+        OT_ASSERT(seed_type_);
+        OT_ASSERT(blockchain_chooser_mainnet_);
+        OT_ASSERT(blockchain_chooser_testnet_);
+
+        Ownership::Claim(seed_type_.get());
+        Ownership::Claim(blockchain_chooser_mainnet_.get());
+        Ownership::Claim(blockchain_chooser_testnet_.get());
+
+#ifdef METIER_DEFAULT_BLOCKCHAIN
+        api_.Blockchain().Enable(util::convert(METIER_DEFAULT_BLOCKCHAIN));
+#endif
     }
 };
 }  // namespace metier

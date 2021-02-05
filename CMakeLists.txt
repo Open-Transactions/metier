@@ -77,6 +77,15 @@ else()
 endif()
 
 
+if("${METIER_DEFAULT_BLOCKCHAIN}" STREQUAL "")
+  set(METIER_USE_DEFAULT_BLOCKCHAIN OFF)
+  message(STATUS "Default blockchain:       none")
+else()
+  set(METIER_USE_DEFAULT_BLOCKCHAIN ON)
+  message(STATUS "Default blockchain:       ${METIER_DEFAULT_BLOCKCHAIN}")
+endif()
+
+
 if(METIER_QML_INTERFACE)
   message(STATUS "Interface type:           Qml")
 else()

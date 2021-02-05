@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QVariant>
 #include <QVector>
 #include <memory>
 
@@ -20,6 +21,8 @@ namespace metier
 namespace model
 {
 class AccountActivity;
+class AccountList;
+class BlockchainChooser;
 class SeedLanguage;
 class SeedSize;
 class SeedType;
@@ -31,6 +34,11 @@ namespace metier
 class OTWrap final : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(int enabledCurrencyCount READ enabledCurrencyCount)
+    Q_PROPERTY(QVector<int> enabledBlockchains READ enabledBlockchains)
+    Q_PROPERTY(int longestBlockchainName READ longestBlockchainName)
+    Q_PROPERTY(int longestSeedWord READ longestSeedWord)
+    Q_PROPERTY(QVector<int> validBlockchains READ validBlockchains)
 
 signals:
     void chainsChanged(int enabledCount);
@@ -48,25 +56,26 @@ public slots:
     void importSeed(int type, int lang, QString words);
 
 public:
-    using EnabledBlockchains = QVector<int>;
+    using BlockchainList = QVector<int>;
 
     static auto Cleanup() noexcept -> void;
 
-    Q_INVOKABLE model::AccountActivity* accountActivityModel(const QString& id);
-    Q_INVOKABLE model::AccountActivity* accountActivityModel(const int chain);
-    Q_INVOKABLE QAbstractItemModel* accountListModel();
-    Q_INVOKABLE QAbstractItemModel* blockchainChooserModel(const bool testnet);
+    model::AccountActivity* accountActivityModel(const QString& id);
+    model::AccountActivity* accountActivityModel(const int chain);
+    model::AccountList* accountListModel();
+    model::BlockchainChooser* blockchainChooserModel(const bool testnet);
     Q_INVOKABLE int convertBlockchainAccountID(const QString& id);
     Q_INVOKABLE QStringList
     createNewSeed(const int type, const int lang, const int strength);
-    Q_INVOKABLE int enabledCurrencyCount();
-    Q_INVOKABLE EnabledBlockchains enabledBlockchains();
-    Q_INVOKABLE int longestBlockchainName();
-    Q_INVOKABLE int longestSeedWord();
-    Q_INVOKABLE model::SeedLanguage* seedLanguageModel(const int type);
-    Q_INVOKABLE model::SeedSize* seedSizeModel(const int type);
-    Q_INVOKABLE model::SeedType* seedTypeModel();
-    Q_INVOKABLE QValidator* seedWordValidator(const int type, const int lang);
+    int enabledCurrencyCount();
+    BlockchainList enabledBlockchains();
+    int longestBlockchainName();
+    int longestSeedWord();
+    model::SeedLanguage* seedLanguageModel(const int type);
+    model::SeedSize* seedSizeModel(const int type);
+    model::SeedType* seedTypeModel();
+    QValidator* seedWordValidator(const int type, const int lang);
+    BlockchainList validBlockchains();
     Q_INVOKABLE int wordCount(const int type, const int strength);
 
     explicit OTWrap(QGuiApplication& parent);

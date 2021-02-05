@@ -14,6 +14,8 @@
 #include <tuple>
 
 #include "models/accountactivity.hpp"
+#include "models/accountlist.hpp"
+#include "models/blockchainchooser.hpp"
 #include "otwrap.hpp"
 #include "ui_mainwindow.h"
 #include "util/resizer.hpp"

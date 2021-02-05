@@ -7,10 +7,10 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_subdirectory(app)
 add_subdirectory(models)
+add_subdirectory(util)
 
 if(NOT METIER_QML_INTERFACE)
   add_subdirectory(ui)
-  add_subdirectory(util)
   add_subdirectory(widgets)
 endif()
 
@@ -22,6 +22,7 @@ set(object-deps
     $<TARGET_OBJECTS:metier-app>
     $<TARGET_OBJECTS:metier-license>
     $<TARGET_OBJECTS:metier-models>
+    $<TARGET_OBJECTS:metier-util>
     $<TARGET_OBJECTS:qr-code-generator>
 )
 
@@ -29,12 +30,7 @@ if(METIER_QML_INTERFACE)
   qt5_add_resources(rcc-sources "skin/qml/resources.qrc")
 else()
   qt5_add_resources(rcc-sources "skin/default/resources.qrc")
-  list(
-    APPEND
-    object-deps
-    $<TARGET_OBJECTS:metier-util>
-    $<TARGET_OBJECTS:metier-widgets>
-  )
+  list(APPEND object-deps $<TARGET_OBJECTS:metier-widgets>)
 endif()
 
 add_executable(
@@ -68,6 +64,12 @@ endif()
 if(METIER_USE_SYNC_SERVER)
   target_compile_definitions(
     metier PRIVATE DEFAULT_SYNC_SERVER="${METIER_DEFAULT_SYNC_SERVER}"
+  )
+endif()
+
+if(METIER_USE_DEFAULT_BLOCKCHAIN)
+  target_compile_definitions(
+    metier PRIVATE METIER_DEFAULT_BLOCKCHAIN=${METIER_DEFAULT_BLOCKCHAIN}
   )
 endif()
 

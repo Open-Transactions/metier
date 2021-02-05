@@ -16,4 +16,9 @@ constexpr auto convert(const int chain)
 {
     return static_cast<ot::blockchain::Type>(static_cast<std::uint32_t>(chain));
 }
+
+constexpr auto convert(const ot::blockchain::Type chain)
+{
+    return static_cast<int>(static_cast<std::uint32_t>(chain));
+}
 }  // namespace metier::util

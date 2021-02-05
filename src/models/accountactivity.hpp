@@ -48,6 +48,8 @@ public:
 
     AccountActivity();
 
+    ~AccountActivity() final = default;
+
 private:
     using ot_super = QSortFilterProxyModel;
 
