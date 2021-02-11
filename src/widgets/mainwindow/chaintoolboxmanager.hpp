@@ -66,7 +66,7 @@ struct ChainToolboxManager {
         return util::convert(items_.at(position));
     }
 
-    auto reconcile(OTWrap::EnabledBlockchains current) noexcept
+    auto reconcile(OTWrap::BlockchainList current) noexcept
     {
         ot::Lock lock{lock_};
         std::sort(std::begin(current), std::end(current));

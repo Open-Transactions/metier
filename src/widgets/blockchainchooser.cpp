@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QTableView>
 
+#include "models/blockchainchooser.hpp"
 #include "otwrap.hpp"
 #include "ui_blockchainchooser.h"
 #include "util/resizer.hpp"

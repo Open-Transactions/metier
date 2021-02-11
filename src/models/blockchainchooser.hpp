@@ -42,6 +42,7 @@ public:
         QObject& parent,
         const opentxs::api::client::UI& ui,
         const bool testnetMode);
+    ~BlockchainChooser() final = default;
 
 private:
     using ot_super = QSortFilterProxyModel;

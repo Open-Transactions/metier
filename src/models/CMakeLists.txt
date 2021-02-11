@@ -5,6 +5,7 @@
 
 set(cxx-sources
     "accountactivity.cpp"
+    "accountlist.cpp"
     "blockchainchooser.cpp"
     "licenses.cpp"
     "seedlang.cpp"
@@ -14,6 +15,7 @@ set(cxx-sources
 set(cxx-headers "")
 set(moc-headers
     "accountactivity.hpp"
+    "accountlist.hpp"
     "blockchainchooser.hpp"
     "licenses.hpp"
     "seedlang.hpp"
