@@ -44,7 +44,7 @@ jobs:
         useVcpkgToolchainFile: true
         vcpkgTriplet: '${{ matrix.vcpkg_triplet }}'
         buildDirectory: '${{ github.workspace }}/build'
-        cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Debug -DMETIER_PEDANTIC_BUILD=OFF -DMETIER_BUNDLED_OPENTXS=ON ${{ matrix.cmake_extra }}'
+        cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Debug -DMETIER_PEDANTIC_BUILD=OFF -DMETIER_BUNDLED_OPENTXS=ON -DMETIER_DEFAULT_SYNC_SERVER=${{ secrets.DEFAULT_SYNC_SERVER }}  ${{ matrix.cmake_extra }}'
         buildWithCMake: true
         buildWithCMakeArgs: '-- -k 0'
     - name: 'Package'
