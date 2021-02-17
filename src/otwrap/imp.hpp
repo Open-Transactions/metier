@@ -18,6 +18,7 @@
 #include <set>
 #include <string>
 
+#include "deps/opentxs/tests/Cli.hpp"
 #include "models/accountactivity.hpp"
 #include "models/accountlist.hpp"
 #include "models/blockchainchooser.hpp"
@@ -33,8 +34,10 @@ namespace ot = opentxs;
 
 static const auto ot_args_ = ot::ArgList{};
 
-auto make_args(QGuiApplication& parent) noexcept -> const ot::ArgList&;
-auto make_args(QGuiApplication& parent) noexcept -> const ot::ArgList&
+auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
+    -> const ot::ArgList&;
+auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
+    -> const ot::ArgList&
 {
     parent.setOrganizationDomain("opentransactions.org");
     parent.setApplicationName("metier");
@@ -58,6 +61,10 @@ auto make_args(QGuiApplication& parent) noexcept -> const ot::ArgList&
 #ifdef DEFAULT_SYNC_SERVER
     args[OPENTXS_ARG_BLOCKCHAIN_SYNC].emplace(DEFAULT_SYNC_SERVER);
 #endif
+    auto parser = ArgumentParser{};
+    parser.parse(argc, argv, args);
+
+    if (parser.show_help_) { std::cout << parser.options() << '\n'; }
 
     return ot_args_;
 }
@@ -542,8 +549,8 @@ struct OTWrap::Imp {
         return static_cast<int>(output);
     }
 
-    Imp(QGuiApplication& parent, OTWrap& me)
-        : ot_(ot::InitContext(make_args(parent)))
+    Imp(QGuiApplication& parent, OTWrap& me, int& argc, char** argv)
+        : ot_(ot::InitContext(make_args(parent, argc, argv)))
         , api_(ot_.StartClient(ot_args_, 0))
         , selector_model_native_(
               api_.UI().BlockchainSelection(ot::ui::Blockchains::All))
