@@ -16,9 +16,9 @@
 
 namespace metier
 {
-OTWrap::OTWrap(QGuiApplication& parent)
+OTWrap::OTWrap(QGuiApplication& parent, int& argc, char** argv)
     : QObject(&parent)
-    , imp_p_(std::make_unique<Imp>(parent, *this))
+    , imp_p_(std::make_unique<Imp>(parent, *this, argc, argv))
     , imp_(*imp_p_)
 {
 }

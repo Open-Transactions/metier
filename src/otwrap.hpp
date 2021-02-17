@@ -78,7 +78,7 @@ public:
     BlockchainList validBlockchains();
     Q_INVOKABLE int wordCount(const int type, const int strength);
 
-    explicit OTWrap(QGuiApplication& parent);
+    explicit OTWrap(QGuiApplication& parent, int& argc, char** argv);
 
     ~OTWrap() final;
 

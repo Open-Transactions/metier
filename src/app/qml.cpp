@@ -91,7 +91,7 @@ public:
         : QGuiApplication(argc, argv)
         , model_promise_()
         , parent_(parent)
-        , ot_(std::make_unique<OTWrap>(*this))
+        , ot_(std::make_unique<OTWrap>(*this, argc, argv))
         , qml_()
         , interface_()
         , model_init_(false)

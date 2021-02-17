@@ -43,6 +43,8 @@ add_executable(
   "${rcc-sources}"
 )
 
+target_include_directories(metier PRIVATE "${metier_SOURCE_DIR}")
+
 target_link_libraries(
   metier
   PRIVATE
@@ -53,6 +55,7 @@ target_link_libraries(
     Qt5::Network
     Threads::Threads
     ${Boost_LIBRARIES}
+    Boost::program_options
 )
 
 if(METIER_QML_INTERFACE)

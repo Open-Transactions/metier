@@ -67,7 +67,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
         : QApplication(argc, argv)
         , parent_(parent)
         , first_run_complete_(false)
-        , ot_(std::make_unique<OTWrap>(*this))
+        , ot_(std::make_unique<OTWrap>(*this, argc, argv))
         , first_run_(std::make_unique<widget::FirstRun>(nullptr))
         , new_seed_(std::make_unique<widget::NewSeed>(*ot_))
         , recover_wallet_(std::make_unique<widget::RecoverWallet>(*ot_))
