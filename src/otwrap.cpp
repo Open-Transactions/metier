@@ -138,6 +138,13 @@ auto OTWrap::longestBlockchainName() -> int
 
 auto OTWrap::longestSeedWord() -> int { return imp_.longest_seed_word_; }
 
+auto OTWrap::profileModel() -> model::Profile*
+{
+    OT_ASSERT(imp_.profile_);
+
+    return imp_.profile_.get();
+}
+
 auto OTWrap::seedLanguageModel(const int type) -> model::SeedLanguage*
 {
     return imp_.seedLanguageModel(type);

@@ -38,7 +38,7 @@ struct ChainToolboxManager {
 
     auto currentChain() const noexcept
     {
-        ot::Lock lock{lock_};
+        ot::rLock lock{lock_};
         const auto index = toolbox_->currentIndex();
 
         if (0 > index) { return ot::blockchain::Type::Unknown; }
@@ -68,7 +68,7 @@ struct ChainToolboxManager {
 
     auto reconcile(OTWrap::BlockchainList current) noexcept
     {
-        ot::Lock lock{lock_};
+        ot::rLock lock{lock_};
         std::sort(std::begin(current), std::end(current));
         auto itemsToDelete = std::deque<int>{};
         auto itemsToInsert = std::deque<int>{};
@@ -148,7 +148,7 @@ struct ChainToolboxManager {
 
 private:
     QMainWindow* parent_;
-    mutable std::mutex lock_;
+    mutable std::recursive_mutex lock_;
     const RegisterProgress progress_cb_;
     OTWrap& ot_;
     AccountList& account_list_;
