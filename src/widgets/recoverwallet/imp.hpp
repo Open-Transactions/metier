@@ -108,7 +108,9 @@ struct RecoverWallet::Imp {
                 text->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
                 util::set_minimum_size(*text, ot_.longestSeedWord(), 1, {3, 2});
                 connect(
-                    text.get(), &QLineEdit::textChanged, [=]() { validate(); });
+                    text.get(),
+                    &QLineEdit::textChanged,
+                    [this, ptr = text.get()]() { validate(ptr); });
             }
             {
                 item->addWidget(label.get());
@@ -175,11 +177,37 @@ struct RecoverWallet::Imp {
             createWords();
         }
 
-        validate();
+        validate(nullptr);
     }
-    auto validate() -> void
+    auto validate(QLineEdit* ptr) -> void
     {
         auto lock = std::lock_guard<std::mutex>{lock_};
+
+        if (nullptr != ptr) {
+            static const auto good = [] {
+                auto palette = QPalette{};
+                palette.setColor(QPalette::Base, Qt::green);
+                palette.setColor(QPalette::Text, Qt::black);
+
+                return palette;
+            }();
+            static const auto bad = [] {
+                auto palette = QPalette{};
+                palette.setColor(QPalette::Base, Qt::yellow);
+                palette.setColor(QPalette::Text, Qt::black);
+
+                return palette;
+            }();
+
+            auto& text = *ptr;
+
+            if (text.hasAcceptableInput()) {
+                text.setPalette(good);
+            } else {
+                text.setPalette(bad);
+            }
+        }
+
         auto valid{true};
 
         for (auto* widget : texts_) {
