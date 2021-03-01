@@ -16,6 +16,7 @@
 #include "models/accountactivity.hpp"
 #include "models/accountlist.hpp"
 #include "models/blockchainchooser.hpp"
+#include "models/profile.hpp"
 #include "otwrap.hpp"
 #include "ui_mainwindow.h"
 #include "util/resizer.hpp"
@@ -37,6 +38,7 @@ struct MainWindow::Imp {
     std::set<std::uintptr_t> registered_chains_;
     SyncProgress sync_progress_;
     ChainToolboxManager chain_toolbox_;
+    model::Profile* profile_;
 
     auto init_models(MainWindow* parent) noexcept
     {
@@ -48,7 +50,19 @@ struct MainWindow::Imp {
             &QItemSelectionModel::selectionChanged,
             parent,
             &MainWindow::accountListUpdated);
+        profile_ = ot_.profileModel();
+        connect(profile_, &model::Profile::updated, [&] { repaintProfile(); });
+        repaintProfile();
         updateProgress();
+    }
+    auto repaintProfile() noexcept -> void
+    {
+        auto& name = *ui_->profileName;
+        auto& code = *ui_->paymentCode;
+        auto& qr = *ui_->qrCode;
+        name.setText(profile_->displayName());
+        code.setText(profile_->paymentCode());
+        qr.setString(profile_->paymentCode());
     }
     auto updateProgress() noexcept -> void
     {
@@ -74,12 +88,18 @@ struct MainWindow::Imp {
     {
         ui_->setupUi(parent);
         ui_->moneyToolbox->setMaximumWidth(util::line_width(
-            *ui_->accountList, ot_.longestBlockchainName() + 4));
+            *ui_->accountList, ot_.longestBlockchainName() + 16));
         {
             auto& accountActivity = *ui_->accountActivity;
             auto& header = *accountActivity.horizontalHeader();
             header.setSectionResizeMode(QHeaderView::ResizeToContents);
         }
+        ui_->header->setMinimumHeight(138);
+        ui_->header->setMaximumHeight(138);
+        auto& paymentCode = *ui_->paymentCode;
+        util::set_minimum_size(paymentCode, 72, 1);
+        ui_->identity->setMaximumWidth(paymentCode.minimumWidth());
+        paymentCode.setStyleSheet("* { background-color: rgba(0, 0, 0, 0); }");
     }
 
 private:

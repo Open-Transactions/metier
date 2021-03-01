@@ -64,7 +64,7 @@ struct BlockchainSend::Imp {
         auto* ok = ui.buttons->button(QDialogButtonBox::Ok);
         auto* address = ui.address;
         ok->setText(tr("Pay"));
-        util::set_minimum_size(*address, 55, 1);
+        util::set_minimum_size(*address, 72, 1);
         check_ok();
     }
 

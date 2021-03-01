@@ -23,6 +23,7 @@ namespace model
 class AccountActivity;
 class AccountList;
 class BlockchainChooser;
+class Profile;
 class SeedLanguage;
 class SeedSize;
 class SeedType;
@@ -64,19 +65,23 @@ public:
     model::AccountActivity* accountActivityModel(const int chain);
     model::AccountList* accountListModel();
     model::BlockchainChooser* blockchainChooserModel(const bool testnet);
+    model::Profile* profileModel();
+    model::SeedLanguage* seedLanguageModel(const int type);
+    model::SeedSize* seedSizeModel(const int type);
+    model::SeedType* seedTypeModel();
+
+    QValidator* seedWordValidator(const int type, const int lang);
+
     Q_INVOKABLE int convertBlockchainAccountID(const QString& id);
     Q_INVOKABLE QStringList
     createNewSeed(const int type, const int lang, const int strength);
+    Q_INVOKABLE int wordCount(const int type, const int strength);
+
     int enabledCurrencyCount();
     BlockchainList enabledBlockchains();
     int longestBlockchainName();
     int longestSeedWord();
-    model::SeedLanguage* seedLanguageModel(const int type);
-    model::SeedSize* seedSizeModel(const int type);
-    model::SeedType* seedTypeModel();
-    QValidator* seedWordValidator(const int type, const int lang);
     BlockchainList validBlockchains();
-    Q_INVOKABLE int wordCount(const int type, const int strength);
 
     explicit OTWrap(QGuiApplication& parent, int& argc, char** argv);
 

@@ -22,6 +22,7 @@
 #include "models/accountactivity.hpp"
 #include "models/accountlist.hpp"
 #include "models/blockchainchooser.hpp"
+#include "models/profile.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
@@ -118,6 +119,7 @@ struct OTWrap::Imp {
     std::unique_ptr<model::BlockchainChooser> blockchain_chooser_mainnet_;
     std::unique_ptr<model::BlockchainChooser> blockchain_chooser_testnet_;
     std::unique_ptr<model::AccountList> account_list_;
+    std::unique_ptr<model::Profile> profile_;
     std::map<ot::OTIdentifier, std::unique_ptr<model::AccountActivity>>
         account_activity_proxy_models_;
     std::map<
@@ -214,17 +216,37 @@ struct OTWrap::Imp {
     {
         ot::Lock lock(lock_);
         auto postcondition = ScopeGuard{[this] {
-            auto& pointer =
-                const_cast<std::unique_ptr<model::AccountList>&>(account_list_);
+            if (nym_id_->empty()) { return; }
 
-            if (pointer || nym_id_->empty()) { return; }
+            {
+                auto& pointer =
+                    const_cast<std::unique_ptr<model::AccountList>&>(
+                        account_list_);
 
-            pointer = std::make_unique<model::AccountList>(
-                api_.UI().AccountListQt(nym_id_));
+                if (!pointer) {
 
-            OT_ASSERT(pointer);
+                    pointer = std::make_unique<model::AccountList>(
+                        api_.UI().AccountListQt(nym_id_));
 
-            Ownership::Claim(pointer.get());
+                    OT_ASSERT(pointer);
+
+                    Ownership::Claim(pointer.get());
+                }
+            }
+            {
+                auto& pointer =
+                    const_cast<std::unique_ptr<model::Profile>&>(profile_);
+
+                if (!pointer) {
+
+                    pointer = std::make_unique<model::Profile>(
+                        api_.UI().ProfileQt(nym_id_));
+
+                    OT_ASSERT(pointer);
+
+                    Ownership::Claim(pointer.get());
+                }
+            }
         }};
 
         if (false == nym_id_->empty()) { return true; }
@@ -584,6 +606,7 @@ struct OTWrap::Imp {
         , blockchain_chooser_testnet_(
               std::make_unique<model::BlockchainChooser>(me, api_.UI(), true))
         , account_list_()
+        , profile_()
         , account_activity_proxy_models_()
         , seed_validators_()
     {
