@@ -5,6 +5,9 @@
 
 #include "blockchainsend.hpp"  // IWYU pragma: associated
 
+#include <opentxs/ui/AmountValidator.hpp>
+#include <opentxs/ui/DestinationValidator.hpp>
+#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QLineEdit>
 #include <QPushButton>
@@ -28,16 +31,53 @@ BlockchainSend::BlockchainSend(QWidget* parent, model::AccountActivity* model)
     auto* ok = ui.buttons->button(QDialogButtonBox::Ok);
     auto* address = ui.address;
     auto* amount = ui.amount;
+    auto* vAddress = imp_.address_validator_;
+    auto* vAmount = imp_.amount_validator_;
+    auto* scale = ui.scale;
     connect(cancel, &QPushButton::clicked, this, &QWidget::close);
-    connect(
-        address, &QLineEdit::textChanged, [this]() { imp_.addressChanged(); });
-    connect(
-        amount, &QLineEdit::textChanged, [this]() { imp_.amountChanged(); });
+    connect(address, &QLineEdit::textChanged, [this]() { imp_.checkOk(); });
+    connect(amount, &QLineEdit::textChanged, [this]() { imp_.checkOk(); });
     connect(ok, &QPushButton::clicked, [this]() {
         imp_.send();
         close();
     });
+    connect(
+        scale,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        [this](int index) { imp_.scaleChanged(index); });
+    using AddressV = opentxs::ui::DestinationValidator;
+    using AmountV = opentxs::ui::AmountValidator;
+    connect(
+        vAddress,
+        &AddressV::detailsChanged,
+        this,
+        &BlockchainSend::updateAddress);
+    connect(
+        vAmount, &AmountV::scaleChanged, this, &BlockchainSend::updateAmount);
 }
 
-BlockchainSend::~BlockchainSend() = default;
+auto BlockchainSend::updateAddress(const QString& in) -> void
+{
+    imp_.updateStatus(in);
+}
+
+auto BlockchainSend::updateAmount(int in) -> void
+{
+    imp_.recalculateAmount(in);
+}
+
+BlockchainSend::~BlockchainSend()
+{
+    auto* vAddress = imp_.address_validator_;
+    auto* vAmount = imp_.amount_validator_;
+    using AddressV = opentxs::ui::DestinationValidator;
+    using AmountV = opentxs::ui::AmountValidator;
+    disconnect(
+        vAddress,
+        &AddressV::detailsChanged,
+        this,
+        &BlockchainSend::updateAddress);
+    disconnect(
+        vAmount, &AmountV::scaleChanged, this, &BlockchainSend::updateAmount);
+}
 }  // namespace metier::widget

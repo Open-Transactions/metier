@@ -89,6 +89,9 @@
           </item>
           <item>
            <widget class="QLineEdit" name="paymentCode">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
             <property name="autoFillBackground">
              <bool>true</bool>
             </property>

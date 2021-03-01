@@ -31,6 +31,10 @@ public:
     BlockchainSend(QWidget* parent, model::AccountActivity* model);
     ~BlockchainSend() final;
 
+private slots:
+    void updateAddress(const QString&);
+    void updateAmount(int);
+
 private:
     struct Imp;
 
