@@ -70,12 +70,48 @@ auto AccountActivity::filterAcceptsColumn(
     }
 }
 
+auto AccountActivity::getAmountValidator() const noexcept
+    -> opentxs::ui::AmountValidator*
+{
+    if (nullptr != ot_model_) {
+
+        return ot_model_->getAmountValidator();
+    } else {
+
+        return {};
+    }
+}
+
 auto AccountActivity::getDepositAddress(const int chain) const noexcept
     -> QString
 {
     if (nullptr != ot_model_) {
 
         return ot_model_->getDepositAddress(chain);
+    } else {
+
+        return {};
+    }
+}
+
+auto AccountActivity::getDestValidator() const noexcept
+    -> opentxs::ui::DestinationValidator*
+{
+    if (nullptr != ot_model_) {
+
+        return ot_model_->getDestValidator();
+    } else {
+
+        return {};
+    }
+}
+
+auto AccountActivity::getScaleModel() const noexcept
+    -> opentxs::ui::DisplayScaleQt*
+{
+    if (nullptr != ot_model_) {
+
+        return ot_model_->getScaleModel();
     } else {
 
         return {};

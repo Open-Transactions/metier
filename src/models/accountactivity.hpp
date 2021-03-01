@@ -17,6 +17,9 @@ namespace opentxs
 namespace ui
 {
 class AccountActivityQt;
+class AmountValidator;
+class DestinationValidator;
+class DisplayScaleQt;
 }  // namespace ui
 }  // namespace opentxs
 
@@ -25,6 +28,12 @@ namespace metier::model
 class AccountActivity final : public QSortFilterProxyModel
 {
     Q_OBJECT
+    Q_PROPERTY(opentxs::ui::AmountValidator* amountValidator READ
+                   getAmountValidator CONSTANT)
+    Q_PROPERTY(opentxs::ui::DestinationValidator* destValidator READ
+                   getDestValidator CONSTANT)
+    Q_PROPERTY(
+        opentxs::ui::DisplayScaleQt* scaleModel READ getScaleModel CONSTANT)
 
 signals:
     void sync(int, int) const;
@@ -35,7 +44,10 @@ public:
         return 3;
     }
     QVariant data(const QModelIndex& index, int role) const final;
+    opentxs::ui::AmountValidator* getAmountValidator() const noexcept;
     Q_INVOKABLE QString getDepositAddress(const int chain = 0) const noexcept;
+    opentxs::ui::DestinationValidator* getDestValidator() const noexcept;
+    opentxs::ui::DisplayScaleQt* getScaleModel() const noexcept;
     Q_INVOKABLE bool sendToAddress(
         const QString& address,
         const QString& amount,

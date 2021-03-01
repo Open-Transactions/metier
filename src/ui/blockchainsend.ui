@@ -31,43 +31,38 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="address"/>
+      <item row="4" column="1" colspan="2">
+       <widget class="QLineEdit" name="memo"/>
       </item>
-      <item row="0" column="2">
-       <widget class="QToolButton" name="scanQR">
-        <property name="toolTip">
-         <string>Scan Recipient's QR code</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/assets/qrcode.png</normaloff>
-          <normalon>:/assets/qrcode.png</normalon>:/assets/qrcode.png</iconset>
-        </property>
-       </widget>
+      <item row="2" column="2">
+       <widget class="QComboBox" name="scale"/>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="amountLabel">
         <property name="text">
          <string>Amount:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2">
-       <widget class="QLineEdit" name="amount"/>
-      </item>
-      <item row="2" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="memoLabel">
         <property name="text">
          <string>Memo:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2">
-       <widget class="QLineEdit" name="memo"/>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="amount"/>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QLabel" name="status">
+        <property name="text">
+         <string></string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QLineEdit" name="address"/>
       </item>
      </layout>
     </widget>
@@ -83,7 +78,6 @@
  </widget>
  <tabstops>
   <tabstop>address</tabstop>
-  <tabstop>scanQR</tabstop>
   <tabstop>amount</tabstop>
   <tabstop>memo</tabstop>
  </tabstops>

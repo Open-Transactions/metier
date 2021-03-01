@@ -7,12 +7,16 @@
 
 #include "widgets/blockchainsend.hpp"  // IWYU pragma: associated
 
+#include <opentxs/ui/AmountValidator.hpp>
+#include <opentxs/ui/DestinationValidator.hpp>
+#include <opentxs/ui/DisplayScale.hpp>
 #include <QApplication>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <cmath>
+#include <iostream>
 #include <mutex>
 #include <string>
 
@@ -24,21 +28,26 @@ namespace metier::widget
 {
 struct BlockchainSend::Imp {
     std::unique_ptr<Ui::BlockchainSend> ui_;
+    model::AccountActivity& model_;
+    opentxs::ui::AmountValidator* amount_validator_;
+    opentxs::ui::DestinationValidator* address_validator_;
 
-    auto addressChanged() noexcept -> void
+    auto checkOk() -> void
     {
-        auto lock = std::lock_guard<std::mutex>{lock_};
+        auto* ok = ui_->buttons->button(QDialogButtonBox::Ok);
         auto* address = ui_->address;
-        valid_address_ = model_.validateAddress(address->text());
-        check_ok(lock);
-    }
-    auto amountChanged() noexcept -> void
-    {
-        auto lock = std::lock_guard<std::mutex>{lock_};
         auto* amount = ui_->amount;
-        formatted_amount_ = model_.validateAmount(amount->text());
-        valid_amount_ = 0 < formatted_amount_.size();
-        check_ok(lock);
+        ok->setEnabled(
+            address->hasAcceptableInput() && amount->hasAcceptableInput());
+    }
+    auto recalculateAmount(int scale) noexcept
+    {
+        auto* amount = ui_->amount;
+        amount->setText(amount_validator_->revise(amount->text(), scale));
+    }
+    auto scaleChanged(int scale) noexcept
+    {
+        amount_validator_->setScale(scale);
     }
     auto send() noexcept -> void
     {
@@ -47,14 +56,17 @@ struct BlockchainSend::Imp {
         auto* memo = ui_->memo;
         model_.sendToAddress(address->text(), amount->text(), memo->text());
     }
+    auto updateStatus(const QString& text) noexcept -> void
+    {
+        auto* status = ui_->status;
+        status->setText(text);
+    }
 
     Imp(BlockchainSend* parent, model::AccountActivity* model) noexcept
         : ui_(std::make_unique<Ui::BlockchainSend>())
-        , lock_()
         , model_(*model)
-        , formatted_amount_()
-        , valid_address_(false)
-        , valid_amount_(false)
+        , amount_validator_(model_.getAmountValidator())
+        , address_validator_(model_.getDestValidator())
     {
         assert(ui_);
         assert(nullptr != model);
@@ -64,26 +76,20 @@ struct BlockchainSend::Imp {
         auto* ok = ui.buttons->button(QDialogButtonBox::Ok);
         auto* address = ui.address;
         ok->setText(tr("Pay"));
+        address->setValidator(address_validator_);
         util::set_minimum_size(*address, 72, 1);
-        check_ok();
+        auto* amount = ui_->amount;
+        amount->setValidator(amount_validator_);
+        auto* scale = ui_->scale;
+        scale->setModel(model_.getScaleModel());
+        amount_validator_->setScale(scale->currentIndex());
+        checkOk();
     }
 
-private:
-    mutable std::mutex lock_;
-    model::AccountActivity& model_;
-    QString formatted_amount_;
-    bool valid_address_;
-    bool valid_amount_;
-
-    auto check_ok(const std::lock_guard<std::mutex>&) -> void
-    {
-        auto* ok = ui_->buttons->button(QDialogButtonBox::Ok);
-        ok->setEnabled(valid_address_ && valid_amount_);
-    }
-    auto check_ok() -> void
-    {
-        auto lock = std::lock_guard<std::mutex>{lock_};
-        check_ok(lock);
-    }
+    Imp() = delete;
+    Imp(const Imp&) = delete;
+    Imp(Imp&&) = delete;
+    auto operator=(const Imp&) -> Imp& = delete;
+    auto operator=(Imp&&) -> Imp& = delete;
 };
 }  // namespace metier::widget

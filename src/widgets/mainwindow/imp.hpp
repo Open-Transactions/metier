@@ -57,6 +57,8 @@ struct MainWindow::Imp {
     }
     auto repaintProfile() noexcept -> void
     {
+        OT_ASSERT(nullptr != profile_);
+
         auto& name = *ui_->profileName;
         auto& code = *ui_->paymentCode;
         auto& qr = *ui_->qrCode;
@@ -85,6 +87,7 @@ struct MainWindow::Imp {
               ui_->accountList,
               ui_->moneyToolbox,
               [this](const auto chain) { register_progress(chain); })
+        , profile_()
     {
         ui_->setupUi(parent);
         ui_->moneyToolbox->setMaximumWidth(util::line_width(
@@ -101,6 +104,11 @@ struct MainWindow::Imp {
         ui_->identity->setMaximumWidth(paymentCode.minimumWidth());
         paymentCode.setStyleSheet("* { background-color: rgba(0, 0, 0, 0); }");
     }
+    Imp() = delete;
+    Imp(const Imp&) = delete;
+    Imp(Imp&&) = delete;
+    auto operator=(const Imp&) -> Imp& = delete;
+    auto operator=(Imp&&) -> Imp& = delete;
 
 private:
     auto receive_progress_update(
