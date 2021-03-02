@@ -27,17 +27,37 @@ public:
         validate(clean, notUsed);
         input = clean;
     }
-    auto validate(QString& input, [[maybe_unused]] int& pos) const
-        -> State final
+    auto validate(QString& input, int& pos) const -> State final
     {
+        if (0 == input.size()) { return State::Intermediate; }
+
         const auto string = input.toStdString();
-        const auto matches = ot_.Seeds().ValidateWord(type_, lang_, string);
+        const auto matches = [&] {
+            // NOTE this logic needs to be moved to opentxs
+            auto out = ot_.Seeds().ValidateWord(type_, lang_, string);
+            out.erase(
+                std::remove_if(
+                    out.begin(),
+                    out.end(),
+                    [&](const auto& match) {
+                        return match.size() < string.size();
+                    }),
+                out.end());
+
+            return out;
+        }();
+
+        if (1 == std::count(matches.begin(), matches.end(), string)) {
+
+            return State::Acceptable;
+        }
 
         if (0 == matches.size()) {
 
             return State::Invalid;
         } else if (1 == matches.size()) {
             input = matches.begin()->c_str();
+            pos = input.size();
 
             return State::Acceptable;
         } else {
