@@ -225,6 +225,7 @@
      <string>Settings</string>
     </property>
     <addaction name="action_settings_blockchain"/>
+    <addaction name="action_settings_recovery_phrase"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -251,6 +252,11 @@
   <action name="action_file_quit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="action_settings_recovery_phrase">
+   <property name="text">
+    <string>Recovery Phrase</string>
    </property>
   </action>
  </widget>

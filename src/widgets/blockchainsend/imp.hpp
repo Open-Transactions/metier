@@ -7,9 +7,9 @@
 
 #include "widgets/blockchainsend.hpp"  // IWYU pragma: associated
 
-#include <opentxs/ui/AmountValidator.hpp>
-#include <opentxs/ui/DestinationValidator.hpp>
-#include <opentxs/ui/DisplayScale.hpp>
+#include <opentxs/ui/qt/AmountValidator.hpp>
+#include <opentxs/ui/qt/DestinationValidator.hpp>
+#include <opentxs/ui/qt/DisplayScale.hpp>
 #include <QApplication>
 #include <QLabel>
 #include <QLineEdit>

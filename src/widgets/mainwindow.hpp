@@ -33,6 +33,7 @@ private slots:
     void initModels();
     void showBlockchainChooser();
     void showLicenseViewer();
+    void showRecoveryWords();
     void changeChain();
     void updateToolbox();
 

@@ -26,7 +26,6 @@
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "otwrap/validateseed.hpp"
 #include "util/claim.hpp"
 #include "util/convertblockchain.hpp"
 #include "util/scopeguard.hpp"
@@ -122,10 +121,6 @@ struct OTWrap::Imp {
     std::unique_ptr<model::Profile> profile_;
     std::map<ot::OTIdentifier, std::unique_ptr<model::AccountActivity>>
         account_activity_proxy_models_;
-    std::map<
-        ot::crypto::SeedStyle,
-        std::map<ot::crypto::Language, std::unique_ptr<validate::SeedWord>>>
-        seed_validators_;
 
     template <typename OutputType, typename InputType>
     static auto transform(const InputType& data) noexcept -> OutputType
@@ -445,6 +440,16 @@ struct OTWrap::Imp {
 
         return words.split(' ', Qt::SkipEmptyParts);
     }
+    auto getRecoveryWords() -> QStringList
+    {
+        ot::Lock lock(lock_);
+        const auto& seeds = api_.Seeds();
+        const auto reason =
+            api_.Factory().PasswordPrompt("Loading recovery words for backup");
+        const auto words = QString{seeds.Words(reason, seed_id_).c_str()};
+
+        return words.split(' ', Qt::SkipEmptyParts);
+    }
     auto importSeed(int type, int lang, QString input) -> void
     {
         ot::Lock lock(lock_);
@@ -545,21 +550,15 @@ struct OTWrap::Imp {
 
         return output;
     }
-    auto seedWordValidator(const int type, const int lang) -> QValidator*
+    auto seedWordValidator(const int type, const int lang)
+        -> const opentxs::ui::SeedValidator*
     {
         const auto style =
             static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type));
         const auto language =
             static_cast<ot::crypto::Language>(static_cast<std::uint8_t>(lang));
-        ot::Lock lock(lock_);
-        auto& output = seed_validators_[style][language];
 
-        if (false == bool(output)) {
-            output =
-                std::make_unique<validate::SeedWord>(api_, style, language);
-        }
-
-        return output.get();
+        return api_.UI().SeedValidator(style, language);
     }
     auto wordCount(const int type, const int strength) -> int
     {
@@ -608,7 +607,6 @@ struct OTWrap::Imp {
         , account_list_()
         , profile_()
         , account_activity_proxy_models_()
-        , seed_validators_()
     {
         selector_model_native_.SetCallback([&me]() { me.checkChainCount(); });
 

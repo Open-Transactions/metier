@@ -15,6 +15,7 @@ qt5_wrap_ui(
   "qrtoolbutton.ui"
   "receivingaddress.ui"
   "recoverwallet.ui"
+  "showseed.ui"
 )
 
 add_custom_target(metier-ui-generated ALL SOURCES "${METIER_UI}")

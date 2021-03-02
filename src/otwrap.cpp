@@ -125,6 +125,11 @@ auto OTWrap::enabledCurrencyCount() -> int
     return imp_.scanBlockchains().first;
 }
 
+auto OTWrap::getRecoveryWords() -> QStringList
+{
+    return imp_.getRecoveryWords();
+}
+
 auto OTWrap::importSeed(int type, int lang, QString words) -> void
 {
     imp_.importSeed(type, lang, words);
@@ -160,7 +165,8 @@ auto OTWrap::seedTypeModel() -> model::SeedType*
     return imp_.seed_type_.get();
 }
 
-auto OTWrap::seedWordValidator(const int type, const int lang) -> QValidator*
+auto OTWrap::seedWordValidator(const int type, const int lang)
+    -> const opentxs::ui::SeedValidator*
 {
     return imp_.seedWordValidator(type, lang);
 }

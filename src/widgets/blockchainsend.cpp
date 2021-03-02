@@ -5,8 +5,8 @@
 
 #include "blockchainsend.hpp"  // IWYU pragma: associated
 
-#include <opentxs/ui/AmountValidator.hpp>
-#include <opentxs/ui/DestinationValidator.hpp>
+#include <opentxs/ui/qt/AmountValidator.hpp>
+#include <opentxs/ui/qt/DestinationValidator.hpp>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QLineEdit>
