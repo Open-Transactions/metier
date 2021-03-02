@@ -14,7 +14,14 @@
 
 class QAbstractItemModel;
 class QGuiApplication;
-class QValidator;
+
+namespace opentxs
+{
+namespace ui
+{
+class SeedValidator;
+}  // namespace ui
+}  // namespace opentxs
 
 namespace metier
 {
@@ -70,11 +77,14 @@ public:
     model::SeedSize* seedSizeModel(const int type);
     model::SeedType* seedTypeModel();
 
-    QValidator* seedWordValidator(const int type, const int lang);
+    const opentxs::ui::SeedValidator* seedWordValidator(
+        const int type,
+        const int lang);
 
     Q_INVOKABLE int convertBlockchainAccountID(const QString& id);
     Q_INVOKABLE QStringList
     createNewSeed(const int type, const int lang, const int strength);
+    Q_INVOKABLE QStringList getRecoveryWords();
     Q_INVOKABLE int wordCount(const int type, const int strength);
 
     int enabledCurrencyCount();

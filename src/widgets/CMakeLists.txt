@@ -14,6 +14,7 @@ set(cxx-sources
     "qrtoolbutton.cpp"
     "receivingaddress.cpp"
     "recoverwallet.cpp"
+    "showseed.cpp"
 )
 set(cxx-headers
     "blockchainsend/imp.hpp"
@@ -22,6 +23,7 @@ set(cxx-headers
     "mainwindow/syncprogress.hpp"
     "newseed/imp.hpp"
     "recoverwallet/imp.hpp"
+    "showseed/imp.hpp"
 )
 set(moc-headers
     "blockchainchooser.hpp"
@@ -34,6 +36,7 @@ set(moc-headers
     "qrtoolbutton.hpp"
     "receivingaddress.hpp"
     "recoverwallet.hpp"
+    "showseed.hpp"
 )
 qt5_wrap_cpp(moc-sources "${moc-headers}")
 

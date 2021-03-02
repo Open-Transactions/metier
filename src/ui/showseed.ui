@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ShowSeed</class>
+ <widget class="QDialog" name="ShowSeed">
+  <property name="windowTitle">
+   <string>Backup Recovery Phrase</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="instructions">
+     <property name="text">
+      <string>Your recovery phrase is the only way to recover your wallet on a new device. Store these words in a secure location before continuing to avoid the risk of losing funds.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="words">
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="completionButtons">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
