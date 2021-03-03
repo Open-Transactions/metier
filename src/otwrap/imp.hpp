@@ -39,8 +39,8 @@ auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
 auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     -> const ot::ArgList&
 {
-    parent.setOrganizationDomain("opentransactions.org");
-    parent.setApplicationName("metier");
+    parent.setOrganizationDomain(METIER_APP_DOMAIN);
+    parent.setApplicationName(METIER_APP_NAME);
     auto path =
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 

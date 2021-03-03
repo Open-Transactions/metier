@@ -71,6 +71,11 @@ else()
   target_link_libraries("${PROJECT_NAME}" PRIVATE metier-ui Qt5::Widgets)
 endif()
 
+target_compile_definitions(
+  "${PROJECT_NAME}" PRIVATE METIER_APP_DOMAIN="${METIER_APP_DOMAIN}"
+                            METIER_APP_NAME="${PROJECT_NAME}"
+)
+
 if(METIER_USE_SYNC_SERVER)
   target_compile_definitions(
     "${PROJECT_NAME}"
