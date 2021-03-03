@@ -8,6 +8,7 @@ cmake_policy(SET CMP0091 NEW)
 project(metier)
 set(METIER_APPSTREAM_ID "org.opentransactions.metier")
 set(METIER_APPSTREAM_NAME "Métier")
+set(METIER_APP_DOMAIN "opentransactions.org")
 list(APPEND CMAKE_MODULE_PATH "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
 include(open-transactions-common)
 
