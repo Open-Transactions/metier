@@ -64,9 +64,18 @@ if(UNIX
     "${CMAKE_CURRENT_BINARY_DIR}/${METIER_APPSTREAM_ID}.desktop"
     @ONLY
   )
-
   install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/${METIER_APPSTREAM_ID}.desktop"
     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications"
+  )
+
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/linux/metainfo.xml.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${METIER_APPSTREAM_ID}.metainfo.xml"
+    @ONLY
+  )
+  install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/${METIER_APPSTREAM_ID}.metainfo.xml"
+    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/metainfo"
   )
 endif()
