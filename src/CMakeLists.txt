@@ -33,20 +33,27 @@ else()
   list(APPEND object-deps $<TARGET_OBJECTS:metier-widgets>)
 endif()
 
+if(WIN32)
+  set(APP_ICON_RESOURCE_WINDOWS "${metier_SOURCE_DIR}/package/windows/app.rc")
+else()
+  set(APP_ICON_RESOURCE_WINDOWS "")
+endif()
+
 add_executable(
-  metier
+  "${PROJECT_NAME}"
   "${object-deps}"
   "${cxx-sources}"
   "${cxx-headers}"
   "${moc-sources}"
   "${moc-headers}"
   "${rcc-sources}"
+  "${APP_ICON_RESOURCE_WINDOWS}"
 )
 
-target_include_directories(metier PRIVATE "${metier_SOURCE_DIR}")
+target_include_directories("${PROJECT_NAME}" PRIVATE "${metier_SOURCE_DIR}")
 
 target_link_libraries(
-  metier
+  "${PROJECT_NAME}"
   PRIVATE
     opentxs
     qr-code-generator
@@ -59,35 +66,37 @@ target_link_libraries(
 )
 
 if(METIER_QML_INTERFACE)
-  target_link_libraries(metier PRIVATE Qt5::Qml Qt5::Quick)
+  target_link_libraries("${PROJECT_NAME}" PRIVATE Qt5::Qml Qt5::Quick)
 else()
-  target_link_libraries(metier PRIVATE metier-ui Qt5::Widgets)
+  target_link_libraries("${PROJECT_NAME}" PRIVATE metier-ui Qt5::Widgets)
 endif()
 
 if(METIER_USE_SYNC_SERVER)
   target_compile_definitions(
-    metier PRIVATE DEFAULT_SYNC_SERVER="${METIER_DEFAULT_SYNC_SERVER}"
+    "${PROJECT_NAME}"
+    PRIVATE DEFAULT_SYNC_SERVER="${METIER_DEFAULT_SYNC_SERVER}"
   )
 endif()
 
 if(METIER_USE_DEFAULT_BLOCKCHAIN)
   target_compile_definitions(
-    metier PRIVATE METIER_DEFAULT_BLOCKCHAIN=${METIER_DEFAULT_BLOCKCHAIN}
+    "${PROJECT_NAME}"
+    PRIVATE METIER_DEFAULT_BLOCKCHAIN=${METIER_DEFAULT_BLOCKCHAIN}
   )
 endif()
 
 if(METIER_BUNDLED_OPENTXS)
-  opentxs_link_target("metier")
+  opentxs_link_target("${PROJECT_NAME}")
 else()
-  target_link_libraries(metier PRIVATE protobuf::libprotobuf-lite)
+  target_link_libraries("${PROJECT_NAME}" PRIVATE protobuf::libprotobuf-lite)
 
   if(CMAKE_DL_LIBS)
-    target_link_libraries(metier PRIVATE ${CMAKE_DL_LIBS})
+    target_link_libraries("${PROJECT_NAME}" PRIVATE ${CMAKE_DL_LIBS})
   endif()
 
   if(LIB_RT)
-    target_link_libraries(metier PRIVATE ${LIB_RT})
+    target_link_libraries("${PROJECT_NAME}" PRIVATE ${LIB_RT})
   endif()
 endif()
 
-install(TARGETS metier)
+install(TARGETS "${PROJECT_NAME}")

@@ -21,6 +21,9 @@ target_include_directories(
   INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}"
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
 )
+target_compile_definitions(
+  metier-license PRIVATE -DMETIER_APPSTREAM_NAME="${METIER_APPSTREAM_NAME}"
+)
 target_link_libraries(
   metier-license
   PRIVATE

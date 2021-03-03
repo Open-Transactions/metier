@@ -12,7 +12,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Get started with Metier</string>
+   <string>Create or restore your wallet</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

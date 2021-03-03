@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>assets/Basic-Copy-icon.png</file>
+        <file>assets/app_icon.png</file>
         <file>assets/qrcode.png</file>
     </qresource>
 </RCC>

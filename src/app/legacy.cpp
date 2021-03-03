@@ -7,6 +7,7 @@
 
 #include <otwrap.hpp>
 #include <QApplication>
+#include <QIcon>
 #include <QPushButton>
 
 #include "util/focuser.hpp"
@@ -23,6 +24,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
     static std::unique_ptr<App> singleton_;
 
     App& parent_;
+    const QIcon icon_;
     std::atomic_bool first_run_complete_;
     std::unique_ptr<OTWrap> ot_;
     std::unique_ptr<widget::FirstRun> first_run_;
@@ -59,13 +61,19 @@ struct LegacyApp final : public App::Imp, public QApplication {
         util::Focuser(recover_wallet_.get()).show();
     }
 
-    auto run() -> int final { return exec(); }
+    auto run() -> int final
+    {
+        setWindowIcon(icon_);
+
+        return exec();
+    }
 
     auto otwrap() noexcept -> OTWrap* final { return ot_.get(); }
 
     LegacyApp(App& parent, int& argc, char** argv) noexcept
         : QApplication(argc, argv)
         , parent_(parent)
+        , icon_(":/assets/app_icon.png")
         , first_run_complete_(false)
         , ot_(std::make_unique<OTWrap>(*this, argc, argv))
         , first_run_(std::make_unique<widget::FirstRun>(nullptr))

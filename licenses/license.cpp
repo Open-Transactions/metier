@@ -28,7 +28,7 @@ auto make_vector() noexcept -> LicenseData;
 auto make_vector() noexcept -> LicenseData
 {
     auto output = LicenseData{
-        {"Metier",
+        {METIER_APPSTREAM_NAME,
          std::string{reinterpret_cast<const char*>(LICENSE), LICENSE_len}},
         {"Boost",
          std::string{reinterpret_cast<const char*>(boost_txt), boost_txt_len}},
