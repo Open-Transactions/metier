@@ -10,9 +10,6 @@
     <height>1080</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Metier</string>
-  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>

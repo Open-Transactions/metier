@@ -3,7 +3,7 @@
  <class>licenseViewer</class>
  <widget class="QDialog" name="licenseViewer">
   <property name="windowTitle">
-   <string>Metier open source licenses</string>
+   <string>Open source licenses</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">

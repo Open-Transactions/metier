@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.4
+Type=Application
+Terminal=false
+Exec=@CMAKE_INSTALL_FULL_BINDIR@/@PROJECT_NAME@
+Name=@METIER_APPSTREAM_NAME@
+Icon=@METIER_APPSTREAM_ID@
+Categories=Network;Office;Finance;P2P;Qt
