@@ -116,7 +116,7 @@ jobs:
       with:
         allowUpdates: true
         artifacts: ${{ matrix.release_artifacts }}
-        commit: release
-        tag: ${{ env.release_version }}-release
+        commit: pkt-release
+        tag: pkt-${{ env.release_version }}-release
         token: ${{ secrets.GITHUB_TOKEN }}
 

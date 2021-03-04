@@ -25,7 +25,9 @@ auto SeedEndpoints() noexcept -> const std::vector<const char*>&
 auto DefaultBlockchains() noexcept
     -> const std::vector<opentxs::blockchain::Type>&
 {
-    static const auto data = std::vector<opentxs::blockchain::Type>{};
+    static const auto data = std::vector<opentxs::blockchain::Type>{
+        opentxs::blockchain::Type::PKT
+    };
 
     return data;
 }

@@ -1,9 +1,9 @@
 {
-  "id": "org.opentransactions.metier",
+  "id": "cash.pkt.pktdesktop",
   "runtime": "org.kde.Platform",
   "runtime-version": "5.15",
   "sdk": "org.kde.Sdk",
-  "command": "metier",
+  "command": "PKT MatterFi",
   "modules": [
     {
       "name": "boost",
@@ -138,8 +138,8 @@
       ],
       "sources": [
         {
-          "url": "https://github.com/Open-Transactions/metier",
-          "branch": "develop",
+          "url": "ssh://git@github.com/matterfi/wallet",
+          "branch": "pkt",
           "type": "git",
           "disable-shallow-clone": true
         }

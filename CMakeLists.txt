@@ -10,12 +10,12 @@ cmake_policy(
   NEW
 )
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
-project(metier)
-set(METIER_APPSTREAM_ID "org.opentransactions.metier")
-set(METIER_APPSTREAM_NAME "Métier")
-set(METIER_APP_DOMAIN "opentransactions.org")
-set(METIER_CLI_COMMAND "metierctl")
-set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
+project(pktdesktop)
+set(METIER_APPSTREAM_ID "cash.pkt.pktdesktop")
+set(METIER_APPSTREAM_NAME "PKT MatterFi")
+set(METIER_APP_DOMAIN "pkt.cash")
+set(METIER_CLI_COMMAND "pktctl")
+set(METIER_GUI_OUTPUT_NAME "${METIER_APPSTREAM_NAME}")
 
 set(METIER_VERSION_MAJOR 22)
 set(METIER_VERSION_MINOR 2)

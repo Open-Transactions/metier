@@ -17,8 +17,8 @@ jobs:
     - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v3
       with:
         manifest-path: package/gui.flatpak.json
-        bundle: org.opentransactions.metier.flatpak
+        bundle: cash.pkt.desktop.flatpak
         cache-key: flatpak-builder-${{ github.workflow }}-${{ github.ref }}
     - uses: actions/upload-artifact@v2
       with:
-        path: org.opentransactions.metier.flatpak
+        path: cash.pkt.desktop.flatpak
