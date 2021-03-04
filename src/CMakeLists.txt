@@ -34,7 +34,9 @@ else()
 endif()
 
 if(WIN32)
-  set(APP_ICON_RESOURCE_WINDOWS "${metier_SOURCE_DIR}/package/windows/app.rc")
+  set(APP_ICON_RESOURCE_WINDOWS
+      "${${PROJECT_NAME}_SOURCE_DIR}/package/windows/app.rc"
+  )
 else()
   set(APP_ICON_RESOURCE_WINDOWS "")
 endif()
@@ -50,7 +52,9 @@ add_executable(
   "${APP_ICON_RESOURCE_WINDOWS}"
 )
 
-target_include_directories("${PROJECT_NAME}" PRIVATE "${metier_SOURCE_DIR}")
+target_include_directories(
+  "${PROJECT_NAME}" PRIVATE "${${PROJECT_NAME}_SOURCE_DIR}"
+)
 
 target_link_libraries(
   "${PROJECT_NAME}"
