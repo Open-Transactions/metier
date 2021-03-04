@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>IOSbackGesture.qml</file>
+        <file>MatterFi_HeaderBar.qml</file>
+        <file>OTidentity.qml</file>
+
+        <!-- Register QML Compnents -->
+        <file>qmldir</file>
     </qresource>
 </RCC>

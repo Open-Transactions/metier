@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="pages/">
+        <file>home.qml</file>
+        <file>app_version.qml</file>
+        <!-- new user routing -->
+        <file>newuser/create_new_profile.qml</file>
+        <file>newuser/account_recovery_storing.qml</file>
+        <file>newuser/new_recovery_phrase.qml</file>
+        <!-- account holder navigation -->
+        <file>existing_user/edit_profile.qml</file>
+        <file>existing_user/user_accounts.qml</file>
+        <file>existing_user/block_chain_chooser.qml</file>
+        <file>existing_user/enter_recovery_phrase.qml</file>
+        <file>existing_user/show_recovery_phrase.qml</file>
+        <file>existing_user/single_crypto_account_display.qml</file>
+        <file>existing_user/advanced_wallet_details.qml</file>
+        <!-- profile features -->
+        <file>contacts/contact_activity_threads.qml</file>
+        <file>contacts/view_contact_profile.qml</file>
+    </qresource>
+</RCC>

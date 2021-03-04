@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="matterfi/">
+        <file>MatterFi_SVGimage.qml</file>
+        <file>MatterFi_BurgerListItem.qml</file>
+        <file>MatterFi_Avatar.qml</file>
+        <file>MatterFi_ContactListDelegate.qml</file>
+        <file>MatterFi_BlockChainDelegate.qml</file>
+        <file>MatterFi_AccountListDelegate.qml</file>
+        <file>MatterFi_AccountActivity.qml</file>
+        <file>MatterFi_RecoveryWordInput.qml</file>
+        <file>MatterFi_ProgressBar.qml</file>
+        <file>MatterFi_ComboBox.qml</file>
+        <file>MatterFi_PaymentCode.qml</file>
+        <file>MatterFi_AmountInput.qml</file>
+        <file>MatterFi_TransactionHistoryDisplay.qml</file>
+        <file>MatterFi_QRCodeImage.qml</file>
+        <file>MatterFi_SeedSizeComboBox.qml</file>
+        <file>MatterFi_SeedTypeComboBox.qml</file>
+        <file>MatterFi_SeedLangComboBox.qml</file>
+        <file>MatterFi_BlockChainReceiveCode.qml</file>
+        <file>MatterFi_Button_Standard.qml</file>
+        <file>MatterFi_Button_Accent.qml</file>
+        <file>MatterFi_BlockChainStatistics.qml</file>
+        <file>MatterFi_ContactActivityDelegate.qml</file>
+        <file>MatterFi_CheckBox.qml</file>
+        <file>MatterFi_BusyIndicator.qml</file>
+        <file>MatterFi_DetailTree.qml</file>
+        <file>MatterFi_HugeIconImage.qml</file>
+        <file>MatterFi_ToolTip.qml</file>
+        <!-- Register QML Compnents -->
+        <file>qmldir</file>
+    </qresource>
+</RCC>

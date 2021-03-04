@@ -1,0 +1,6 @@
+# qmldir
+
+singleton OTidentity 1.0 OTidentity.qml
+
+IOSbackGesture 1.0 IOSbackGesture.qml
+MatterFi_HeaderBar 1.0 MatterFi_HeaderBar.qml

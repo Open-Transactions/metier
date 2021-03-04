@@ -1,0 +1,27 @@
+# qmldir
+
+MatterFi_SVGimage 1.0 MatterFi_SVGimage.qml
+MatterFi_Avatar 1.0 MatterFi_Avatar.qml
+MatterFi_BurgerListItem 1.0 MatterFi_BurgerListItem.qml
+MatterFi_ContactListDelegate 1.0 MatterFi_ContactListDelegate.qml
+MatterFi_BlockChainDelegate 1.0 MatterFi_BlockChainDelegate.qml
+MatterFi_AccountListDelegate 1.0 MatterFi_AccountListDelegate.qml
+MatterFi_AccountActivity 1.0 MatterFi_AccountActivity.qml
+MatterFi_ProgressBar 1.0 MatterFi_ProgressBar.qml
+MatterFi_RecoveryWordInput 1.0 MatterFi_RecoveryWordInput.qml
+MatterFi_ComboBox 1.0 MatterFi_ComboBox.qml
+MatterFi_PaymentCode 1.0 MatterFi_PaymentCode.qml
+MatterFi_AmountInput 1.0 MatterFi_AmountInput.qml
+MatterFi_TransactionHistoryDisplay 1.0 MatterFi_TransactionHistoryDisplay.qml
+MatterFi_QRCodeImage 1.0 MatterFi_QRCodeImage.qml
+MatterFi_SeedSizeComboBox 1.0 MatterFi_SeedSizeComboBox.qml
+MatterFi_SeedTypeComboBox 1.0 MatterFi_SeedTypeComboBox.qml
+MatterFi_BlockChainReceiveCode 1.0 MatterFi_BlockChainReceiveCode.qml
+MatterFi_Button_Standard 1.0 MatterFi_Button_Standard.qml
+MatterFi_Button_Accent 1.0 MatterFi_Button_Accent.qml
+MatterFi_BlockChainStatistics 1.0 MatterFi_BlockChainStatistics.qml
+MatterFi_BusyIndicator 1.0 MatterFi_BusyIndicator.qml
+MatterFi_SeedLangComboBox 1.0 MatterFi_SeedLangComboBox.qml
+MatterFi_DetailTree 1.0 MatterFi_DetailTree.qml
+MatterFi_HugeIconImage 1.0 MatterFi_HugeIconImage.qml
+MatterFi_ToolTip 1.0 MatterFi_ToolTip.qml

@@ -1,0 +1,10 @@
+# qmldir
+
+singleton QML_Debugger QML_Debugger.qml
+
+ButtonText 1.0 ButtonText.qml
+NavButton 1.0 NavButton.qml
+FontIconButton 1.0 FontIconButton.qml
+SvgIconButton 1.0 SvgIconButton.qml
+ListButtonObject 1.0 ListButtonObject.qml
+WatterMarker 1.0 WaterMarker.qml

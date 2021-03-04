@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="drawers/">
+    <file>MatterFi_ContextDrawer.qml</file>
+    <file>ReceiveFunds_ContextDrawer.qml</file>
+    <file>SendFunds_ContextDrawer.qml</file>
+    <file>AccountActivity_ContextDrawer.qml</file>
+    <file>CreateContact_ContextDrawer.qml</file>
+    <!-- Register QML Compnents -->
+    <file>qmldir</file>
+  </qresource>
+</RCC>

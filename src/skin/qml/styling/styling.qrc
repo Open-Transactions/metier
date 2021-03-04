@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="styling/">
+    <file>CustStyle.qml</file>
+    <file>Fonts.qml</file>
+    <file>IconIndex.qml</file>
+    <file>HorizontalLineRect.qml</file>
+    <file>OutlineSimple.qml</file>
+    <!-- Register QML Compnents -->
+    <file>qmldir</file>
+  </qresource>
+</RCC>

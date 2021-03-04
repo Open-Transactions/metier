@@ -9,7 +9,7 @@ namespace metier
 {
 auto qml_default_size() noexcept -> std::pair<int, int>
 {
-    return std::make_pair(0, 0);
+    return std::make_pair(1024, 768);
 }
 
 auto qml_maximum_size() noexcept -> std::pair<int, int>
@@ -19,6 +19,6 @@ auto qml_maximum_size() noexcept -> std::pair<int, int>
 
 auto qml_minimum_size() noexcept -> std::pair<int, int>
 {
-    return std::make_pair(0, 0);
+    return std::make_pair(1024, 768);
 }
 }  // namespace metier

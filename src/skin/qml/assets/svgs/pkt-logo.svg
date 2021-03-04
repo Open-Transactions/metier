@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 324.08 128.83">
+  <defs>
+    <style>
+      .cls-1{fill:none;}
+      .cls-2{clip-path:url(#clip-path);}
+      .cls-3,.cls-5{fill:#f5fcfe;}
+      .cls-4{fill:#3cadef;}
+      .cls-5{font-size:14px;font-family:DaysOne-Regular, Days One;letter-spacing:0.01em;}
+    </style>
+    
+    <clipPath id="clip-path" transform="translate(0.01 -0.1)">
+      <rect id="SVGID" class="cls-1" width="324" height="129.02"/>
+    </clipPath>
+  </defs>
+  
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Body">
+      <g class="cls-2">
+        <path class="cls-3" d="M314.72,82.71c-5.11,0-8.14-3-8.14-8V52.51h17V34H306V13.63h-5L281.71,34H254.78L238,61.32V8.84H213.85V58.32c-4.13-16-17.72-26.59-35.52-26.59a33.25,33.25,0,0,0-16.16,4.08V32l-24.89.07v96.82h23.93V101.48a33.19,33.19,0,0,0,17.14,4.63c17.8,0,31.39-10.65,35.52-26.66v24.3h24.19V74.26l17.59,29.49h28.53l-24.11-36.5,9.69-14.74h12.62V78.82c0,15.5,9.45,24.92,25,24.92H324v-21ZM176.57,84.84c-9.07,0-15.73-6.8-15.73-16s6.66-16,15.73-16,15.72,6.8,15.72,16S185.58,84.84,176.57,84.84Z" transform="translate(0.01 -0.1)"/>
+        <path class="cls-4" d="M30.5,28.75H3.9v26.4H30.5Z" transform="translate(0.01 -0.1)"/>
+        <path class="cls-4" d="M16.81.1H0V16.8H16.81Z" transform="translate(0.01 -0.1)"/>
+        <path class="cls-4" d="M62,1.76H43.85v18H62Z" transform="translate(0.01 -0.1)"/>
+        <path class="cls-4" d="M35,6.26H26v9H35Z" transform="translate(0.01 -0.1)"/>
+        <path class="cls-4" d="M115.64,32.19v57.6a16.47,16.47,0,0,1-1.27,6.35,16.74,16.74,0,0,1-15.46,10.25h-58V32.19Z" transform="translate(0.01 -0.1)"/>
+      </g>
+
+      <text class="cls-5" transform="translate(176 120.92)">
+        <tspan>A</tspan>
+        <tspan dx="5">MATTERFI</tspan>
+        <tspan dx="5">WALLET ™</tspan>
+      </text>
+
+    </g>
+  </g>
+</svg>

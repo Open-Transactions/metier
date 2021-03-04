@@ -1,0 +1,46 @@
+<RCC>
+    <qresource prefix="/assets">
+        <file>splash.png</file>
+        
+        <!-- MatterFi -->
+        <file>svgs/pkt-logo.svg</file>
+        <file>svgs/pkt-icon.svg</file>
+        <file>svgs/Matterfi-black.svg</file>
+        <file>svgs/Matterfi-grey.svg</file>
+        <file>svgs/Matterfi-normal.svg</file>
+        <file>svgs/Matterfi-white.svg</file>
+
+        <!-- Font Awesome -->
+        <file>fonts/fontAwesome/FA5-b400.otf</file>
+        <file>fonts/fontAwesome/FA5-r400.otf</file>
+        <file>fonts/fontAwesome/FA5-s900.otf</file>
+        <file>fonts/fontAwesome/LICENSE.txt</file>
+        <file>svgs/FA5-Free/solid/chevron-up.svg</file>
+        <file>svgs/FA5-Free/solid/chevron-down.svg</file>
+        <file>svgs/FA5-Free/solid/check.svg</file>
+        <file>svgs/FA5-Free/solid/chevron-left.svg</file>
+        <file>svgs/FA5-Free/solid/wallet.svg</file>
+        <file>svgs/FA5-Free/solid/list.svg</file>
+        <file>svgs/FA5-Free/solid/cog.svg</file>
+        <file>svgs/FA5-Free/solid/info-circle.svg</file>
+        <file>svgs/FA5-Free/solid/user-friends.svg</file>
+        <file>svgs/FA5-Free/solid/user.svg</file>
+        <file>svgs/FA5-Free/solid/caret-down.svg</file>
+        <file>svgs/FA5-Free/solid/camera.svg</file>
+        <file>svgs/FA5-Free/solid/keyboard.svg</file>
+        <file>svgs/FA5-Free/solid/eye-slash.svg</file>
+        <file>svgs/FA5-Free/solid/search.svg</file>
+        <file>svgs/FA5-Free/solid/qrcode.svg</file>
+        <file>svgs/FA5-Free/solid/link.svg</file>
+        <file>svgs/FA5-Free/solid/phone.svg</file>
+        <file>svgs/FA5-Free/solid/home.svg</file>
+        <file>svgs/FA5-Free/solid/building.svg</file>
+        <file>svgs/FA5-Free/solid/plus.svg</file>
+        <file>svgs/FA5-Free/solid/ellipsis-v.svg</file>
+        <file>svgs/FA5-Free/solid/arrow-alt-circle-left.svg</file>
+        <file>svgs/FA5-Free/solid/envelope-square.svg</file>
+        <file>svgs/FA5-Free/solid/envelope.svg</file>
+        <file>svgs/FA5-Free/solid/address-card.svg</file>
+    </qresource>
+
+</RCC>

@@ -1,0 +1,7 @@
+# qmldir
+
+MatterFi_ContextDrawer 1.0 MatterFi_ContextDrawer.qml
+ReceiveFunds_ContextDrawer 1.0 ReceiveFunds_ContextDrawer.qml
+SendFunds_ContextDrawer 1.0 SendFunds_ContextDrawer.qml
+AccountActivity_ContextDrawer 1.0 AccountActivity_ContextDrawer.qml
+CreateContact_ContextDrawer 1.0 CreateContact_ContextDrawer.qml

@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="qml_shared/">
+        <file>WaterMarker.qml</file>
+        <file>NavButton.qml</file>
+        <file>ButtonText.qml</file>
+        <file>FontIconButton.qml</file>
+        <file>SvgIconButton.qml</file>
+        <file>ListButtonObject.qml</file>
+        <file>NewWindow.qml</file>
+        <file>QML_Debugger.qml</file>
+        <!-- Register QML Compnents -->
+        <file>qmldir</file>
+    </qresource>
+</RCC>
