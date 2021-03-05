@@ -5,54 +5,28 @@
 
 #pragma once
 
+#include <QIdentityProxyModel>
 #include <QObject>
-#include <QSortFilterProxyModel>
-#include <QString>
-#include <QVariant>
 
 class QModelIndex;
-
-namespace opentxs::api::client
-{
-class UI;
-}
+class QAbstractItemModel;
 
 namespace metier::model
 {
-class BlockchainChooser final : public QSortFilterProxyModel
+class BlockchainChooser final : public QIdentityProxyModel
 {
     Q_OBJECT
 public:
-    auto columnCount([[maybe_unused]] const QModelIndex& parent) const
-        -> int final
-    {
-        return 2;
-    }
-    auto data(const QModelIndex& index, int role = Qt::DisplayRole) const
-        -> QVariant final;
-    auto flags(const QModelIndex& index) const -> Qt::ItemFlags final;
-    auto headerData(
-        int section,
-        Qt::Orientation orientation,
-        int role = Qt::DisplayRole) const -> QVariant final;
-    auto setData(const QModelIndex& index, const QVariant& value, int role)
-        -> bool final;
+    auto flags(const QModelIndex&) const -> Qt::ItemFlags final { return {}; }
 
-    BlockchainChooser(
-        QObject& parent,
-        const opentxs::api::client::UI& ui,
-        const bool testnetMode);
+    BlockchainChooser(QAbstractItemModel* parent) noexcept
+    {
+        setSourceModel(parent);
+    }
+
     ~BlockchainChooser() final = default;
 
 private:
-    using ot_super = QSortFilterProxyModel;
-
-    const bool testnetMode_;
-
-    auto filterAcceptsColumn(
-        int source_column,
-        const QModelIndex& source_parent) const -> bool final;
-
     BlockchainChooser(const BlockchainChooser&) = delete;
     BlockchainChooser(BlockchainChooser&&) = delete;
     BlockchainChooser& operator=(const BlockchainChooser&) = delete;

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "models/blockchainchooser.hpp"
 #include "otwrap/imp.hpp"
 #include "util/convertblockchain.hpp"
 
@@ -42,17 +43,15 @@ auto OTWrap::accountListModel() -> model::AccountList*
     return imp_.account_list_.get();
 }
 
-auto OTWrap::blockchainChooserModel(const bool testnet)
-    -> model::BlockchainChooser*
+auto OTWrap::blockchainChooserModel(const bool testnet) -> QAbstractItemModel*
 {
-    return (testnet ? imp_.blockchain_chooser_testnet_
-                    : imp_.blockchain_chooser_mainnet_)
-        .get();
-}
+    if (testnet) {
 
-auto OTWrap::checkChainCount() -> void
-{
-    emit chainsChanged(imp_.scanBlockchains().first);
+        return imp_.api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Test);
+    } else {
+
+        return imp_.mainnet_model_.get();
+    }
 }
 
 auto OTWrap::checkStartupConditions() -> void
@@ -79,7 +78,9 @@ auto OTWrap::checkStartupConditions() -> void
 
     emit nymReady();
 
-    if (0 == imp_.scanBlockchains().first) {
+    if (auto* model =
+            imp_.api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::All);
+        1 > model->enabledCount()) {
         emit needBlockchain();
 
         return;
@@ -122,7 +123,7 @@ auto OTWrap::enabledBlockchains() -> BlockchainList
 
 auto OTWrap::enabledCurrencyCount() -> int
 {
-    return imp_.scanBlockchains().first;
+    return static_cast<int>(imp_.enabled_chains_.count());
 }
 
 auto OTWrap::getRecoveryWords() -> QStringList
@@ -138,7 +139,17 @@ auto OTWrap::importSeed(int type, int lang, QString words) -> void
 
 auto OTWrap::longestBlockchainName() -> int
 {
-    return imp_.scanBlockchains().second;
+    static const auto length = [&] {
+        auto out = std::size_t{0};
+
+        for (const auto chain : ot::blockchain::DefinedChains()) {
+            out = std::max(out, ot::blockchain::DisplayString(chain).size());
+        }
+
+        return out;
+    }();
+
+    return static_cast<int>(length);
 }
 
 auto OTWrap::longestSeedWord() -> int { return imp_.longest_seed_word_; }

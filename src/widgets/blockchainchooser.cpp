@@ -5,11 +5,12 @@
 
 #include "blockchainchooser.hpp"  // IWYU pragma: associated
 
+#include <opentxs/ui/qt/BlockchainSelection.hpp>
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QTableView>
+#include <iostream>
 
-#include "models/blockchainchooser.hpp"
 #include "otwrap.hpp"
 #include "ui_blockchainchooser.h"
 #include "util/resizer.hpp"
@@ -34,10 +35,9 @@ BlockchainChooser::BlockchainChooser(QWidget* parent, OTWrap& ot)
         mainnet.setModel(mainModel);
         testnet.setModel(testModel);
         const auto setWidth = [&](auto& table) {
-            const auto width0 = util::line_width(table, longestBlockchainName);
-            const auto width1 = util::line_width(table, enabled_column_width_);
-            table.setColumnWidth(0, width0);
-            table.setColumnWidth(1, width1);
+            const auto width =
+                util::line_width(table, longestBlockchainName + 6);
+            table.setColumnWidth(0, width);
         };
         setWidth(mainnet);
         setWidth(testnet);

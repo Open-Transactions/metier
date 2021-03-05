@@ -29,7 +29,6 @@ namespace model
 {
 class AccountActivity;
 class AccountList;
-class BlockchainChooser;
 class Profile;
 class SeedLanguage;
 class SeedSize;
@@ -58,7 +57,6 @@ signals:
 
 public slots:
     void checkAccounts();
-    void checkChainCount();
     void checkStartupConditions();
     void createNym(QString alias);
     void importSeed(int type, int lang, QString words);
@@ -71,7 +69,7 @@ public:
     model::AccountActivity* accountActivityModel(const QString& id);
     model::AccountActivity* accountActivityModel(const int chain);
     model::AccountList* accountListModel();
-    model::BlockchainChooser* blockchainChooserModel(const bool testnet);
+    QAbstractItemModel* blockchainChooserModel(const bool testnet);
     model::Profile* profileModel();
     model::SeedLanguage* seedLanguageModel(const int type);
     model::SeedSize* seedSizeModel(const int type);

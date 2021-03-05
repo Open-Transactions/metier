@@ -21,7 +21,6 @@
 #include "deps/opentxs/tests/Cli.hpp"
 #include "models/accountactivity.hpp"
 #include "models/accountlist.hpp"
-#include "models/blockchainchooser.hpp"
 #include "models/profile.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
@@ -78,6 +77,12 @@ struct OTWrap::Imp {
     struct EnabledChains {
         using Vector = std::set<ot::blockchain::Type>;
 
+        auto count() const noexcept
+        {
+            ot::Lock lock(lock_);
+
+            return enabled_.size();
+        }
         auto get() const noexcept
         {
             auto output = BlockchainList{};
@@ -93,10 +98,25 @@ struct OTWrap::Imp {
             return output;
         }
 
+        auto add(ot::blockchain::Type chain) noexcept
+        {
+            ot::Lock lock(lock_);
+            enabled_.emplace(chain);
+        }
+        auto remove(ot::blockchain::Type chain) noexcept
+        {
+            ot::Lock lock(lock_);
+            enabled_.erase(chain);
+        }
         auto set(Vector&& in) noexcept
         {
             ot::Lock lock(lock_);
             std::swap(enabled_, in);
+        }
+
+        EnabledChains(Vector&& in) noexcept
+            : enabled_(std::move(in))
+        {
         }
 
     private:
@@ -106,21 +126,19 @@ struct OTWrap::Imp {
 
     const opentxs::api::Context& ot_;
     const opentxs::api::client::Manager& api_;
-    const opentxs::ui::BlockchainSelection& selector_model_native_;
     const std::string seed_id_;
     const ot::OTNymID nym_id_;
     const int longest_seed_word_;
     mutable std::mutex lock_;
-    mutable EnabledChains enabled_chains_;
+    EnabledChains enabled_chains_;
     std::unique_ptr<model::SeedType> seed_type_;
     std::map<int, std::unique_ptr<model::SeedLanguage>> seed_language_;
     std::map<int, std::unique_ptr<model::SeedSize>> seed_size_;
-    std::unique_ptr<model::BlockchainChooser> blockchain_chooser_mainnet_;
-    std::unique_ptr<model::BlockchainChooser> blockchain_chooser_testnet_;
     std::unique_ptr<model::AccountList> account_list_;
     std::unique_ptr<model::Profile> profile_;
     std::map<ot::OTIdentifier, std::unique_ptr<model::AccountActivity>>
         account_activity_proxy_models_;
+    std::unique_ptr<model::BlockchainChooser> mainnet_model_;
 
     template <typename OutputType, typename InputType>
     static auto transform(const InputType& data) noexcept -> OutputType
@@ -138,37 +156,10 @@ struct OTWrap::Imp {
 
     auto needNym() const noexcept { return 0 == api_.Wallet().LocalNymCount(); }
     auto needSeed() const noexcept { return api_.Storage().SeedList().empty(); }
-    auto scanBlockchains() const noexcept -> std::pair<int, int>
-    {
-        auto enabledVector = EnabledChains::Vector{};
-        auto output = std::pair<int, int>{};
-        auto& [enabled, longest] = output;
-        const auto& model = selector_model_native_;
-        auto row = model.First();
-
-        while (true) {
-            if (false == row->Valid()) { break; }
-
-            if (row->IsEnabled()) {
-                ++enabled;
-                enabledVector.emplace(row->Type());
-            }
-
-            longest = std::max(longest, static_cast<int>(row->Name().size()));
-
-            if (row->Last()) { break; }
-
-            row = model.Next();
-        }
-
-        enabled_chains_.set(std::move(enabledVector));
-
-        return output;
-    }
     auto validateBlockchains() const noexcept
     {
-        auto enabledVector = EnabledChains::Vector{};
-        const auto& model = selector_model_native_;
+        const auto& model =
+            api_.UI().BlockchainSelection(ot::ui::Blockchains::All);
         auto row = model.First();
         auto accountCount = std::size_t{0};
 
@@ -177,7 +168,6 @@ struct OTWrap::Imp {
 
             if (row->IsEnabled()) {
                 const auto chain = row->Type();
-                enabledVector.emplace(chain);
                 const auto accounts =
                     api_.Blockchain().AccountList(nym_id_, chain);
                 accountCount += accounts.size();
@@ -202,8 +192,6 @@ struct OTWrap::Imp {
 
             row = model.Next();
         }
-
-        enabled_chains_.set(std::move(enabledVector));
 
         return 0 < accountCount;
     }
@@ -573,8 +561,6 @@ struct OTWrap::Imp {
     Imp(QGuiApplication& parent, OTWrap& me, int& argc, char** argv)
         : ot_(ot::InitContext(make_args(parent, argc, argv)))
         , api_(ot_.StartClient(ot_args_, 0))
-        , selector_model_native_(
-              api_.UI().BlockchainSelection(ot::ui::Blockchains::All))
         , seed_id_()
         , nym_id_(api_.Factory().NymID())
         , longest_seed_word_([&]() -> auto {
@@ -594,30 +580,45 @@ struct OTWrap::Imp {
             return output;
         }())
         , lock_()
-        , enabled_chains_()
+        , enabled_chains_([&] {
+            auto* full =
+                api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::All);
+            auto* main =
+                api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Main);
+            auto* test =
+                api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Test);
+
+            OT_ASSERT(nullptr != full);
+            OT_ASSERT(nullptr != main);
+            OT_ASSERT(nullptr != test);
+
+            using Model = ot::ui::BlockchainSelectionQt;
+            connect(full, &Model::enabledChanged, &me, &OTWrap::chainsChanged);
+            connect(full, &Model::chainEnabled, [&](const int chain) {
+                enabled_chains_.add(static_cast<ot::blockchain::Type>(chain));
+            });
+            connect(full, &Model::chainDisabled, [&](const int chain) {
+                enabled_chains_.remove(
+                    static_cast<ot::blockchain::Type>(chain));
+            });
+
+            return api_.Blockchain().EnabledChains();
+        }())
         , seed_type_(std::make_unique<model::SeedType>(
               transform<model::SeedType::Data>(
                   api_.Seeds().AllowedSeedTypes())))
         , seed_language_()
         , seed_size_()
-        , blockchain_chooser_mainnet_(
-              std::make_unique<model::BlockchainChooser>(me, api_.UI(), false))
-        , blockchain_chooser_testnet_(
-              std::make_unique<model::BlockchainChooser>(me, api_.UI(), true))
         , account_list_()
         , profile_()
         , account_activity_proxy_models_()
+        , mainnet_model_(std::make_unique<model::BlockchainChooser>(
+              api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Main)))
     {
-        selector_model_native_.SetCallback([&me]() { me.checkChainCount(); });
-
         OT_ASSERT(seed_type_);
-        OT_ASSERT(blockchain_chooser_mainnet_);
-        OT_ASSERT(blockchain_chooser_testnet_);
 
+        Ownership::Claim(mainnet_model_.get());
         Ownership::Claim(seed_type_.get());
-        Ownership::Claim(blockchain_chooser_mainnet_.get());
-        Ownership::Claim(blockchain_chooser_testnet_.get());
-
 #ifdef METIER_DEFAULT_BLOCKCHAIN
         api_.Blockchain().Enable(util::convert(METIER_DEFAULT_BLOCKCHAIN));
 #endif
