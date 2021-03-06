@@ -6,7 +6,6 @@
 set(cxx-sources
     "accountactivity.cpp"
     "accountlist.cpp"
-    "blockchainchooser.cpp"
     "licenses.cpp"
     "profile.cpp"
     "seedlang.cpp"
