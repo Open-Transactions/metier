@@ -94,18 +94,4 @@ if(METIER_USE_DEFAULT_BLOCKCHAIN)
   )
 endif()
 
-if(METIER_BUNDLED_OPENTXS)
-  opentxs_link_target("${PROJECT_NAME}")
-else()
-  target_link_libraries("${PROJECT_NAME}" PRIVATE protobuf::libprotobuf-lite)
-
-  if(CMAKE_DL_LIBS)
-    target_link_libraries("${PROJECT_NAME}" PRIVATE ${CMAKE_DL_LIBS})
-  endif()
-
-  if(LIB_RT)
-    target_link_libraries("${PROJECT_NAME}" PRIVATE ${LIB_RT})
-  endif()
-endif()
-
 install(TARGETS "${PROJECT_NAME}")
