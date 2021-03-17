@@ -61,7 +61,8 @@ if(UNIX
 
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/linux/desktop.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/${METIER_APPSTREAM_ID}.desktop" @ONLY
+    "${CMAKE_CURRENT_BINARY_DIR}/${METIER_APPSTREAM_ID}.desktop"
+    @ONLY
   )
 
   install(

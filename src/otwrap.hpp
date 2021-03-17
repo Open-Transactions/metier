@@ -66,16 +66,16 @@ public:
 
     static auto Cleanup() noexcept -> void;
 
-    model::AccountActivity* accountActivityModel(const QString& id);
-    model::AccountActivity* accountActivityModel(const int chain);
-    model::AccountList* accountListModel();
-    QAbstractItemModel* blockchainChooserModel(const bool testnet);
-    model::Profile* profileModel();
-    model::SeedLanguage* seedLanguageModel(const int type);
-    model::SeedSize* seedSizeModel(const int type);
-    model::SeedType* seedTypeModel();
+    Q_INVOKABLE model::AccountActivity* accountActivityModel(const QString& id);
+    Q_INVOKABLE model::AccountActivity* accountActivityModel(const int chain);
+    Q_INVOKABLE model::AccountList* accountListModel();
+    Q_INVOKABLE QAbstractItemModel* blockchainChooserModel(const bool testnet);
+    Q_INVOKABLE model::Profile* profileModel();
+    Q_INVOKABLE model::SeedLanguage* seedLanguageModel(const int type);
+    Q_INVOKABLE model::SeedSize* seedSizeModel(const int type);
+    Q_INVOKABLE model::SeedType* seedTypeModel();
 
-    const opentxs::ui::SeedValidator* seedWordValidator(
+    Q_INVOKABLE const opentxs::ui::SeedValidator* seedWordValidator(
         const int type,
         const int lang);
 
@@ -85,11 +85,11 @@ public:
     Q_INVOKABLE QStringList getRecoveryWords();
     Q_INVOKABLE int wordCount(const int type, const int strength);
 
-    int enabledCurrencyCount();
-    BlockchainList enabledBlockchains();
-    int longestBlockchainName();
-    int longestSeedWord();
-    BlockchainList validBlockchains();
+    Q_INVOKABLE int enabledCurrencyCount();
+    Q_INVOKABLE BlockchainList enabledBlockchains();
+    Q_INVOKABLE int longestBlockchainName();
+    Q_INVOKABLE int longestSeedWord();
+    Q_INVOKABLE BlockchainList validBlockchains();
 
     explicit OTWrap(QGuiApplication& parent, int& argc, char** argv);
 
