@@ -14,7 +14,10 @@ if(NOT MSVC)
                               "-Wno-shadow-field-in-constructor"
   )
 
-  if(${CMAKE_CXX_COMPILER_ID} MATCHES GNU)
+  if(${CMAKE_CXX_COMPILER_ID}
+     MATCHES
+     GNU
+  )
     target_compile_options(qr-code-generator PRIVATE "-Wno-effc++")
   endif()
 endif()
@@ -28,27 +31,45 @@ if(METIER_BUNDLED_OPENTXS)
   set(CMAKE_CXX_FLAGS "${METIER_ORIGINAL_CXX_FLAGS}")
   set(OPENTXS_BUILD_TESTS
       OFF
-      CACHE BOOL "" FORCE
+      CACHE
+        BOOL
+        ""
+        FORCE
   )
   set(OPENTXS_PEDANTIC_BUILD
       ${METIER_PEDANTIC_BUILD}
-      CACHE BOOL "" FORCE
+      CACHE
+        BOOL
+        ""
+        FORCE
   )
   set(OT_WITH_BLOCKCHAIN
       ON
-      CACHE BOOL "" FORCE
+      CACHE
+        BOOL
+        ""
+        FORCE
   )
   set(OT_WITH_QT
       ON
-      CACHE BOOL "" FORCE
+      CACHE
+        BOOL
+        ""
+        FORCE
   )
   set(OT_WITH_QML
       ${METIER_QML_INTERFACE}
-      CACHE BOOL "" FORCE
+      CACHE
+        BOOL
+        ""
+        FORCE
   )
   set(OT_ENABLE_RPC
       OFF
-      CACHE BOOL "" FORCE
+      CACHE
+        BOOL
+        ""
+        FORCE
   )
 
   add_subdirectory(opentxs)

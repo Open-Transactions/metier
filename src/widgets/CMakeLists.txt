@@ -49,7 +49,10 @@ add_library(
 )
 target_link_libraries(
   metier-widgets
-  PUBLIC Qt5::Core Qt5::Network Qt5::Widgets
+  PUBLIC
+    Qt5::Core
+    Qt5::Network
+    Qt5::Widgets
   PRIVATE
     metier-ui
     qr-code-generator

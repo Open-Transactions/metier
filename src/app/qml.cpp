@@ -5,7 +5,7 @@
 
 #include "imp.hpp"  // IWYU pragma: associated
 
-#include <otwrap.hpp>
+#include <opentxs/ui/qt/SeedValidator.hpp>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -18,9 +18,11 @@
 #include "models/accountactivity.hpp"
 #include "models/accountlist.hpp"
 #include "models/blockchainchooser.hpp"
+#include "models/profile.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
+#include "otwrap.hpp"
 #include "qml.hpp"
 #include "util/claim.hpp"
 
@@ -108,6 +110,23 @@ public:
             Ownership::Claim(app);
             qml_.rootContext()->setContextProperty("app", app);
         }
+
+        constexpr auto product{"org.opentransactions.metier"};
+        constexpr auto reason{"Do not instantiate models in qml"};
+        qmlRegisterUncreatableType<model::AccountActivity>(
+            product, 1, 0, "AccountActivityModel", reason);
+        qmlRegisterUncreatableType<model::AccountList>(
+            product, 1, 0, "AccountListModel", reason);
+        qmlRegisterUncreatableType<model::Profile>(
+            product, 1, 0, "ProfileModel", reason);
+        qmlRegisterUncreatableType<model::SeedLanguage>(
+            product, 1, 0, "SeedLanguageModel", reason);
+        qmlRegisterUncreatableType<model::SeedSize>(
+            product, 1, 0, "SeedSizeModel", reason);
+        qmlRegisterUncreatableType<model::SeedType>(
+            product, 1, 0, "SeedTypeModel", reason);
+        qmlRegisterUncreatableType<opentxs::ui::SeedValidator>(
+            product, 1, 0, "SeedValidator", reason);
 
         qml_.connect(
             qml_.engine(), &QQmlEngine::quit, this, &QCoreApplication::quit);

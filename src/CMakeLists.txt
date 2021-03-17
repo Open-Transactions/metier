@@ -30,7 +30,11 @@ if(METIER_QML_INTERFACE)
   qt5_add_resources(rcc-sources "skin/qml/resources.qrc")
 else()
   qt5_add_resources(rcc-sources "skin/default/resources.qrc")
-  list(APPEND object-deps $<TARGET_OBJECTS:metier-widgets>)
+  list(
+    APPEND
+    object-deps
+    $<TARGET_OBJECTS:metier-widgets>
+  )
 endif()
 
 if(WIN32)

@@ -4,10 +4,18 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 set(cxx-sources "")
-set(cxx-headers "claim.hpp" "convertblockchain.hpp" "scopeguard.hpp")
+set(cxx-headers
+    "claim.hpp"
+    "convertblockchain.hpp"
+    "scopeguard.hpp"
+)
 
 if(METIER_QML_INTERFACE)
-  list(APPEND cxx-sources "claim_qml.cpp")
+  list(
+    APPEND
+    cxx-sources
+    "claim_qml.cpp"
+  )
 else()
   list(
     APPEND
