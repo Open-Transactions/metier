@@ -73,6 +73,7 @@ public:
     {
         // NOTE once the app.displayMainWindow signal is received the startup
         // process is complete. Display the main screen.
+        models_set_.get();
         interface_.doDisplayMainWindow();
     }
 
@@ -81,7 +82,6 @@ public:
         // NOTE when the app.displayNamePrompt signal is received the user must
         // provide a profile name. call otwrap.createNym() with the name the
         // user provides
-        models_set_.get();
         interface_.doDisplayNamePrompt();
     }
 
