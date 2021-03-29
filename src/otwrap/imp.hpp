@@ -424,7 +424,7 @@ struct OTWrap::Imp {
         if (false == api_.Config().Save()) { return {}; }
 
         success = true;
-        const auto words = QString{seeds.Words(reason, id).c_str()};
+        const auto words = QString{seeds.Words(id, reason).c_str()};
 
         return words.split(' ', Qt::SkipEmptyParts);
     }
@@ -434,7 +434,7 @@ struct OTWrap::Imp {
         const auto& seeds = api_.Seeds();
         const auto reason =
             api_.Factory().PasswordPrompt("Loading recovery words for backup");
-        const auto words = QString{seeds.Words(reason, seed_id_).c_str()};
+        const auto words = QString{seeds.Words(seed_id_, reason).c_str()};
 
         return words.split(' ', Qt::SkipEmptyParts);
     }
