@@ -103,24 +103,12 @@ find_system_libraries()
 find_package(
   Boost 1.73.0 REQUIRED
   COMPONENTS
-    system
-    filesystem
     program_options
-    thread
-    iostreams
-  OPTIONAL_COMPONENTS stacktrace_basic
 )
-find_package(OpenSSL 1.0.1 REQUIRED)
-find_package(Protobuf REQUIRED)
 find_package(
   Qt5
   COMPONENTS Core Gui Network
   REQUIRED
-)
-find_package(
-  Qt5
-  COMPONENTS Qml Quick Widgets
-  QUIET
 )
 
 if(METIER_QML_INTERFACE)
@@ -137,22 +125,60 @@ else()
   )
 endif()
 
-find_package(ZLIB REQUIRED)
-
-if(NOT METIER_BUNDLED_OPENTXS)
-  find_package(opentxs REQUIRED)
-endif()
-
-find_package(lmdb REQUIRED)
-find_package(unofficial-sodium REQUIRED)
-
 if(OT_USE_VCPKG_TARGETS)
-  find_package(ZeroMQ REQUIRED)
+  set(METIER_ZMQ_TARGET "ZeroMQ")
 else()
-  find_package(unofficial-zeromq REQUIRED)
+  set(METIER_ZMQ_TARGET "unofficial-zeromq")
 endif()
 
-find_package(unofficial-secp256k1 REQUIRED)
+if(METIER_BUNDLED_OPENTXS)
+  find_package(
+    Boost 1.73.0 REQUIRED
+    COMPONENTS
+      system
+      filesystem
+      thread
+      iostreams
+    OPTIONAL_COMPONENTS stacktrace_basic
+  )
+  find_package(ZLIB REQUIRED)
+  find_package("${METIER_ZMQ_TARGET}" REQUIRED)
+  find_package(OpenSSL 1.0.1 REQUIRED)
+  find_package(unofficial-secp256k1 REQUIRED)
+  find_package(unofficial-sodium REQUIRED)
+  find_package(Protobuf REQUIRED)
+  find_package(lmdb REQUIRED)
+  find_package(
+    Qt5
+    COMPONENTS Core Gui
+    REQUIRED
+  )
+else()
+  find_package(opentxs REQUIRED)
+  find_package(
+    Boost 1.73.0 REQUIRED
+    COMPONENTS
+      system
+      filesystem
+      thread
+      iostreams
+    OPTIONAL_COMPONENTS stacktrace_basic
+  )
+  find_package(ZLIB REQUIRED)
+  find_package("${METIER_ZMQ_TARGET}" REQUIRED)
+  find_package(OpenSSL 1.0.1 REQUIRED)
+  find_package(unofficial-secp256k1 REQUIRED)
+  find_package(unofficial-sodium REQUIRED)
+  find_package(Protobuf REQUIRED)
+  find_package(lmdb REQUIRED)
+  find_package(
+    Qt5
+    COMPONENTS Core Gui Qml
+    QUIET
+  )
+  find_package(SQLite3 QUIET)
+endif()
+
 
 # -----------------------------------------------------------------------------
 # Source Definitions
