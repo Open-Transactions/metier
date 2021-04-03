@@ -68,6 +68,19 @@ auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     return ot_args_;
 }
 
+auto ready(bool complete = false) noexcept -> std::shared_future<void>;
+auto ready(bool complete) noexcept -> std::shared_future<void>
+{
+    static auto mutex = std::mutex{};
+    auto lock = std::lock_guard{mutex};
+    static auto promise = std::promise<void>{};
+    static auto future = std::shared_future<void>{promise.get_future()};
+
+    if (complete) { promise.set_value(); }
+
+    return future;
+}
+
 namespace metier
 {
 constexpr auto seed_id_key{"seedid"};
@@ -154,49 +167,47 @@ struct OTWrap::Imp {
         return output;
     }
 
-    auto needNym() const noexcept { return 0 == api_.Wallet().LocalNymCount(); }
-    auto needSeed() const noexcept { return api_.Storage().SeedList().empty(); }
+    auto enableDefaultChain() const noexcept -> bool
+    {
+#ifdef METIER_DEFAULT_BLOCKCHAIN
+        return api_.Blockchain().Enable(
+            util::convert(METIER_DEFAULT_BLOCKCHAIN));
+#else
+        return false;
+#endif
+    }
+    auto needNym() const noexcept {
+        ready().get();
+
+        return 0 == api_.Wallet().LocalNymCount(); }
+    auto needSeed() const noexcept {
+        ready().get();
+
+        return api_.Storage().SeedList().empty(); }
     auto validateBlockchains() const noexcept
     {
-        const auto& model =
-            api_.UI().BlockchainSelection(ot::ui::Blockchains::All);
-        auto row = model.First();
-        auto accountCount = std::size_t{0};
+        ready().get();
 
-        while (true) {
-            if (false == row->Valid()) { break; }
+        for (const auto chain : api_.Blockchain().EnabledChains()) {
+            const auto accounts = api_.Blockchain().AccountList(nym_id_, chain);
 
-            if (row->IsEnabled()) {
-                const auto chain = row->Type();
-                const auto accounts =
-                    api_.Blockchain().AccountList(nym_id_, chain);
-                accountCount += accounts.size();
+            if (0 < accounts.size()) { continue; }
 
-                if (0 == accounts.size()) {
-                    const auto prompt = std::string{"Creating a new "} +
-                                        row->Name() + " account";
-                    auto reason = api_.Factory().PasswordPrompt(prompt);
-                    const auto id = api_.Blockchain().NewHDSubaccount(
-                        nym_id_,
-                        ot::BlockchainAccountType::BIP44,
-                        chain,
-                        reason);
+            const auto prompt = std::string{"Creating a new "} +
+                                ot::blockchain::DisplayString(chain) +
+                                " account";
+            auto reason = api_.Factory().PasswordPrompt(prompt);
+            const auto id = api_.Blockchain().NewHDSubaccount(
+                nym_id_, ot::BlockchainAccountType::BIP44, chain, reason);
 
-                    if (id->empty()) { return false; }
-
-                    ++accountCount;
-                }
-            }
-
-            if (row->Last()) { break; }
-
-            row = model.Next();
+            if (id->empty()) { return false; }
         }
 
-        return 0 < accountCount;
+        return true;
     }
     auto validateNym() const noexcept
     {
+        ready().get();
         ot::Lock lock(lock_);
         auto postcondition = ScopeGuard{[this] {
             if (nym_id_->empty()) { return; }
@@ -275,6 +286,7 @@ struct OTWrap::Imp {
     }
     auto validateSeed() const noexcept
     {
+        ready().get();
         ot::Lock lock(lock_);
 
         if (false == seed_id_.empty()) { return true; }
@@ -322,6 +334,7 @@ struct OTWrap::Imp {
     auto accountActivityModel(const ot::Identifier& id) noexcept
         -> model::AccountActivity*
     {
+        ready().get();
         ot::Lock lock{lock_};
         auto& map = account_activity_proxy_models_;
 
@@ -348,6 +361,7 @@ struct OTWrap::Imp {
     }
     auto createNym(QString alias) noexcept -> void
     {
+        ready().get();
         ot::Lock lock(lock_);
         auto success{false};
         auto& id = const_cast<ot::identifier::Nym&>(nym_id_.get());
@@ -383,6 +397,7 @@ struct OTWrap::Imp {
         const int lang,
         const int strength) noexcept -> QStringList
     {
+        ready().get();
         ot::Lock lock(lock_);
         auto success{false};
         auto& id = const_cast<std::string&>(seed_id_);
@@ -430,6 +445,7 @@ struct OTWrap::Imp {
     }
     auto getRecoveryWords() -> QStringList
     {
+        ready().get();
         ot::Lock lock(lock_);
         const auto& seeds = api_.Seeds();
         const auto reason =
@@ -440,6 +456,7 @@ struct OTWrap::Imp {
     }
     auto importSeed(int type, int lang, QString input) -> void
     {
+        ready().get();
         ot::Lock lock(lock_);
         auto success{false};
         auto& id = const_cast<std::string&>(seed_id_);
@@ -479,6 +496,7 @@ struct OTWrap::Imp {
     }
     auto seedLanguageModel(const int type) -> model::SeedLanguage*
     {
+        ready().get();
         ot::Lock lock(lock_);
         {
             auto it = seed_language_.find(type);
@@ -510,6 +528,7 @@ struct OTWrap::Imp {
     }
     auto seedSizeModel(const int type) -> model::SeedSize*
     {
+        ready().get();
         ot::Lock lock(lock_);
         {
             auto it = seed_size_.find(type);
@@ -541,6 +560,7 @@ struct OTWrap::Imp {
     auto seedWordValidator(const int type, const int lang)
         -> const opentxs::ui::SeedValidator*
     {
+        ready().get();
         const auto style =
             static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type));
         const auto language =
@@ -550,6 +570,7 @@ struct OTWrap::Imp {
     }
     auto wordCount(const int type, const int strength) -> int
     {
+        ready().get();
         const auto output = api_.Seeds().WordCount(
             static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type)),
             static_cast<ot::crypto::SeedStrength>(
@@ -619,9 +640,7 @@ struct OTWrap::Imp {
 
         Ownership::Claim(mainnet_model_.get());
         Ownership::Claim(seed_type_.get());
-#ifdef METIER_DEFAULT_BLOCKCHAIN
-        api_.Blockchain().Enable(util::convert(METIER_DEFAULT_BLOCKCHAIN));
-#endif
+        ready(true);
     }
 };
 }  // namespace metier

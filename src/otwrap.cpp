@@ -78,12 +78,24 @@ auto OTWrap::checkStartupConditions() -> void
 
     emit nymReady();
 
-    if (auto* model =
+    {
+        auto* model =
             imp_.api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::All);
-        1 > model->enabledCount()) {
-        emit needBlockchain();
 
-        return;
+        if (imp_.enableDefaultChain()) {
+            const auto start = ot::Clock::now();
+            constexpr auto limit = std::chrono::minutes{1};
+
+            while (0 == model->enabledCount()) {
+                if ((ot::Clock::now() - start) > limit) {
+                    qFatal("Timeout waiting for enabled blockchain");
+                }
+            }
+        } else if (1 > model->enabledCount()) {
+            emit needBlockchain();
+
+            return;
+        }
     }
 
     if (false == imp_.validateBlockchains()) {
