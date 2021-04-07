@@ -72,7 +72,7 @@ auto ready(bool complete = false) noexcept -> std::shared_future<void>;
 auto ready(bool complete) noexcept -> std::shared_future<void>
 {
     static auto mutex = std::mutex{};
-    auto lock = std::lock_guard{mutex};
+    auto lock = std::lock_guard<std::mutex>{mutex};
     static auto promise = std::promise<void>{};
     static auto future = std::shared_future<void>{promise.get_future()};
 
@@ -176,14 +176,18 @@ struct OTWrap::Imp {
         return false;
 #endif
     }
-    auto needNym() const noexcept {
+    auto needNym() const noexcept
+    {
         ready().get();
 
-        return 0 == api_.Wallet().LocalNymCount(); }
-    auto needSeed() const noexcept {
+        return 0 == api_.Wallet().LocalNymCount();
+    }
+    auto needSeed() const noexcept
+    {
         ready().get();
 
-        return api_.Storage().SeedList().empty(); }
+        return api_.Storage().SeedList().empty();
+    }
     auto validateBlockchains() const noexcept
     {
         ready().get();
