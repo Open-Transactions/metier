@@ -19,7 +19,7 @@
 
 namespace metier::widget
 {
-BlockchainSend::BlockchainSend(QWidget* parent, model::AccountActivity* model)
+BlockchainSend::BlockchainSend(QWidget* parent, Model* model)
     : QDialog(parent)
     , imp_p_(std::make_unique<Imp>(this, model))
     , imp_(*imp_p_)

@@ -13,7 +13,6 @@
 #include <set>
 #include <tuple>
 
-#include "models/accountactivity.hpp"
 #include "models/accountlist.hpp"
 #include "models/profile.hpp"
 #include "otwrap.hpp"
@@ -120,6 +119,7 @@ private:
     }
     auto register_progress(const ot::blockchain::Type chain) noexcept -> void
     {
+        using Model = OTWrap::AccountActivity;
         auto* model = ot_.accountActivityModel(static_cast<int>(chain));
 
         assert(nullptr != model);
@@ -131,7 +131,7 @@ private:
             registered_chains_.emplace(ptr);
         }
 
-        connect(model, &model::AccountActivity::sync, [=](int value, int max) {
+        connect(model, &Model::syncProgressUpdated, [=](int value, int max) {
             receive_progress_update(chain, value, max);
         });
     }

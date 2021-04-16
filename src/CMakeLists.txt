@@ -17,9 +17,9 @@ endif()
 set(cxx-sources
     "main.cpp"
     "otwrap.cpp"
-    "otwrap/metiercallback.cpp"
+    "otwrap/passwordcallback.cpp"
 )
-set(cxx-headers "otwrap/imp.hpp" "otwrap/metiercallback.hpp")
+set(cxx-headers "otwrap/imp.hpp" "otwrap/passwordcallback.hpp")
 
 set(moc-headers "app.hpp" "otwrap.hpp")
 qt5_wrap_cpp(moc-sources "${moc-headers}")

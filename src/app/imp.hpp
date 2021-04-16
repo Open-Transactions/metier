@@ -24,6 +24,9 @@ struct App::Imp {
     virtual auto displayFirstRun() -> void = 0;
     virtual auto displayMainWindow() -> void = 0;
     virtual auto displayNamePrompt() -> void = 0;
+    virtual auto confirmPassword(QString prompt, QString key) -> QString = 0;
+    virtual auto getPassword(QString prompt, QString key) -> QString = 0;
+    virtual auto init(int& argc, char** argv) noexcept -> void = 0;
     virtual auto run() -> int = 0;
     virtual auto otwrap() noexcept -> OTWrap* = 0;
 

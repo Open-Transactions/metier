@@ -4,7 +4,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 set(cxx-sources
-    "accountactivity.cpp"
     "accountlist.cpp"
     "licenses.cpp"
     "profile.cpp"
@@ -14,7 +13,6 @@ set(cxx-sources
 )
 set(cxx-headers "")
 set(moc-headers
-    "accountactivity.hpp"
     "accountlist.hpp"
     "blockchainchooser.hpp"
     "licenses.hpp"

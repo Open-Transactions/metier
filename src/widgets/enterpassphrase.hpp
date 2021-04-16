@@ -13,18 +13,19 @@ class QWidget;
 
 namespace metier::widget
 {
-class EnterPassphrase : public QDialog
+class EnterPassphrase final : public QDialog
 {
     Q_OBJECT
 
 public:
+    auto secret() -> QString;
+
     EnterPassphrase(
         QWidget* parent,
         const QString& displayString,
         bool runOneOrTwo = true);
-    ~EnterPassphrase() override;
 
-    auto secret(opentxs::Secret& theSecret, QString& qstrSecret) -> bool;
+    ~EnterPassphrase() final;
 
 private:
     struct Imp;

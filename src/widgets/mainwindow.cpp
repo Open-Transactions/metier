@@ -17,7 +17,6 @@
 #include <QVariant>
 
 #include "mainwindow/imp.hpp"
-#include "models/accountactivity.hpp"
 #include "otwrap.hpp"
 #include "ui_mainwindow.h"
 #include "util/focuser.hpp"

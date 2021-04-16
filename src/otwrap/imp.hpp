@@ -19,13 +19,12 @@
 #include <string>
 
 #include "deps/opentxs/tests/Cli.hpp"
-#include "models/accountactivity.hpp"
 #include "models/accountlist.hpp"
 #include "models/profile.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "otwrap/metiercallback.hpp"
+#include "otwrap/passwordcallback.hpp"
 #include "util/claim.hpp"
 #include "util/convertblockchain.hpp"
 #include "util/scopeguard.hpp"
@@ -138,7 +137,7 @@ struct OTWrap::Imp {
         Vector enabled_{};
     };
 
-    MetierCallback callback_;
+    PasswordCallback callback_;
     opentxs::OTCaller caller_;
     const opentxs::api::Context& ot_;
     const opentxs::api::client::Manager& api_;
@@ -152,8 +151,6 @@ struct OTWrap::Imp {
     std::map<int, std::unique_ptr<model::SeedSize>> seed_size_;
     std::unique_ptr<model::AccountList> account_list_;
     std::unique_ptr<model::Profile> profile_;
-    std::map<ot::OTIdentifier, std::unique_ptr<model::AccountActivity>>
-        account_activity_proxy_models_;
     std::unique_ptr<model::BlockchainChooser> mainnet_model_;
 
     template <typename OutputType, typename InputType>
@@ -339,32 +336,11 @@ struct OTWrap::Imp {
     }
 
     auto accountActivityModel(const ot::Identifier& id) noexcept
-        -> model::AccountActivity*
+        -> AccountActivity*
     {
         ready().get();
-        ot::Lock lock{lock_};
-        auto& map = account_activity_proxy_models_;
 
-        if (auto it = map.find(id); map.end() != it) {
-
-            return it->second.get();
-        }
-
-        auto [it, added] =
-            map.try_emplace(id, std::make_unique<model::AccountActivity>());
-
-        OT_ASSERT(added);
-
-        auto& pModel = it->second;
-
-        OT_ASSERT(pModel);
-
-        auto& model = *(it->second);
-        model.setSourceModel(api_.UI().AccountActivityQt(nym_id_, id));
-        auto* output = pModel.get();
-        Ownership::Claim(output);
-
-        return output;
+        return api_.UI().AccountActivityQt(nym_id_, id);
     }
     auto createNym(QString alias) noexcept -> void
     {
@@ -586,8 +562,8 @@ struct OTWrap::Imp {
         return static_cast<int>(output);
     }
 
-    Imp(QGuiApplication& parent, OTWrap& me, int& argc, char** argv)
-        : callback_()
+    Imp(QGuiApplication& parent, App& app, OTWrap& me, int& argc, char** argv)
+        : callback_(app)
         , caller_()
         , ot_(ot::InitContext(
               make_args(parent, argc, argv),
@@ -646,7 +622,6 @@ struct OTWrap::Imp {
         , seed_size_()
         , account_list_()
         , profile_()
-        , account_activity_proxy_models_()
         , mainnet_model_(std::make_unique<model::BlockchainChooser>(
               api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Main)))
     {
