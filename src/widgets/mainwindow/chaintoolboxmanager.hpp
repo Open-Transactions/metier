@@ -14,7 +14,6 @@
 #include <iostream>
 #include <tuple>
 
-#include "models/accountactivity.hpp"
 #include "otwrap.hpp"
 #include "ui_mainwindow.h"
 #include "util/convertblockchain.hpp"

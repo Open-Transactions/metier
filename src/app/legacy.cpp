@@ -7,6 +7,7 @@
 
 #include <otwrap.hpp>
 #include <QApplication>
+#include <QEventLoop>
 #include <QIcon>
 #include <QPushButton>
 
@@ -17,6 +18,8 @@
 #include "widgets/newseed.hpp"
 #include "widgets/profilealias.hpp"
 #include "widgets/recoverwallet.hpp"
+#include "widgets/enterpassphrase.hpp"
+#include "util/scopeguard.hpp"
 
 namespace metier
 {
@@ -61,29 +64,44 @@ struct LegacyApp final : public App::Imp, public QApplication {
         util::Focuser(recover_wallet_.get()).show();
     }
 
-    auto run() -> int final
+    auto confirmPassword(QString prompt, [[maybe_unused]] QString key)
+        -> QString final
     {
-        setWindowIcon(icon_);
+        auto dialog = std::make_unique<metier::widget::EnterPassphrase>(
+            nullptr, prompt, false);
+        auto postcondition = metier::ScopeGuard{[&dialog]() {
+            dialog->deleteLater();
+            dialog.release();
+        }};
+        dialog->exec();
 
-        return exec();
+        return dialog->secret();
     }
 
-    auto otwrap() noexcept -> OTWrap* final { return ot_.get(); }
-
-    LegacyApp(App& parent, int& argc, char** argv) noexcept
-        : QApplication(argc, argv)
-        , parent_(parent)
-        , icon_(":/assets/app_icon.png")
-        , first_run_complete_(false)
-        , ot_(std::make_unique<OTWrap>(*this, argc, argv))
-        , first_run_(std::make_unique<widget::FirstRun>(nullptr))
-        , new_seed_(std::make_unique<widget::NewSeed>(*ot_))
-        , recover_wallet_(std::make_unique<widget::RecoverWallet>(*ot_))
-        , profile_alias_(std::make_unique<widget::ProfileAlias>(nullptr))
-        , blockchains_(
-              std::make_unique<widget::BlockchainChooser>(nullptr, *ot_))
-        , main_window_(std::make_unique<widget::MainWindow>(nullptr, *ot_))
+    auto getPassword(QString prompt, [[maybe_unused]] QString key)
+        -> QString final
     {
+        auto dialog = std::make_unique<metier::widget::EnterPassphrase>(
+            nullptr, prompt, true);
+        auto postcondition = metier::ScopeGuard{[&dialog]() {
+            dialog->deleteLater();
+            dialog.release();
+        }};
+        dialog->exec();
+
+        return dialog->secret();
+    }
+
+    auto init(int& argc, char** argv) noexcept -> void final
+    {
+        ot_ = std::make_unique<OTWrap>(*this, parent_, argc, argv);
+        first_run_ = std::make_unique<widget::FirstRun>(nullptr);
+        new_seed_ = std::make_unique<widget::NewSeed>(*ot_);
+        recover_wallet_ = std::make_unique<widget::RecoverWallet>(*ot_);
+        profile_alias_ = std::make_unique<widget::ProfileAlias>(nullptr);
+        blockchains_ =
+            std::make_unique<widget::BlockchainChooser>(nullptr, *ot_);
+        main_window_ = std::make_unique<widget::MainWindow>(nullptr, *ot_);
         auto* ot = ot_.get();
         auto* first = first_run_.get();
         auto* alias = profile_alias_.get();
@@ -100,6 +118,30 @@ struct LegacyApp final : public App::Imp, public QApplication {
             &LegacyApp::displayRecovery);
         connect(alias, &widget::ProfileAlias::gotAlias, ot, &OTWrap::createNym);
         connect(ok, &QPushButton::clicked, &parent_, &App::startup);
+    }
+
+    auto run() -> int final
+    {
+        setWindowIcon(icon_);
+
+        return exec();
+    }
+
+    auto otwrap() noexcept -> OTWrap* final { return ot_.get(); }
+
+    LegacyApp(App& parent, int& argc, char** argv) noexcept
+        : QApplication(argc, argv)
+        , parent_(parent)
+        , icon_(":/assets/app_icon.png")
+        , first_run_complete_(false)
+        , ot_()
+        , first_run_()
+        , new_seed_()
+        , recover_wallet_()
+        , profile_alias_()
+        , blockchains_()
+        , main_window_()
+    {
     }
 
     ~LegacyApp() final = default;

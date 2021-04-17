@@ -40,11 +40,7 @@ EnterPassphrase::EnterPassphrase(
         retype, &QLineEdit::textChanged, [this]() { imp_.retypeChanged(); });
 }
 
-auto EnterPassphrase::secret(opentxs::Secret& theSecret, QString& qstrSecret)
-    -> bool
-{
-    return imp_.secret(theSecret, qstrSecret);
-}
+auto EnterPassphrase::secret() -> QString { return imp_.secret(); }
 
 EnterPassphrase::~EnterPassphrase() = default;
 }  // namespace metier::widget

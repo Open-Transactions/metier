@@ -53,20 +53,17 @@ struct EnterPassphrase::Imp {
         canceled_ = true;
     }
 
-    auto secret(opentxs::Secret& theSecret, QString& qstrSecret) -> bool
+    auto secret() -> QString
     {
         auto lock = std::lock_guard<std::mutex>{lock_};
 
-        if (0 == passphrase_.size()) { passphrase_ = "opentxs"; }
+        static constexpr auto defaultPassword{"opentxs"};
 
-        if (valid()) {
-            qstrSecret = passphrase_;
-            const std::string str_passphrase = passphrase_.toStdString();
-            theSecret.Assign(str_passphrase.c_str(), str_passphrase.size());
-            return true;
-        }
+        if (0 == passphrase_.size()) { passphrase_ = defaultPassword; }
 
-        return false;
+        if (valid()) { return passphrase_; }
+
+        return defaultPassword;
     }
 
     Imp(EnterPassphrase* parent,

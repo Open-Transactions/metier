@@ -18,6 +18,7 @@ App::App(int& argc, char** argv) noexcept
     : imp_p_(Imp::factory(*this, argc, argv))
     , imp_(*imp_p_)
 {
+    imp_.init(argc, argv);
     auto* ot = imp_.otwrap();
     connect(ot, &OTWrap::needSeed, this, &App::displayFirstRun);
     connect(ot, &OTWrap::needProfileName, this, &App::displayNamePrompt);
@@ -39,6 +40,16 @@ auto App::displayFirstRun() -> void { imp_.displayFirstRun(); }
 auto App::displayMainWindow() -> void { imp_.displayMainWindow(); }
 
 auto App::displayNamePrompt() -> void { imp_.displayNamePrompt(); }
+
+auto App::confirmPassword(QString prompt, QString key) -> QString
+{
+    return imp_.confirmPassword(prompt, key);
+}
+
+auto App::getPassword(QString prompt, QString key) -> QString
+{
+    return imp_.getPassword(prompt, key);
+}
 
 auto App::run() -> int { return imp_.run(); }
 

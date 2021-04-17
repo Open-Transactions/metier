@@ -15,7 +15,6 @@
 #include <atomic>
 #include <future>
 
-#include "models/accountactivity.hpp"
 #include "models/accountlist.hpp"
 #include "models/blockchainchooser.hpp"
 #include "models/profile.hpp"
@@ -85,48 +84,30 @@ public:
         interface_.doDisplayNamePrompt();
     }
 
-    auto run() -> int final { return exec(); }
-
-    auto otwrap() noexcept -> OTWrap* final { return ot_.get(); }
-
-    QmlApp(App& parent, int& argc, char** argv) noexcept
-        : QGuiApplication(argc, argv)
-        , model_promise_()
-        , parent_(parent)
-        , ot_(std::make_unique<OTWrap>(*this, argc, argv))
-        , qml_()
-        , interface_()
-        , model_init_(false)
-        , models_set_(model_promise_.get_future())
+    auto confirmPassword(
+        [[maybe_unused]] QString prompt,
+        [[maybe_unused]] QString key) -> QString final
     {
+        return "opentxs";  // TODO
+    }
+
+    auto getPassword(
+        [[maybe_unused]] QString prompt,
+        [[maybe_unused]] QString key) -> QString final
+    {
+        return "opentxs";  // TODO
+    }
+
+    auto init(int& argc, char** argv) noexcept -> void final
+    {
+        ot_ = std::make_unique<OTWrap>(*this, parent_, argc, argv);
+
         {
             auto* ot = ot_.get();
             ot->connect(ot, &OTWrap::nymReady, this, &QmlApp::nymReady);
             Ownership::Claim(ot);
             qml_.rootContext()->setContextProperty("otwrap", ot);
         }
-        {
-            auto* app = &interface_;
-            Ownership::Claim(app);
-            qml_.rootContext()->setContextProperty("app", app);
-        }
-
-        constexpr auto product{"org.opentransactions.metier"};
-        constexpr auto reason{"Do not instantiate models in qml"};
-        qmlRegisterUncreatableType<model::AccountActivity>(
-            product, 1, 0, "AccountActivityModel", reason);
-        qmlRegisterUncreatableType<model::AccountList>(
-            product, 1, 0, "AccountListModel", reason);
-        qmlRegisterUncreatableType<model::Profile>(
-            product, 1, 0, "ProfileModel", reason);
-        qmlRegisterUncreatableType<model::SeedLanguage>(
-            product, 1, 0, "SeedLanguageModel", reason);
-        qmlRegisterUncreatableType<model::SeedSize>(
-            product, 1, 0, "SeedSizeModel", reason);
-        qmlRegisterUncreatableType<model::SeedType>(
-            product, 1, 0, "SeedTypeModel", reason);
-        qmlRegisterUncreatableType<opentxs::ui::SeedValidator>(
-            product, 1, 0, "SeedValidator", reason);
 
         qml_.connect(
             qml_.engine(), &QQmlEngine::quit, this, &QCoreApplication::quit);
@@ -138,6 +119,27 @@ public:
         qml_.show();
     }
 
+    auto run() -> int final { return exec(); }
+
+    auto otwrap() noexcept -> OTWrap* final { return ot_.get(); }
+
+    QmlApp(App& parent, int& argc, char** argv) noexcept
+        : QGuiApplication(argc, argv)
+        , model_promise_()
+        , parent_(parent)
+        , ot_()
+        , qml_()
+        , interface_()
+        , model_init_(false)
+        , models_set_(model_promise_.get_future())
+    {
+        {
+            auto* app = &interface_;
+            Ownership::Claim(app);
+            qml_.rootContext()->setContextProperty("app", app);
+        }
+    }
+
     ~QmlApp() final = default;
 
 private:
@@ -146,28 +148,6 @@ private:
         const auto init = model_init_.exchange(true);
 
         if (init) { return; }
-
-        for (const auto chain : ot_->validBlockchains()) {
-            auto name =
-                std::string{"accountActivityModel"} + std::to_string(chain);
-            auto* model = ot_->accountActivityModel(chain);
-            qml_.rootContext()->setContextProperty(name.c_str(), model);
-        }
-
-        {
-            auto* model = ot_->accountListModel();
-            qml_.rootContext()->setContextProperty("accountListModel", model);
-        }
-        {
-            auto* model = ot_->blockchainChooserModel(true);
-            qml_.rootContext()->setContextProperty(
-                "testnetBlockchainsModel", model);
-        }
-        {
-            auto* model = ot_->blockchainChooserModel(false);
-            qml_.rootContext()->setContextProperty(
-                "testnetBlockchainsModel", model);
-        }
 
         model_promise_.set_value();
     }

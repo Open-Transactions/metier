@@ -30,6 +30,8 @@ public:
     static App* Get(int argc = 0, char* argv[] = nullptr) noexcept;
     static void Cleanup() noexcept;
 
+    auto confirmPassword(QString prompt, QString key) -> QString;
+    auto getPassword(QString prompt, QString key) -> QString;
     auto run() -> int;
 
     ~App() final;

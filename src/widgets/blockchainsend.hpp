@@ -10,14 +10,13 @@
 #include <QString>
 #include <memory>
 
-namespace metier
+namespace opentxs
 {
-namespace model
+namespace ui
 {
-class AccountActivity;
-}  // namespace model
-
-}  // namespace metier
+class AccountActivityQt;
+}  // namespace ui
+}  // namespace opentxs
 
 class QWidget;
 
@@ -28,7 +27,9 @@ class BlockchainSend final : public QDialog
     Q_OBJECT
 
 public:
-    BlockchainSend(QWidget* parent, model::AccountActivity* model);
+    using Model = opentxs::ui::AccountActivityQt;
+
+    BlockchainSend(QWidget* parent, Model* model);
     ~BlockchainSend() final;
 
 private slots:

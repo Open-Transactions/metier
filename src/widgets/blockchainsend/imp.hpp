@@ -7,6 +7,7 @@
 
 #include "widgets/blockchainsend.hpp"  // IWYU pragma: associated
 
+#include <opentxs/ui/qt/AccountActivity.hpp>
 #include <opentxs/ui/qt/AmountValidator.hpp>
 #include <opentxs/ui/qt/DestinationValidator.hpp>
 #include <opentxs/ui/qt/DisplayScale.hpp>
@@ -20,7 +21,6 @@
 #include <mutex>
 #include <string>
 
-#include "models/accountactivity.hpp"
 #include "ui_blockchainsend.h"
 #include "util/resizer.hpp"
 
@@ -28,7 +28,7 @@ namespace metier::widget
 {
 struct BlockchainSend::Imp {
     std::unique_ptr<Ui::BlockchainSend> ui_;
-    model::AccountActivity& model_;
+    Model& model_;
     opentxs::ui::AmountValidator* amount_validator_;
     opentxs::ui::DestinationValidator* address_validator_;
 
@@ -62,7 +62,7 @@ struct BlockchainSend::Imp {
         status->setText(text);
     }
 
-    Imp(BlockchainSend* parent, model::AccountActivity* model) noexcept
+    Imp(BlockchainSend* parent, Model* model) noexcept
         : ui_(std::make_unique<Ui::BlockchainSend>())
         , model_(*model)
         , amount_validator_(model_.getAmountValidator())
