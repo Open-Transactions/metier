@@ -24,7 +24,13 @@ class MainWindow final : public QMainWindow
 {
     Q_OBJECT
 
+signals:
+    void progMaxUpdated(int);
+    void progValueUpdated(int);
+
 public slots:
+    void setProgressMax(int);
+    void setProgressValue(int);
 
 private slots:
     void accountListUpdated(

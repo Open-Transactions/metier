@@ -29,6 +29,7 @@ namespace ot = opentxs;
 namespace metier::widget
 {
 struct MainWindow::Imp {
+    MainWindow& parent_;
     OTWrap& ot_;
     std::unique_ptr<Ui::MainWindow> ui_;
     std::unique_ptr<widget::BlockchainChooser> blockchains_;
@@ -68,12 +69,13 @@ struct MainWindow::Imp {
     {
         const auto chain = chain_toolbox_.currentChain();
         const auto [current, max] = sync_progress_.get(chain);
-        ui_->syncProgress->setMaximum(max);
-        ui_->syncProgress->setValue(current);
+        parent_.setProgressMax(max);
+        parent_.setProgressValue(current);
     }
 
-    Imp(QMainWindow* parent, OTWrap& ot) noexcept
-        : ot_(ot)
+    Imp(MainWindow* parent, OTWrap& ot) noexcept
+        : parent_(*parent)
+        , ot_(ot)
         , ui_(std::make_unique<Ui::MainWindow>())
         , blockchains_(std::make_unique<widget::BlockchainChooser>(parent, ot_))
         , licenses_(std::make_unique<widget::Licenses>(parent))

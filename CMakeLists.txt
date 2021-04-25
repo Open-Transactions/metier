@@ -4,12 +4,20 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 cmake_minimum_required(VERSION 3.15)
-cmake_policy(SET CMP0091 NEW)
+cmake_policy(
+  SET
+  CMP0091
+  NEW
+)
 project(metier)
 set(METIER_APPSTREAM_ID "org.opentransactions.metier")
 set(METIER_APPSTREAM_NAME "Métier")
 set(METIER_APP_DOMAIN "opentransactions.org")
-list(APPEND CMAKE_MODULE_PATH "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
+list(
+  APPEND
+  CMAKE_MODULE_PATH
+  "${${PROJECT_NAME}_SOURCE_DIR}/cmake"
+)
 include(open-transactions-common)
 
 # -----------------------------------------------------------------------------
@@ -22,7 +30,10 @@ update_git_submodules()
 # -----------------------------------------------------------------------------
 # Set option defaults
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(CMAKE_BUILD_TYPE
+   STREQUAL
+   "Debug"
+)
   set(METIER_PEDANTIC_DEFAULT ON)
   set(CMAKE_VERBOSE_MAKEFILE ON)
 else()
@@ -39,15 +50,25 @@ endif()
 # Options
 
 option(
-  METIER_PEDANTIC_BUILD "Treat compiler warnings as errors."
+  METIER_PEDANTIC_BUILD
+  "Treat compiler warnings as errors."
   ${METIER_PEDANTIC_DEFAULT}
 )
-option(METIER_BUNDLED_OPENTXS "Use submodule version of libopentxs" OFF)
 option(
-  OT_USE_VCPKG_TARGETS "Assume dependencies are managed by vcpkg"
+  METIER_BUNDLED_OPENTXS
+  "Use submodule version of libopentxs"
+  OFF
+)
+option(
+  OT_USE_VCPKG_TARGETS
+  "Assume dependencies are managed by vcpkg"
   ${OT_USE_VCPKG_TARGETS_DEFAULT}
 )
-option(METIER_QML_INTERFACE "Use Qt Quick interface instead of Qt Widgets" OFF)
+option(
+  METIER_QML_INTERFACE
+  "Use Qt Quick interface instead of Qt Widgets"
+  OFF
+)
 
 # -----------------------------------------------------------------------------
 # Set compiler options
@@ -56,7 +77,10 @@ set(METIER_ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
 set(METIER_ORIGINAL_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set_compiler_flags(17 ${METIER_PEDANTIC_BUILD})
 
-if(${CMAKE_CXX_COMPILER_ID} MATCHES Clang)
+if(${CMAKE_CXX_COMPILER_ID}
+   MATCHES
+   Clang
+)
   set(CMAKE_CXX_FLAGS
       "${CMAKE_CXX_FLAGS} -Wno-redundant-parens -Wno-extra-semi-stmt"
   )
@@ -71,7 +95,10 @@ endif()
 
 print_build_details(METIER_PEDANTIC_BUILD METIER_BUILD_TESTS)
 
-if("${METIER_DEFAULT_SYNC_SERVER}" STREQUAL "")
+if("${METIER_DEFAULT_SYNC_SERVER}"
+   STREQUAL
+   ""
+)
   set(METIER_USE_SYNC_SERVER OFF)
   message(STATUS "Default sync server:      not defined")
 else()
@@ -79,15 +106,16 @@ else()
   message(STATUS "Default sync server:      ${METIER_DEFAULT_SYNC_SERVER}")
 endif()
 
-
-if("${METIER_DEFAULT_BLOCKCHAIN}" STREQUAL "")
+if("${METIER_DEFAULT_BLOCKCHAIN}"
+   STREQUAL
+   ""
+)
   set(METIER_USE_DEFAULT_BLOCKCHAIN OFF)
   message(STATUS "Default blockchain:       none")
 else()
   set(METIER_USE_DEFAULT_BLOCKCHAIN ON)
   message(STATUS "Default blockchain:       ${METIER_DEFAULT_BLOCKCHAIN}")
 endif()
-
 
 if(METIER_QML_INTERFACE)
   message(STATUS "Interface type:           Qml")
@@ -101,13 +129,18 @@ endif()
 find_system_libraries()
 
 find_package(
-  Boost 1.73.0 REQUIRED
-  COMPONENTS
-    program_options
+  Boost
+  1.73.0
+  REQUIRED
+  COMPONENTS program_options
 )
 find_package(
   Qt5
-  COMPONENTS Core Gui Network Widgets
+  COMPONENTS
+    Core
+    Gui
+    Network
+    Widgets
   REQUIRED
 )
 
@@ -127,7 +160,9 @@ endif()
 
 if(METIER_BUNDLED_OPENTXS)
   find_package(
-    Boost 1.73.0 REQUIRED
+    Boost
+    1.73.0
+    REQUIRED
     COMPONENTS
       system
       filesystem
@@ -137,7 +172,11 @@ if(METIER_BUNDLED_OPENTXS)
   )
   find_package(ZLIB REQUIRED)
   find_package("${METIER_ZMQ_TARGET}" REQUIRED)
-  find_package(OpenSSL 1.0.1 REQUIRED)
+  find_package(
+    OpenSSL
+    1.0.1
+    REQUIRED
+  )
   find_package(unofficial-secp256k1 REQUIRED)
   find_package(unofficial-sodium REQUIRED)
   find_package(Protobuf REQUIRED)
@@ -150,7 +189,9 @@ if(METIER_BUNDLED_OPENTXS)
 else()
   find_package(opentxs REQUIRED)
   find_package(
-    Boost 1.73.0 REQUIRED
+    Boost
+    1.73.0
+    REQUIRED
     COMPONENTS
       system
       filesystem
@@ -160,19 +201,26 @@ else()
   )
   find_package(ZLIB REQUIRED)
   find_package("${METIER_ZMQ_TARGET}" REQUIRED)
-  find_package(OpenSSL 1.0.1 REQUIRED)
+  find_package(
+    OpenSSL
+    1.0.1
+    REQUIRED
+  )
   find_package(unofficial-secp256k1 REQUIRED)
   find_package(unofficial-sodium REQUIRED)
   find_package(Protobuf REQUIRED)
   find_package(lmdb REQUIRED)
   find_package(
     Qt5
-    COMPONENTS Core Gui Qml
+    COMPONENTS
+      Core
+      Gui
+      Qml
     QUIET
   )
   find_package(SQLite3 QUIET)
+  find_package(opendht QUIET)
 endif()
-
 
 # -----------------------------------------------------------------------------
 # Source Definitions

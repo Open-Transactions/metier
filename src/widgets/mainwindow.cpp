@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget* parent, OTWrap& ot) noexcept
     auto* bcdone = imp_.blockchains_->Ok();
     auto* license = imp_.ui_->action_help_opensource;
     auto* toolbox = imp_.ui_->moneyToolbox;
+    auto* prog = imp_.ui_->syncProgress;
     connect(&ot, &OTWrap::nymReady, this, &MainWindow::initModels);
     connect(&ot, &OTWrap::readyForMainWindow, this, &MainWindow::updateToolbox);
     connect(&ot, &OTWrap::chainsChanged, this, &MainWindow::updateToolbox);
@@ -50,6 +51,8 @@ MainWindow::MainWindow(QWidget* parent, OTWrap& ot) noexcept
     connect(bcdone, &QPushButton::clicked, &ot, &OTWrap::checkAccounts);
     connect(license, &QAction::triggered, this, &MainWindow::showLicenseViewer);
     connect(toolbox, &QToolBox::currentChanged, this, &MainWindow::changeChain);
+    connect(this, &MainWindow::progMaxUpdated, prog, &QProgressBar::setMaximum);
+    connect(this, &MainWindow::progValueUpdated, prog, &QProgressBar::setValue);
 }
 
 void MainWindow::accountListUpdated(
@@ -74,6 +77,13 @@ void MainWindow::accountListUpdated(
 }
 
 auto MainWindow::initModels() -> void { imp_.init_models(this); }
+
+auto MainWindow::setProgressMax(int max) -> void { emit progMaxUpdated(max); }
+
+auto MainWindow::setProgressValue(int value) -> void
+{
+    emit progValueUpdated(value);
+}
 
 auto MainWindow::showBlockchainChooser() -> void
 {

@@ -12,14 +12,14 @@
 #include <QPushButton>
 
 #include "util/focuser.hpp"
+#include "util/scopeguard.hpp"
 #include "widgets/blockchainchooser.hpp"
+#include "widgets/enterpassphrase.hpp"
 #include "widgets/firstrun.hpp"
 #include "widgets/mainwindow.hpp"
 #include "widgets/newseed.hpp"
 #include "widgets/profilealias.hpp"
 #include "widgets/recoverwallet.hpp"
-#include "widgets/enterpassphrase.hpp"
-#include "util/scopeguard.hpp"
 
 namespace metier
 {
