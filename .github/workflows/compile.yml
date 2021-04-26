@@ -6,16 +6,20 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [macos-10.15, windows-2019]
+        platform: [macos-10.15, ubuntu-20.04]
         include:
           - platform: 'macos-10.15'
             vcpkg_triplet: 'x64-osx'
             cmake_extra: ''
             zip_command: 'zip metier.zip metier'
-          - platform: 'windows-2019'
-            vcpkg_triplet: 'x64-windows-static'
+          - platform: 'ubuntu-20.04'
+            vcpkg_triplet: 'x64-linux'
             cmake_extra: ''
-            zip_command: '7z a -tzip metier.zip metier.exe'
+            zip_command: 'zip metier.zip metier'
+#          - platform: 'windows-2019'
+#            vcpkg_triplet: 'x64-windows-static'
+#            cmake_extra: ''
+#            zip_command: '7z a -tzip metier.zip metier.exe'
     runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v2
@@ -27,6 +31,11 @@ jobs:
       run: |
           sudo apt-get update
           sudo apt-get install -y autoconf autopoint curl g++ git gperf libgl1-mesa-dev libglu1-mesa-dev libtool libx11-dev libx11-xcb-dev libxcb-glx0-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-shape0-dev libxcb-shm0-dev libxcb-sync0-dev libxcb-xfixes0-dev libxcb-xinerama0-dev libxext-dev libxi-dev libxkbcommon-x11-dev libxrender-dev make pkg-config python3 tar unzip zip
+    - name: Get more disk space
+      if: matrix.platform == 'ubuntu-20.04'
+      run: |
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /usr/share/dotnet
     - name: Setup cmake
       uses: jwlawson/actions-setup-cmake@v1.4
       with:
@@ -47,12 +56,12 @@ jobs:
         cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Debug -DMETIER_PEDANTIC_BUILD=OFF -DMETIER_BUNDLED_OPENTXS=ON -DMETIER_DEFAULT_SYNC_SERVER=${{ secrets.DEFAULT_SYNC_SERVER }}  ${{ matrix.cmake_extra }}'
         buildWithCMake: true
         buildWithCMakeArgs: '-- -k 0'
-    - name: 'Package'
-      run: |
-        cd ${{ github.workspace }}/build
-        cd src
-        ${{ matrix.zip_command }}
-    - uses: actions/upload-artifact@v2
-      with:
-        name: metier-${{ matrix.platform }}.zip
-        path: ${{ github.workspace }}/build/src/metier.zip
+#    - name: 'Package'
+#      run: |
+#        cd ${{ github.workspace }}/build
+#        cd src
+#        ${{ matrix.zip_command }}
+#    - uses: actions/upload-artifact@v2
+#      with:
+#        name: metier-${{ matrix.platform }}.zip
+#        path: ${{ github.workspace }}/build/src/metier.zip
