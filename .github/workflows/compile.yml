@@ -6,16 +6,16 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [macos-10.15, ubuntu-20.04]
+        platform: [macos-10.15]
         include:
           - platform: 'macos-10.15'
             vcpkg_triplet: 'x64-osx'
             cmake_extra: ''
             zip_command: 'zip metier.zip metier'
-          - platform: 'ubuntu-20.04'
-            vcpkg_triplet: 'x64-linux'
-            cmake_extra: ''
-            zip_command: 'zip metier.zip metier'
+#          - platform: 'ubuntu-20.04'
+#            vcpkg_triplet: 'x64-linux'
+#            cmake_extra: ''
+#            zip_command: 'zip metier.zip metier'
 #          - platform: 'windows-2019'
 #            vcpkg_triplet: 'x64-windows-static'
 #            cmake_extra: ''
