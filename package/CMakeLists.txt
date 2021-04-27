@@ -9,13 +9,6 @@ if(UNIX
    AND NOT APPLE
    AND NOT ANDROID
 )
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/app-1024.png")
-    install(
-      FILES "icons/app-1024.png"
-      DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/1024x1024/apps/"
-      RENAME "${METIER_APPSTREAM_ID}.png"
-    )
-  endif()
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/app-512.png")
     install(
       FILES "icons/app-512.png"
