@@ -193,7 +193,8 @@ struct OTWrap::Imp {
         ready().get();
 
         for (const auto chain : api_.Blockchain().EnabledChains()) {
-            const auto accounts = api_.Blockchain().AccountList(nym_id_, chain);
+            const auto accounts =
+                api_.Blockchain().SubaccountList(nym_id_, chain);
 
             if (0 < accounts.size()) { continue; }
 
