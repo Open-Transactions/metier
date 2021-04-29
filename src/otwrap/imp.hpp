@@ -336,6 +336,14 @@ struct OTWrap::Imp {
         return false;
     }
 
+    auto accountActivityModel(const int chain) noexcept -> AccountActivity*
+    {
+        ready().get();
+        const auto& account =
+            api_.Blockchain().Account(nym_id_, util::convert(chain));
+
+        return api_.UI().AccountActivityQt(nym_id_, account.AccountID());
+    }
     auto accountActivityModel(const ot::Identifier& id) noexcept
         -> AccountActivity*
     {

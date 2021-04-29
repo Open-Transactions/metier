@@ -44,10 +44,8 @@ class OTWrap final : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int enabledCurrencyCount READ enabledCurrencyCount)
-    Q_PROPERTY(QVector<int> enabledBlockchains READ enabledBlockchains)
     Q_PROPERTY(int longestBlockchainName READ longestBlockchainName)
     Q_PROPERTY(int longestSeedWord READ longestSeedWord)
-    Q_PROPERTY(QVector<int> validBlockchains READ validBlockchains)
 
 signals:
     void chainsChanged(int enabledCount);
@@ -98,10 +96,10 @@ public:
     Q_INVOKABLE QStringList getRecoveryWords();
     Q_INVOKABLE int wordCount(const int type, const int strength);
     Q_INVOKABLE int enabledCurrencyCount();
-    Q_INVOKABLE BlockchainList enabledBlockchains();
+    BlockchainList enabledBlockchains();
     Q_INVOKABLE int longestBlockchainName();
     Q_INVOKABLE int longestSeedWord();
-    Q_INVOKABLE BlockchainList validBlockchains();
+    BlockchainList validBlockchains();
 
     explicit OTWrap(QGuiApplication& parent, App& app, int& argc, char** argv);
 
