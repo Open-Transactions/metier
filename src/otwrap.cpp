@@ -37,8 +37,7 @@ auto OTWrap::accountActivityModelQML(const QString& id) -> const QObject*
 
 auto OTWrap::accountActivityModel(const int chain) -> AccountActivity*
 {
-    return imp_.accountActivityModel(
-        imp_.api_.UI().BlockchainAccountID(util::convert(chain)));
+    return imp_.accountActivityModel(chain);
 }
 
 auto OTWrap::accountListModel() -> model::AccountList*
@@ -127,8 +126,9 @@ auto OTWrap::Cleanup() noexcept -> void { ot::Cleanup(); }
 auto OTWrap::convertBlockchainAccountID(const QString& id) -> int
 {
     const auto accountID = imp_.api_.Factory().Identifier(id.toStdString());
+    const auto [chain, owner] = imp_.api_.Blockchain().LookupAccount(accountID);
 
-    return static_cast<int>(imp_.api_.UI().BlockchainAccountToChain(accountID));
+    return static_cast<int>(chain);
 }
 
 auto OTWrap::createNewSeed(const int type, const int lang, const int strength)
