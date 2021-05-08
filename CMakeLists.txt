@@ -13,6 +13,7 @@ project(metier)
 set(METIER_APPSTREAM_ID "org.opentransactions.metier")
 set(METIER_APPSTREAM_NAME "Métier")
 set(METIER_APP_DOMAIN "opentransactions.org")
+set(METIER_CLI_COMMAND "metierctl")
 list(
   APPEND
   CMAKE_MODULE_PATH
@@ -130,9 +131,9 @@ find_system_libraries()
 
 find_package(
   Boost
-  1.73.0
+  1.75.0
   REQUIRED
-  COMPONENTS program_options
+  COMPONENTS json program_options
 )
 find_package(
   Qt5
@@ -153,9 +154,11 @@ if(METIER_QML_INTERFACE)
 endif()
 
 if(OT_USE_VCPKG_TARGETS)
-  set(METIER_ZMQ_TARGET "ZeroMQ")
+  set(METIER_ZMQ_PACKAGE "ZeroMQ")
+  set(METIER_ZMQ_TARGET "libzmq-static")
 else()
-  set(METIER_ZMQ_TARGET "unofficial-zeromq")
+  set(METIER_ZMQ_PACKAGE "unofficial-zeromq")
+  set(METIER_ZMQ_TARGET "libzmq")
 endif()
 
 if(METIER_BUNDLED_OPENTXS)
@@ -171,7 +174,7 @@ if(METIER_BUNDLED_OPENTXS)
     OPTIONAL_COMPONENTS stacktrace_basic
   )
   find_package(ZLIB REQUIRED)
-  find_package("${METIER_ZMQ_TARGET}" REQUIRED)
+  find_package("${METIER_ZMQ_PACKAGE}" REQUIRED)
   find_package(
     OpenSSL
     1.0.1
@@ -200,7 +203,7 @@ else()
     OPTIONAL_COMPONENTS stacktrace_basic
   )
   find_package(ZLIB REQUIRED)
-  find_package("${METIER_ZMQ_TARGET}" REQUIRED)
+  find_package("${METIER_ZMQ_PACKAGE}" REQUIRED)
   find_package(
     OpenSSL
     1.0.1

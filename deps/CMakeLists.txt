@@ -65,7 +65,7 @@ if(METIER_BUNDLED_OPENTXS)
         FORCE
   )
   set(OT_ENABLE_RPC
-      OFF
+      ON
       CACHE
         BOOL
         ""

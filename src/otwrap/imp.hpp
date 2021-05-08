@@ -25,6 +25,7 @@
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
 #include "otwrap/passwordcallback.hpp"
+#include "rpc/rpc.hpp"
 #include "util/claim.hpp"
 #include "util/convertblockchain.hpp"
 #include "util/scopeguard.hpp"
@@ -86,6 +87,8 @@ namespace metier
 constexpr auto seed_id_key{"seedid"};
 constexpr auto nym_id_key{"nymid"};
 
+namespace zmq = opentxs::network::zeromq;
+
 struct OTWrap::Imp {
     struct EnabledChains {
         using Vector = std::set<ot::blockchain::Type>;
@@ -140,6 +143,8 @@ struct OTWrap::Imp {
     PasswordCallback callback_;
     opentxs::OTCaller caller_;
     const opentxs::api::Context& ot_;
+    const ot::OTZMQListenCallback rpc_cb_;
+    ot::OTZMQRouterSocket rpc_socket_;
     const opentxs::api::client::Manager& api_;
     const std::string seed_id_;
     const ot::OTNymID nym_id_;
@@ -187,6 +192,19 @@ struct OTWrap::Imp {
         ready().get();
 
         return api_.Storage().SeedList().empty();
+    }
+    auto rpc(zmq::Message& in) const noexcept -> void
+    {
+        const auto body = in.Body();
+
+        if (1u != body.size()) { qInfo() << "Invalid message"; }
+
+        const auto& cmd = body.at(0);
+        auto out = ot_.ZMQ().ReplyMessage(in);
+
+        if (ot_.RPC(cmd.Bytes(), out->AppendBytes())) {
+            rpc_socket_->Send(out);
+        }
     }
     auto validateBlockchains() const noexcept
     {
@@ -580,6 +598,21 @@ struct OTWrap::Imp {
                   caller_.SetCallback(&callback_);
                   return &caller_;
               }()))
+        , rpc_cb_(zmq::ListenCallback::Factory([this](auto& in) { rpc(in); }))
+        , rpc_socket_([this] {
+            using Dir = zmq::socket::Socket::Direction;
+            auto out = ot_.ZMQ().RouterSocket(rpc_cb_, Dir::Bind);
+            const auto endpoint = rpc_endpoint();
+
+            if (out->Start(endpoint)) {
+                qInfo() << QString("RPC socket opened at: %1")
+                               .arg(endpoint.c_str());
+            } else {
+                qFatal("Failed to start RPC socket");
+            }
+
+            return out;
+        }())
         , api_(ot_.StartClient(ot_args_, 0))
         , seed_id_()
         , nym_id_(api_.Factory().NymID())
@@ -640,5 +673,6 @@ struct OTWrap::Imp {
         Ownership::Claim(seed_type_.get());
         ready(true);
     }
+    ~Imp() { rpc_socket_->Close(); }
 };
 }  // namespace metier

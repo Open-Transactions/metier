@@ -5,8 +5,20 @@
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
+if(WIN32)
+  set(APP_ICON_RESOURCE_WINDOWS
+      "${${PROJECT_NAME}_SOURCE_DIR}/package/windows/app.rc"
+  )
+else()
+  set(APP_ICON_RESOURCE_WINDOWS "")
+endif()
+
+add_library(metier-rpc OBJECT "")
+
 add_subdirectory(app)
+add_subdirectory(cli)
 add_subdirectory(models)
+add_subdirectory(rpc)
 add_subdirectory(util)
 
 if(NOT METIER_QML_INTERFACE)
@@ -20,13 +32,13 @@ set(cxx-sources
     "otwrap/passwordcallback.cpp"
 )
 set(cxx-headers "otwrap/imp.hpp" "otwrap/passwordcallback.hpp")
-
 set(moc-headers "app.hpp" "otwrap.hpp")
 qt5_wrap_cpp(moc-sources "${moc-headers}")
 set(object-deps
     $<TARGET_OBJECTS:metier-app>
     $<TARGET_OBJECTS:metier-license>
     $<TARGET_OBJECTS:metier-models>
+    $<TARGET_OBJECTS:metier-rpc>
     $<TARGET_OBJECTS:metier-util>
     $<TARGET_OBJECTS:qr-code-generator>
 )
@@ -40,14 +52,6 @@ else()
     object-deps
     $<TARGET_OBJECTS:metier-widgets>
   )
-endif()
-
-if(WIN32)
-  set(APP_ICON_RESOURCE_WINDOWS
-      "${${PROJECT_NAME}_SOURCE_DIR}/package/windows/app.rc"
-  )
-else()
-  set(APP_ICON_RESOURCE_WINDOWS "")
 endif()
 
 add_executable(
@@ -68,14 +72,15 @@ target_include_directories(
 target_link_libraries(
   "${PROJECT_NAME}"
   PRIVATE
-    opentxs
-    qr-code-generator
+    ${Boost_LIBRARIES}
+    Boost::program_options
     Qt5::Core
     Qt5::Gui
     Qt5::Network
     Threads::Threads
-    ${Boost_LIBRARIES}
-    Boost::program_options
+    metier-rpc
+    opentxs
+    qr-code-generator
 )
 
 if(METIER_QML_INTERFACE)
@@ -88,6 +93,7 @@ target_compile_definitions(
   "${PROJECT_NAME}" PRIVATE METIER_APP_DOMAIN="${METIER_APP_DOMAIN}"
                             METIER_APP_NAME="${PROJECT_NAME}"
 )
+target_compile_definitions(metier-rpc PRIVATE METIER_APP_NAME="${PROJECT_NAME}")
 
 if(METIER_USE_SYNC_SERVER)
   target_compile_definitions(
