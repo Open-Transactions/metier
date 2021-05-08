@@ -10,8 +10,8 @@
       "buildsystem": "simple",
       "sources": [
         {
-          "url": "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2",
-          "sha256": "953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb",
+          "url": "https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2",
+          "sha256": "f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41",
           "type": "archive"
         }
       ],
@@ -90,8 +90,8 @@
       ],
       "sources": [
         {
-          "url": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.15.8.tar.gz",
-          "sha256": "0cbdc9adda01f6d2facc65a22a2be5cecefbefe5a09e5382ee8879b522c04441",
+          "url": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.16.0.tar.gz",
+          "sha256": "7892a35d979304a404400a101c46ce90e85ec9e2a766a86041bb361f626247f5",
           "type": "archive"
         }
       ],
@@ -145,8 +145,8 @@
       "sources": [
         {
           "url": "https://github.com/LMDB/lmdb",
-          "tag": "LMDB_0.9.28",
-          "commit": "51a29155e1609f325e4155556f242bc58b7d8287",
+          "tag": "LMDB_0.9.29",
+          "commit": "8ad7be2510414b9506ec9f9e24f24d04d9b04a1a",
           "type": "git"
         }
       ],
@@ -173,7 +173,7 @@
       "sources": [
         {
           "url": "https://github.com/Open-Transactions/opentxs",
-          "commit": "51f1d8e4e6543c798f4eac020f8f2a9eb4e5b26d",
+          "commit": "d64f97a8175ceb70cd989c798c3220b8f99408fc",
           "type": "git",
           "disable-shallow-clone": true
         }
