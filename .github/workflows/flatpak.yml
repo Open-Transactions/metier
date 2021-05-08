@@ -1,0 +1,21 @@
+name: Flatpak
+
+on: [push, pull_request]
+
+jobs:
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:kde-5.15
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v2
+    - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v3
+      with:
+        manifest-path: package/gui.flatpak.json
+        bundle: org.opentransactions.metier.flatpak
+        cache-key: flatpak-builder-${{ github.workflow }}-${{ github.ref }}
+    - uses: actions/upload-artifact@v2
+      with:
+        path: org.opentransactions.metier.flatpak
