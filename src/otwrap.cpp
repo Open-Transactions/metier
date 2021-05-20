@@ -30,9 +30,9 @@ auto OTWrap::accountActivityModel(const QString& id) -> AccountActivity*
         imp_.api_.Factory().Identifier(id.toStdString()));
 }
 
-auto OTWrap::accountActivityModelQML(const QString& id) -> const QObject*
+auto OTWrap::accountActivityModelQML(const QString& id) -> QObject*
 {
-    return accountActivityModel(id);
+    return const_cast<AccountActivity*>(accountActivityModel(id));
 }
 
 auto OTWrap::accountActivityModel(const int chain) -> AccountActivity*
@@ -47,9 +47,9 @@ auto OTWrap::accountListModel() -> model::AccountList*
     return imp_.account_list_.get();
 }
 
-auto OTWrap::accountListModelQML() -> const QObject*
+auto OTWrap::accountListModelQML() -> QObject*
 {
-    return accountListModel();
+    return const_cast<model::AccountList*>(accountListModel());
 }
 
 auto OTWrap::blockchainChooserModel(const bool testnet) -> QAbstractItemModel*
@@ -63,7 +63,7 @@ auto OTWrap::blockchainChooserModel(const bool testnet) -> QAbstractItemModel*
     }
 }
 
-auto OTWrap::blockchainChooserModelQML(const bool testnet) -> const QObject*
+auto OTWrap::blockchainChooserModelQML(const bool testnet) -> QObject*
 {
     return blockchainChooserModel(testnet);
 }
@@ -188,14 +188,14 @@ auto OTWrap::profileModel() -> model::Profile*
     return imp_.profile_.get();
 }
 
-auto OTWrap::profileModelQML() -> const QObject* { return profileModel(); }
+auto OTWrap::profileModelQML() -> QObject* { return profileModel(); }
 
 auto OTWrap::seedLanguageModel(const int type) -> model::SeedLanguage*
 {
     return imp_.seedLanguageModel(type);
 }
 
-auto OTWrap::seedLanguageModelQML(const int type) -> const QObject*
+auto OTWrap::seedLanguageModelQML(const int type) -> QObject*
 {
     return seedLanguageModel(type);
 }
@@ -205,7 +205,7 @@ auto OTWrap::seedSizeModel(const int type) -> model::SeedSize*
     return imp_.seedSizeModel(type);
 }
 
-auto OTWrap::seedSizeModelQML(const int type) -> const QObject*
+auto OTWrap::seedSizeModelQML(const int type) -> QObject*
 {
     return seedSizeModel(type);
 }
@@ -215,7 +215,7 @@ auto OTWrap::seedTypeModel() -> model::SeedType*
     return imp_.seed_type_.get();
 }
 
-auto OTWrap::seedTypeModelQML() -> const QObject* { return seedTypeModel(); }
+auto OTWrap::seedTypeModelQML() -> QObject* { return seedTypeModel(); }
 
 auto OTWrap::seedWordValidator(const int type, const int lang)
     -> const opentxs::ui::SeedValidator*
@@ -223,10 +223,10 @@ auto OTWrap::seedWordValidator(const int type, const int lang)
     return imp_.seedWordValidator(type, lang);
 }
 
-auto OTWrap::seedWordValidatorQML(const int type, const int lang)
-    -> const QObject*
+auto OTWrap::seedWordValidatorQML(const int type, const int lang) -> QObject*
 {
-    return seedWordValidator(type, lang);
+    return const_cast<opentxs::ui::SeedValidator*>(
+        seedWordValidator(type, lang));
 }
 
 auto OTWrap::validBlockchains() -> BlockchainList

@@ -15,9 +15,11 @@ boost-program-options
 boost-stacktrace
 boost-system
 boost-thread
+gettext
 libsodium
 lmdb
 openssl
+pcre2
 protobuf
 qt5-base
 secp256k1
