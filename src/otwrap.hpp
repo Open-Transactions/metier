@@ -79,16 +79,14 @@ public:
         const int type,
         const int lang);
 
-    Q_INVOKABLE const QObject* accountActivityModelQML(const QString& id);
-    Q_INVOKABLE const QObject* accountListModelQML();
-    Q_INVOKABLE const QObject* blockchainChooserModelQML(bool testnet);
-    Q_INVOKABLE const QObject* profileModelQML();
-    Q_INVOKABLE const QObject* seedLanguageModelQML(const int type);
-    Q_INVOKABLE const QObject* seedSizeModelQML(const int type);
-    Q_INVOKABLE const QObject* seedTypeModelQML();
-    Q_INVOKABLE const QObject* seedWordValidatorQML(
-        const int type,
-        const int lang);
+    Q_INVOKABLE QObject* accountActivityModelQML(const QString& id);
+    Q_INVOKABLE QObject* accountListModelQML();
+    Q_INVOKABLE QObject* blockchainChooserModelQML(bool testnet);
+    Q_INVOKABLE QObject* profileModelQML();
+    Q_INVOKABLE QObject* seedLanguageModelQML(const int type);
+    Q_INVOKABLE QObject* seedSizeModelQML(const int type);
+    Q_INVOKABLE QObject* seedTypeModelQML();
+    Q_INVOKABLE QObject* seedWordValidatorQML(const int type, const int lang);
 
     Q_INVOKABLE int convertBlockchainAccountID(const QString& id);
     Q_INVOKABLE QStringList
