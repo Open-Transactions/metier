@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget* parent, OTWrap& ot) noexcept
     connect(toolbox, &QToolBox::currentChanged, this, &MainWindow::changeChain);
     connect(this, &MainWindow::progMaxUpdated, prog, &QProgressBar::setMaximum);
     connect(this, &MainWindow::progValueUpdated, prog, &QProgressBar::setValue);
+    showBlockchainStatistics();
 }
 
 void MainWindow::accountListUpdated(
@@ -60,17 +61,16 @@ void MainWindow::accountListUpdated(
     [[maybe_unused]] const QItemSelection& previous)
 {
     const auto indices = current.indexes();
-    auto& accountActivity = *imp_.ui_->accountActivity;
 
     if (0 == indices.size()) {
-        accountActivity.setModel(nullptr);
+        showBlockchainStatistics();
     } else {
         auto& accountList = *imp_.ui_->accountList;
         const auto& index = indices.first();
         const auto& model = *accountList.model();
         const auto accountID =
             model.data(index, OTModel::Roles::AccountIDRole).toString();
-        accountActivity.setModel(imp_.ot_.accountActivityModel(accountID));
+        showAccountActivity(accountID);
     }
 
     imp_.updateProgress();
@@ -85,9 +85,27 @@ auto MainWindow::setProgressValue(int value) -> void
     emit progValueUpdated(value);
 }
 
+auto MainWindow::showAccountActivity(int chain) -> void
+{
+    auto& accountActivity = *imp_.ui_->accountActivity;
+    accountActivity.setModel(imp_.ot_.accountActivityModel(chain));
+}
+
+auto MainWindow::showAccountActivity(QString account) -> void
+{
+    auto& accountActivity = *imp_.ui_->accountActivity;
+    accountActivity.setModel(imp_.ot_.accountActivityModel(account));
+}
+
 auto MainWindow::showBlockchainChooser() -> void
 {
     util::Focuser(imp_.blockchains_.get()).show();
+}
+
+auto MainWindow::showBlockchainStatistics() -> void
+{
+    auto& accountActivity = *imp_.ui_->accountActivity;
+    accountActivity.setModel(imp_.ot_.blockchainStatisticsModel());
 }
 
 auto MainWindow::showLicenseViewer() -> void
@@ -105,13 +123,11 @@ auto MainWindow::showRecoveryWords() -> void
 auto MainWindow::changeChain() -> void
 {
     const auto chain = imp_.chain_toolbox_.currentChain();
-    auto& accountActivity = *imp_.ui_->accountActivity;
 
     if (ot::blockchain::Type::Unknown == chain) {
-        accountActivity.setModel(nullptr);
+        showBlockchainStatistics();
     } else {
-        accountActivity.setModel(
-            imp_.ot_.accountActivityModel(static_cast<int>(chain)));
+        showAccountActivity(static_cast<int>(chain));
     }
 
     imp_.updateProgress();

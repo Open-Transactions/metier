@@ -105,34 +105,6 @@
       ]
     },
     {
-      "name": "secp256k1",
-      "buildsystem": "autotools",
-      "config-opts": [
-        "--enable-shared",
-        "--disable-static",
-        "--disable-benchmark",
-        "--disable-tests",
-        "--disable-openssl-tests",
-        "--disable-exhaustive-tests",
-        "--enable-experimental",
-        "--enable-module-ecdh",
-        "--enable-module-recovery"
-      ],
-      "sources": [
-        {
-          "url": "https://github.com/bitcoin-core/secp256k1",
-          "commit": "3e5cfc5c73f856010fe646657703faf8d63e7120",
-          "type": "git"
-        }
-      ],
-      "cleanup": [
-        "*.la",
-        "/include",
-        "/lib/debug",
-        "/lib/pkgconfig"
-      ]
-    },
-    {
       "name": "lmdb",
       "buildsystem": "simple",
       "subdir": "libraries/liblmdb",
@@ -168,12 +140,13 @@
         "-DOT_CASH_USING_LUCRE=ON",
         "-DOT_WITH_QT=ON",
         "-DOT_WITH_QML=OFF",
-        "-DOT_ENABLE_RPC=ON"
+        "-DOT_ENABLE_RPC=ON",
+        "-DOT_BUNDLED_SECP256K1=ON"
       ],
       "sources": [
         {
           "url": "https://github.com/Open-Transactions/opentxs",
-          "commit": "9c1d98767df4ec5e79595de5b6eddde1e7218071",
+          "commit": "7d1e99b958b317103dbba99e2e139c65377249aa",
           "type": "git",
           "disable-shallow-clone": true
         }

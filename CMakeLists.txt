@@ -165,61 +165,60 @@ if(METIER_BUNDLED_OPENTXS)
   find_package(
     Boost
     1.73.0
-    REQUIRED
-    COMPONENTS
+    QUIET
+    OPTIONAL_COMPONENTS
       system
       filesystem
       thread
       iostreams
-    OPTIONAL_COMPONENTS stacktrace_basic
+      stacktrace_basic
   )
-  find_package(ZLIB REQUIRED)
-  find_package("${METIER_ZMQ_PACKAGE}" REQUIRED)
+  find_package(ZLIB QUIET)
+  find_package("${METIER_ZMQ_PACKAGE}" QUIET)
   find_package(
     OpenSSL
     1.0.1
-    REQUIRED
+    QUIET
   )
-  find_package(unofficial-secp256k1 REQUIRED)
-  find_package(unofficial-sodium REQUIRED)
-  find_package(Protobuf REQUIRED)
-  find_package(lmdb REQUIRED)
+  find_package(unofficial-sodium QUIET)
+  find_package(Protobuf QUIET)
+  find_package(lmdb QUIET)
   find_package(
     Qt5
     COMPONENTS Core Gui
-    REQUIRED
+    QUIET
   )
 else()
   find_package(opentxs REQUIRED)
   find_package(
     Boost
     1.73.0
-    REQUIRED
-    COMPONENTS
+    QUIET
+    OPTIONAL_COMPONENTS
       system
       filesystem
       thread
       iostreams
-    OPTIONAL_COMPONENTS stacktrace_basic
+      stacktrace_basic
   )
-  find_package(ZLIB REQUIRED)
-  find_package("${METIER_ZMQ_PACKAGE}" REQUIRED)
+  find_package(ZLIB QUIET)
+  find_package("${METIER_ZMQ_PACKAGE}" QUIET)
   find_package(
     OpenSSL
     1.0.1
-    REQUIRED
+    QUIET
   )
-  find_package(unofficial-secp256k1 REQUIRED)
-  find_package(unofficial-sodium REQUIRED)
-  find_package(Protobuf REQUIRED)
-  find_package(lmdb REQUIRED)
+
+  find_package(unofficial-secp256k1 QUIET)
+  find_package(unofficial-sodium QUIET)
+  find_package(Protobuf QUIET)
+  find_package(lmdb QUIET)
   find_package(
-    Qt5
+    Qt5 QUIET
     COMPONENTS
       Core
       Gui
       Qml
-    QUIET
   )
   find_package(SQLite3 QUIET)
   find_package(opendht QUIET)

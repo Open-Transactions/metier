@@ -68,6 +68,16 @@ auto OTWrap::blockchainChooserModelQML(const bool testnet) -> QObject*
     return blockchainChooserModel(testnet);
 }
 
+auto OTWrap::blockchainStatisticsModel() -> QAbstractItemModel*
+{
+    return imp_.api_.UI().BlockchainStatisticsQt();
+}
+
+auto OTWrap::blockchainStatisticsModelQML() -> QObject*
+{
+    return blockchainStatisticsModel();
+}
+
 auto OTWrap::checkStartupConditions() -> void
 {
     if (imp_.needSeed()) {

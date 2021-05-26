@@ -71,6 +71,13 @@ if(METIER_BUNDLED_OPENTXS)
         ""
         FORCE
   )
+  set(OT_BUNDLED_SECP256K1
+      ON
+      CACHE
+        BOOL
+        ""
+        FORCE
+  )
 
   add_subdirectory(opentxs)
 endif()

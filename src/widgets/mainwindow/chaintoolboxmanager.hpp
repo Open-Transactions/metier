@@ -49,17 +49,11 @@ struct ChainToolboxManager {
         if (0 == position) {
             assert(nullptr != account_list_);
 
-            using OTModel = opentxs::ui::AccountListQt;
-
             auto& accountList = *account_list_;
-            auto* selection = accountList.selectionModel();
-            auto selected = selection->currentIndex();
-            const auto& model = *accountList.model();
-            const auto accountID =
-                model.data(selected, OTModel::Roles::AccountIDRole).toString();
-            const auto chain = ot_.convertBlockchainAccountID(accountID);
+            auto& selection = *accountList.selectionModel();
+            selection.clear();
 
-            return util::convert(chain);
+            return ot::blockchain::Type::Unknown;
         }
 
         return util::convert(items_.at(position));

@@ -1,9 +1,12 @@
 name: Flatpak
 
-on: [push, pull_request]
+on:
+  pull_request:
+    types: [ closed ]
 
 jobs:
   flatpak:
+    if: github.event.pull_request.merged == true
     name: "Flatpak"
     runs-on: ubuntu-latest
     container:

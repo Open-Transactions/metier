@@ -19,7 +19,6 @@
 #include "metier.h"
 #include "openssl.h"
 #include "qt.h"
-#include "secp256k1.h"
 #include "sodium.h"
 
 auto width_ = std::size_t{0};
@@ -32,9 +31,6 @@ auto make_vector() noexcept -> LicenseData
          std::string{reinterpret_cast<const char*>(LICENSE), LICENSE_len}},
         {"Boost",
          std::string{reinterpret_cast<const char*>(boost_txt), boost_txt_len}},
-        {"libsecp256k1",
-         std::string{
-             reinterpret_cast<const char*>(secp256k1_txt), secp256k1_txt_len}},
         {"libsodium",
          std::string{
              reinterpret_cast<const char*>(sodium_txt), sodium_txt_len}},
