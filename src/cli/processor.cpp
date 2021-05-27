@@ -6,7 +6,7 @@
 #include "cli/processor.hpp"  // IWYU pragma: associated
 
 #include <boost/container/flat_map.hpp>
-#include <boost/json.hpp>
+#include <boost/json/src.hpp>
 #include <opentxs/opentxs.hpp>
 #include <zmq.h>
 #include <chrono>
