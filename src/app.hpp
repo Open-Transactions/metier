@@ -16,13 +16,18 @@ class App final : public QObject
     Q_OBJECT
 
 signals:
+    void passwordPrompt(QString prompt, bool once);
     void startup();
 
 public slots:
-    void displayFirstRun();
-    void displayNamePrompt();
     void displayBlockchainChooser();
+    void displayFirstRun();
     void displayMainWindow();
+    void displayNamePrompt();
+    void needPasswordPrompt(QString prompt, bool once);
+
+private slots:
+    void displayPasswordPrompt(QString prompt, bool once);
 
 public:
     struct Imp;

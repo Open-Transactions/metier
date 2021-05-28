@@ -33,7 +33,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="labelRetype">
        <property name="text">
-        <string>Retype:</string>
+        <string>Confirm:</string>
        </property>
       </widget>
      </item>

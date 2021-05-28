@@ -18,7 +18,7 @@ add_library(
 target_include_directories(
   metier-license
   INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}"
-  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
+  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${opentxs_INCLUDE_DIRS}"
 )
 target_compile_definitions(
   metier-license PRIVATE -DMETIER_APPSTREAM_NAME="${METIER_APPSTREAM_NAME}"
@@ -31,3 +31,9 @@ target_link_libraries(
     Qt5::Core
     Qt5::Gui
 )
+
+if(NOT METIER_BUNDLED_OPENTXS)
+  target_include_directories(
+    metier-license SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
+  )
+endif()

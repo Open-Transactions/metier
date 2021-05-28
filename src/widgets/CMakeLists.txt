@@ -4,6 +4,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 set(cxx-sources
+    "enterpassphrase/imp.cpp"
     "blockchainchooser.cpp"
     "blockchainsend.cpp"
     "enterpassphrase.cpp"
@@ -65,3 +66,9 @@ target_link_libraries(
 target_compile_definitions(
   metier-widgets PRIVATE -DMETIER_APPSTREAM_NAME="${METIER_APPSTREAM_NAME}"
 )
+
+if(NOT METIER_BUNDLED_OPENTXS)
+  target_include_directories(
+    metier-widgets SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
+  )
+endif()

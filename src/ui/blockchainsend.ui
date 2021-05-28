@@ -57,7 +57,7 @@
       <item row="1" column="1" colspan="2">
        <widget class="QLabel" name="status">
         <property name="text">
-         <string></string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -65,6 +65,13 @@
        <widget class="QLineEdit" name="address"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="result">
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </item>
    <item>

@@ -17,6 +17,8 @@ namespace metier
 struct App::Imp {
     static std::unique_ptr<App> singleton_;
 
+    bool init_{false};
+
     static auto factory(App& parent, int& argc, char** argv) noexcept
         -> std::unique_ptr<Imp>;
 
@@ -24,6 +26,7 @@ struct App::Imp {
     virtual auto displayFirstRun() -> void = 0;
     virtual auto displayMainWindow() -> void = 0;
     virtual auto displayNamePrompt() -> void = 0;
+    virtual auto displayPasswordPrompt(QString prompt, bool once) -> void = 0;
     virtual auto confirmPassword(QString prompt, QString key) -> QString = 0;
     virtual auto getPassword(QString prompt, QString key) -> QString = 0;
     virtual auto init(int& argc, char** argv) noexcept -> void = 0;

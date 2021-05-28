@@ -7,6 +7,8 @@
 
 #include "widgets/blockchainsend.hpp"  // IWYU pragma: associated
 
+#include <opentxs/blockchain/SendResult.hpp>
+#include <opentxs/blockchain/Types.hpp>
 #include <opentxs/ui/qt/AccountActivity.hpp>
 #include <opentxs/ui/qt/AmountValidator.hpp>
 #include <opentxs/ui/qt/DestinationValidator.hpp>
@@ -19,18 +21,25 @@
 #include <cmath>
 #include <iostream>
 #include <mutex>
+#include <optional>
 #include <string>
 
 #include "ui_blockchainsend.h"
 #include "util/resizer.hpp"
 
+namespace ot = opentxs;
+
 namespace metier::widget
 {
 struct BlockchainSend::Imp {
+    BlockchainSend& parent_;
     std::unique_ptr<Ui::BlockchainSend> ui_;
     Model& model_;
     opentxs::ui::AmountValidator* amount_validator_;
     opentxs::ui::DestinationValidator* address_validator_;
+    std::mutex lock_;
+    std::optional<int> key_;
+    bool finished_;
 
     auto checkOk() -> void
     {
@@ -39,6 +48,43 @@ struct BlockchainSend::Imp {
         auto* amount = ui_->amount;
         ok->setEnabled(
             address->hasAcceptableInput() && amount->hasAcceptableInput());
+    }
+    auto fail() noexcept -> void
+    {
+        lock_input();
+        auto* result = ui_->result;
+        result->setText("Unspecified fatal error");
+        finished();
+    }
+    auto finished() noexcept -> void
+    {
+        finished_ = true;
+        auto* ok = ui_->buttons->button(QDialogButtonBox::Ok);
+        ok->setText("Done");
+        ok->setEnabled(true);
+    }
+    auto handle_ok() noexcept -> void
+    {
+        if (finished_) {
+            parent_.close();
+        } else {
+            send();
+        }
+    }
+    auto lock_input() noexcept -> void
+    {
+        auto* address = ui_->address;
+        auto* amount = ui_->amount;
+        auto* memo = ui_->memo;
+        auto* scale = ui_->scale;
+        auto* ok = ui_->buttons->button(QDialogButtonBox::Ok);
+        auto* cancel = ui_->buttons->button(QDialogButtonBox::Cancel);
+        address->setReadOnly(true);
+        amount->setReadOnly(true);
+        scale->setEditable(false);
+        memo->setReadOnly(true);
+        ok->setEnabled(false);
+        cancel->setEnabled(false);
     }
     auto recalculateAmount(int scale) noexcept
     {
@@ -53,20 +99,58 @@ struct BlockchainSend::Imp {
     {
         auto* address = ui_->address;
         auto* amount = ui_->amount;
+        auto* scale = ui_->scale;
         auto* memo = ui_->memo;
-        model_.sendToAddress(address->text(), amount->text(), memo->text());
+        auto failed{false};
+
+        {
+            auto lock = std::lock_guard(lock_);
+            key_ = model_.sendToAddress(
+                address->text(),
+                amount->text(),
+                memo->text(),
+                scale->currentIndex());
+            failed = (0 > key_.value());
+        }
+
+        if (failed) {
+            fail();
+        } else {
+            wait();
+        }
+    }
+    auto updateSendResult(int key, int code, const QString& txid) -> void
+    {
+        auto lock = std::lock_guard(lock_);
+
+        if (false == key_.has_value()) { return; }
+        if (key_.value() != key) { return; }
+
+        using Result = ot::blockchain::SendResult;
+        const auto result = static_cast<Result>(code);
+        auto status = QString{ot::print(result).c_str()};
+
+        if (0 < txid.size()) { status.append(" ").append(txid); }
+
+        ui_->result->setText(status);
+        finished();
     }
     auto updateStatus(const QString& text) noexcept -> void
     {
         auto* status = ui_->status;
         status->setText(text);
     }
+    auto wait() noexcept -> void { lock_input(); }
 
     Imp(BlockchainSend* parent, Model* model) noexcept
-        : ui_(std::make_unique<Ui::BlockchainSend>())
+        : parent_(*parent)
+        , ui_(std::make_unique<Ui::BlockchainSend>())
         , model_(*model)
         , amount_validator_(model_.getAmountValidator())
         , address_validator_(model_.getDestValidator())
+        , lock_()
+        , key_(std::nullopt)
+        , finished_(false)
     {
         assert(ui_);
         assert(nullptr != model);
@@ -83,6 +167,11 @@ struct BlockchainSend::Imp {
         auto* scale = ui_->scale;
         scale->setModel(model_.getScaleModel());
         amount_validator_->setScale(scale->currentIndex());
+        parent->connect(
+            model,
+            &Model::transactionSendResult,
+            parent,
+            &BlockchainSend::updateSendResult);
         checkOk();
     }
 
