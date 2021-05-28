@@ -71,6 +71,7 @@ public:
     AccountActivity* accountActivityModel(const int chain);
     model::AccountList* accountListModel();
     QAbstractItemModel* blockchainChooserModel(const bool testnet);
+    QAbstractItemModel* blockchainStatisticsModel();
     model::Profile* profileModel();
     model::SeedLanguage* seedLanguageModel(const int type);
     model::SeedSize* seedSizeModel(const int type);
@@ -82,6 +83,7 @@ public:
     Q_INVOKABLE QObject* accountActivityModelQML(const QString& id);
     Q_INVOKABLE QObject* accountListModelQML();
     Q_INVOKABLE QObject* blockchainChooserModelQML(bool testnet);
+    Q_INVOKABLE QObject* blockchainStatisticsModelQML();
     Q_INVOKABLE QObject* profileModelQML();
     Q_INVOKABLE QObject* seedLanguageModelQML(const int type);
     Q_INVOKABLE QObject* seedSizeModelQML(const int type);

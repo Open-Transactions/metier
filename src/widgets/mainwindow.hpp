@@ -37,7 +37,10 @@ private slots:
         const QItemSelection& current,
         const QItemSelection& previous);
     void initModels();
+    void showAccountActivity(int chain);
+    void showAccountActivity(QString account);
     void showBlockchainChooser();
+    void showBlockchainStatistics();
     void showLicenseViewer();
     void showRecoveryWords();
     void changeChain();

@@ -90,6 +90,10 @@ constexpr auto nym_id_key{"nymid"};
 namespace zmq = opentxs::network::zeromq;
 
 struct OTWrap::Imp {
+private:
+    OTWrap& parent_;
+
+public:
     struct EnabledChains {
         using Vector = std::set<ot::blockchain::Type>;
 
@@ -172,6 +176,12 @@ struct OTWrap::Imp {
         return output;
     }
 
+    auto check_chains(int count) const noexcept -> void
+    {
+        validateBlockchains();
+        emit parent_.chainsChanged(count);
+    }
+
     auto enableDefaultChain() const noexcept -> bool
     {
 #ifdef METIER_DEFAULT_BLOCKCHAIN
@@ -206,9 +216,10 @@ struct OTWrap::Imp {
             rpc_socket_->Send(out);
         }
     }
-    auto validateBlockchains() const noexcept
+    auto validateBlockchains() const noexcept -> bool
     {
         ready().get();
+        ot::Lock lock(lock_);
 
         for (const auto chain : api_.Blockchain().EnabledChains()) {
             const auto accounts =
@@ -590,7 +601,8 @@ struct OTWrap::Imp {
     }
 
     Imp(QGuiApplication& parent, App& app, OTWrap& me, int& argc, char** argv)
-        : callback_(app)
+        : parent_(me)
+        , callback_(app)
         , caller_()
         , ot_(ot::InitContext(
               make_args(parent, argc, argv),
@@ -646,7 +658,8 @@ struct OTWrap::Imp {
             OT_ASSERT(nullptr != test);
 
             using Model = ot::ui::BlockchainSelectionQt;
-            connect(full, &Model::enabledChanged, &me, &OTWrap::chainsChanged);
+            connect(
+                full, &Model::enabledChanged, [&](int c) { check_chains(c); });
             connect(full, &Model::chainEnabled, [&](const int chain) {
                 enabled_chains_.add(static_cast<ot::blockchain::Type>(chain));
             });

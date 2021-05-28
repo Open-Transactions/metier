@@ -13,7 +13,6 @@ add_library(
   "metier.h"
   "openssl.h"
   "qt.h"
-  "secp256k1.h"
   "sodium.h"
 )
 target_include_directories(
