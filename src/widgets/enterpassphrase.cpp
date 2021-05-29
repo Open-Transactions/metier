@@ -18,29 +18,35 @@ namespace metier::widget
 EnterPassphrase::EnterPassphrase(
     QWidget* parent,
     const QString& displayString,
-    bool runOneOrTwo)
+    Mode mode) noexcept
     : QDialog(parent)
-    , imp_p_(std::make_unique<Imp>(this, displayString, runOneOrTwo))
+    , imp_p_(Imp::factory(this, displayString, mode))
     , imp_(*imp_p_)
 {
     assert(imp_p_);
 
     auto& ui = *imp_.ui_;
-    auto* cancel = ui.buttons->button(QDialogButtonBox::Cancel);
     auto* passphrase = ui.passphrase;
-    auto* retype = ui.retype;
+    auto* confirm = ui.retype;
+    auto* cancel = ui.buttons->button(QDialogButtonBox::Cancel);
+    auto* ok = ui.buttons->button(QDialogButtonBox::Ok);
+
     connect(cancel, &QPushButton::clicked, [this]() {
         imp_.cancel();
         close();
     });
+    connect(ok, &QPushButton::clicked, [this]() { close(); });
     connect(passphrase, &QLineEdit::textChanged, [this]() {
         imp_.passphraseChanged();
     });
     connect(
-        retype, &QLineEdit::textChanged, [this]() { imp_.retypeChanged(); });
+        confirm, &QLineEdit::textChanged, [this]() { imp_.confirmChanged(); });
 }
 
-auto EnterPassphrase::secret() -> QString { return imp_.secret(); }
+auto EnterPassphrase::secret() const noexcept -> QString
+{
+    return imp_.secret();
+}
 
 EnterPassphrase::~EnterPassphrase() = default;
 }  // namespace metier::widget

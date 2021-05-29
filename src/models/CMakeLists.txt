@@ -38,3 +38,9 @@ target_link_libraries(
     protobuf::libprotobuf-lite
   PRIVATE metier-license opentxs
 )
+
+if(NOT METIER_BUNDLED_OPENTXS)
+  target_include_directories(
+    metier-models SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
+  )
+endif()

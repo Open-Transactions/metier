@@ -31,6 +31,7 @@ add_library(
   "${moc-sources}"
   "${moc-headers}"
 )
+
 target_link_libraries(
   metier-app
   PRIVATE
@@ -38,6 +39,12 @@ target_link_libraries(
     Qt5::Gui
     opentxs
 )
+
+if(NOT METIER_BUNDLED_OPENTXS)
+  target_include_directories(
+    metier-app SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
+  )
+endif()
 
 if(METIER_QML_INTERFACE)
   target_link_libraries(metier-app PRIVATE Qt5::Qml Qt5::Quick)

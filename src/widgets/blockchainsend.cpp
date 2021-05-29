@@ -37,10 +37,7 @@ BlockchainSend::BlockchainSend(QWidget* parent, Model* model)
     connect(cancel, &QPushButton::clicked, this, &QWidget::close);
     connect(address, &QLineEdit::textChanged, [this]() { imp_.checkOk(); });
     connect(amount, &QLineEdit::textChanged, [this]() { imp_.checkOk(); });
-    connect(ok, &QPushButton::clicked, [this]() {
-        imp_.send();
-        close();
-    });
+    connect(ok, &QPushButton::clicked, [this]() { imp_.handle_ok(); });
     connect(
         scale,
         QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -64,6 +61,11 @@ auto BlockchainSend::updateAddress(const QString& in) -> void
 auto BlockchainSend::updateAmount(int in) -> void
 {
     imp_.recalculateAmount(in);
+}
+
+auto BlockchainSend::updateSendResult(int key, int code, QString txid) -> void
+{
+    imp_.updateSendResult(key, code, txid);
 }
 
 BlockchainSend::~BlockchainSend()

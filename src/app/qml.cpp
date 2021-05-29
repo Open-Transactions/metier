@@ -84,6 +84,11 @@ public:
         interface_.doDisplayNamePrompt();
     }
 
+    auto displayPasswordPrompt(QString, bool) -> void final
+    {
+        // TODO
+    }
+
     auto confirmPassword(
         [[maybe_unused]] QString prompt,
         [[maybe_unused]] QString key) -> QString final

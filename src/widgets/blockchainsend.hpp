@@ -35,6 +35,7 @@ public:
 private slots:
     void updateAddress(const QString&);
     void updateAmount(int);
+    void updateSendResult(int, int, QString);
 
 private:
     struct Imp;

@@ -26,7 +26,14 @@ namespace metier
 struct LegacyApp final : public App::Imp, public QApplication {
     static std::unique_ptr<App> singleton_;
 
+    struct PasswordData {
+        std::mutex lock_{};
+        std::promise<QString> promise_{};
+        std::future<QString> future_{};
+    };
+
     App& parent_;
+    PasswordData password_;
     const QIcon icon_;
     std::atomic_bool first_run_complete_;
     std::unique_ptr<OTWrap> ot_;
@@ -67,29 +74,36 @@ struct LegacyApp final : public App::Imp, public QApplication {
     auto confirmPassword(QString prompt, [[maybe_unused]] QString key)
         -> QString final
     {
-        auto dialog = std::make_unique<metier::widget::EnterPassphrase>(
-            nullptr, prompt, false);
+        auto lock = std::lock_guard<std::mutex>{password_.lock_};
+        password_.promise_ = {};
+        password_.future_ = password_.promise_.get_future();
+        parent_.needPasswordPrompt(prompt, false);
+
+        return password_.future_.get();
+    }
+
+    auto displayPasswordPrompt(QString prompt, bool once) -> void final
+    {
+        using Widget = metier::widget::EnterPassphrase;
+        auto dialog = std::make_unique<Widget>(
+            nullptr, prompt, once ? Widget::Mode::Once : Widget::Mode::Twice);
         auto postcondition = metier::ScopeGuard{[&dialog]() {
             dialog->deleteLater();
             dialog.release();
         }};
         dialog->exec();
-
-        return dialog->secret();
+        password_.promise_.set_value(dialog->secret());
     }
 
     auto getPassword(QString prompt, [[maybe_unused]] QString key)
         -> QString final
     {
-        auto dialog = std::make_unique<metier::widget::EnterPassphrase>(
-            nullptr, prompt, true);
-        auto postcondition = metier::ScopeGuard{[&dialog]() {
-            dialog->deleteLater();
-            dialog.release();
-        }};
-        dialog->exec();
+        auto lock = std::lock_guard<std::mutex>{password_.lock_};
+        password_.promise_ = {};
+        password_.future_ = password_.promise_.get_future();
+        parent_.needPasswordPrompt(prompt, true);
 
-        return dialog->secret();
+        return password_.future_.get();
     }
 
     auto init(int& argc, char** argv) noexcept -> void final
@@ -132,6 +146,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
     LegacyApp(App& parent, int& argc, char** argv) noexcept
         : QApplication(argc, argv)
         , parent_(parent)
+        , password_()
         , icon_(":/assets/app_icon.png")
         , first_run_complete_(false)
         , ot_()

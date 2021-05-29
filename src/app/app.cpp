@@ -6,6 +6,7 @@
 #include "app.hpp"  // IWYU pragma: associated
 
 #include <otwrap.hpp>
+#include <iostream>
 #include <mutex>
 
 #include "app/imp.hpp"
@@ -18,6 +19,7 @@ App::App(int& argc, char** argv) noexcept
     : imp_p_(Imp::factory(*this, argc, argv))
     , imp_(*imp_p_)
 {
+    connect(this, &App::passwordPrompt, this, &App::displayPasswordPrompt);
     imp_.init(argc, argv);
     auto* ot = imp_.otwrap();
     connect(ot, &OTWrap::needSeed, this, &App::displayFirstRun);
@@ -37,9 +39,18 @@ auto App::displayBlockchainChooser() -> void
 
 auto App::displayFirstRun() -> void { imp_.displayFirstRun(); }
 
-auto App::displayMainWindow() -> void { imp_.displayMainWindow(); }
+auto App::displayMainWindow() -> void
+{
+    imp_.init_ = true;
+    imp_.displayMainWindow();
+}
 
 auto App::displayNamePrompt() -> void { imp_.displayNamePrompt(); }
+
+auto App::displayPasswordPrompt(QString prompt, bool once) -> void
+{
+    imp_.displayPasswordPrompt(prompt, once);
+}
 
 auto App::confirmPassword(QString prompt, QString key) -> QString
 {
@@ -49,6 +60,15 @@ auto App::confirmPassword(QString prompt, QString key) -> QString
 auto App::getPassword(QString prompt, QString key) -> QString
 {
     return imp_.getPassword(prompt, key);
+}
+
+auto App::needPasswordPrompt(QString prompt, bool once) -> void
+{
+    if (imp_.init_) {
+        emit passwordPrompt(prompt, once);
+    } else {
+        imp_.displayPasswordPrompt(prompt, once);
+    }
 }
 
 auto App::run() -> int { return imp_.run(); }

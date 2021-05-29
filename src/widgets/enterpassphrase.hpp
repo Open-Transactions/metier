@@ -18,18 +18,23 @@ class EnterPassphrase final : public QDialog
     Q_OBJECT
 
 public:
-    auto secret() -> QString;
+    struct Imp;
+
+    enum class Mode : bool {
+        Once = true,
+        Twice = false,
+    };
+
+    auto secret() const noexcept -> QString;
 
     EnterPassphrase(
         QWidget* parent,
         const QString& displayString,
-        bool runOneOrTwo = true);
+        Mode mode) noexcept;
 
     ~EnterPassphrase() final;
 
 private:
-    struct Imp;
-
     std::unique_ptr<Imp> imp_p_;
     Imp& imp_;
 

@@ -24,4 +24,10 @@ target_link_libraries(
     opentxs
 )
 
+if(NOT METIER_BUNDLED_OPENTXS)
+  target_include_directories(
+    "${METIER_CLI_COMMAND}" SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
+  )
+endif()
+
 install(TARGETS "${METIER_CLI_COMMAND}")

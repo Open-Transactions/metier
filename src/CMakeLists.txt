@@ -69,6 +69,12 @@ target_include_directories(
   "${PROJECT_NAME}" PRIVATE "${${PROJECT_NAME}_SOURCE_DIR}"
 )
 
+if(NOT METIER_BUNDLED_OPENTXS)
+  target_include_directories(
+    "${PROJECT_NAME}" SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
+  )
+endif()
+
 target_link_libraries(
   "${PROJECT_NAME}"
   PRIVATE
