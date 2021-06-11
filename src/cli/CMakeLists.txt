@@ -18,7 +18,6 @@ target_link_libraries(
   "${METIER_CLI_COMMAND}"
   PRIVATE
     "${METIER_ZMQ_TARGET}"
-    Boost::json
     Boost::program_options
     metier-rpc
     opentxs
@@ -30,4 +29,4 @@ if(NOT METIER_BUNDLED_OPENTXS)
   )
 endif()
 
-install(TARGETS "${METIER_CLI_COMMAND}")
+install(TARGETS "${METIER_CLI_COMMAND}" COMPONENT metier-bundle)

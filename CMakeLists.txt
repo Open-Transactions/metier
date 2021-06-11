@@ -9,6 +9,7 @@ cmake_policy(
   CMP0091
   NEW
 )
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 project(metier)
 set(METIER_APPSTREAM_ID "org.opentransactions.metier")
 set(METIER_APPSTREAM_NAME "Métier")
@@ -133,7 +134,7 @@ find_package(
   Boost
   1.75.0
   REQUIRED
-  COMPONENTS json program_options
+  COMPONENTS program_options
 )
 find_package(
   Qt5
@@ -148,7 +149,12 @@ find_package(
 if(METIER_QML_INTERFACE)
   find_package(
     Qt5
-    COMPONENTS Qml Quick
+    COMPONENTS
+      Qml
+      Quick
+      QuickControls2 
+      QmlImportScanner 
+      Svg
     REQUIRED
   )
 endif()
@@ -173,6 +179,7 @@ if(METIER_BUNDLED_OPENTXS)
       iostreams
       stacktrace_basic
   )
+  
   find_package(ZLIB QUIET)
   find_package("${METIER_ZMQ_PACKAGE}" QUIET)
   find_package(
