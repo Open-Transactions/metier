@@ -185,7 +185,7 @@ public:
     auto enableDefaultChain() const noexcept -> bool
     {
 #ifdef METIER_DEFAULT_BLOCKCHAIN
-        return api_.Blockchain().Enable(
+        return api_.Network().Blockchain().Enable(
             util::convert(METIER_DEFAULT_BLOCKCHAIN));
 #else
         return false;
@@ -221,7 +221,7 @@ public:
         ready().get();
         ot::Lock lock(lock_);
 
-        for (const auto chain : api_.Blockchain().EnabledChains()) {
+        for (const auto chain : api_.Network().Blockchain().EnabledChains()) {
             const auto accounts =
                 api_.Blockchain().SubaccountList(nym_id_, chain);
 
@@ -668,7 +668,7 @@ public:
                     static_cast<ot::blockchain::Type>(chain));
             });
 
-            return api_.Blockchain().EnabledChains();
+            return api_.Network().Blockchain().EnabledChains();
         }())
         , seed_type_(std::make_unique<model::SeedType>(
               transform<model::SeedType::Data>(
