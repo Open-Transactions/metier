@@ -146,7 +146,7 @@
       "sources": [
         {
           "url": "https://github.com/Open-Transactions/opentxs",
-          "commit": "d5473f40a3bc836537a89c63ca23b12413c11988",
+          "commit": "ff969b7f82337880e573521948b58dae1204bfbf",
           "type": "git",
           "disable-shallow-clone": true
         }
