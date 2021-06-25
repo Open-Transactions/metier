@@ -6,6 +6,7 @@
 #include "cli/processor.hpp"  // IWYU pragma: associated
 
 #include <boost/container/flat_map.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/json/src.hpp>
 #include <opentxs/opentxs.hpp>
 #include <zmq.h>
@@ -18,6 +19,7 @@
 
 namespace ot = opentxs;
 namespace json = boost::json;
+namespace ptime = boost::posix_time;
 
 namespace metier::cli
 {
@@ -66,10 +68,13 @@ struct Processor::Imp {
                 tx["id"] = event.UUID();
                 tx["time"] = [&] {
                     auto time = ot::Clock::to_time_t(event.Timestamp());
+                    auto ptime = ptime::from_time_t(time);
+                    auto facet = std::make_unique<ptime::time_facet>(
+                        "%a %b %d %l:%M:%S %p %Y");
                     auto text = std::stringstream{};
-                    text << std::asctime(std::localtime(&time));
+                    text.imbue(std::locale(text.getloc(), facet.release()));
+                    text << ptime;
                     auto str = text.str();
-                    str.pop_back();
 
                     return str;
                 }();

@@ -3,6 +3,7 @@ boost-bind
 boost-circular-buffer
 boost-container
 boost-core
+boost-date-time
 boost-dynamic-bitset
 boost-endian
 boost-exception

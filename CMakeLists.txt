@@ -134,7 +134,9 @@ find_package(
   Boost
   1.75.0
   REQUIRED
-  COMPONENTS program_options
+  COMPONENTS
+    date_time 
+    program_options
 )
 find_package(
   Qt5
