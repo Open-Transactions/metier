@@ -19,6 +19,7 @@ target_link_libraries(
   PRIVATE
     "${METIER_ZMQ_TARGET}"
     Boost::program_options
+    Boost::date_time
     metier-rpc
     opentxs
 )
