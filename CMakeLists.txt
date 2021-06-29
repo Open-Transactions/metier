@@ -15,6 +15,10 @@ set(METIER_APPSTREAM_ID "org.opentransactions.metier")
 set(METIER_APPSTREAM_NAME "Métier")
 set(METIER_APP_DOMAIN "opentransactions.org")
 set(METIER_CLI_COMMAND "metierctl")
+
+set(METIER_VERSION_MAJOR 21)
+set(METIER_VERSION_MINOR 1)
+set(METIER_VERSION_PATCH 64)
 list(
   APPEND
   CMAKE_MODULE_PATH
