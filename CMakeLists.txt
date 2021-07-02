@@ -18,7 +18,7 @@ set(METIER_CLI_COMMAND "metierctl")
 
 set(METIER_VERSION_MAJOR 21)
 set(METIER_VERSION_MINOR 2)
-set(METIER_VERSION_PATCH 0)
+set(METIER_VERSION_PATCH 1)
 list(
   APPEND
   CMAKE_MODULE_PATH
@@ -139,7 +139,7 @@ find_package(
   1.75.0
   REQUIRED
   COMPONENTS
-    date_time 
+    date_time
     program_options
 )
 find_package(
@@ -158,8 +158,8 @@ if(METIER_QML_INTERFACE)
     COMPONENTS
       Qml
       Quick
-      QuickControls2 
-      QmlImportScanner 
+      QuickControls2
+      QmlImportScanner
       Svg
     REQUIRED
   )
@@ -185,7 +185,7 @@ if(METIER_BUNDLED_OPENTXS)
       iostreams
       stacktrace_basic
   )
-  
+
   find_package(ZLIB QUIET)
   find_package("${METIER_ZMQ_PACKAGE}" QUIET)
   find_package(

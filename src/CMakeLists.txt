@@ -6,9 +6,7 @@
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(WIN32)
-  set(APP_ICON_RESOURCE
-      "${${PROJECT_NAME}_SOURCE_DIR}/package/windows/app.rc"
-  )
+  set(APP_ICON_RESOURCE "${${PROJECT_NAME}_SOURCE_DIR}/package/windows/app.rc")
 elseif(APPLE)
   set(APP_ICON_RESOURCE
       "${${PROJECT_NAME}_SOURCE_DIR}/package/icons/app-1024.icns"
@@ -59,8 +57,7 @@ else()
 endif()
 
 add_executable(
-  "${PROJECT_NAME}"
-   MACOSX_BUNDLE
+  "${PROJECT_NAME}" MACOSX_BUNDLE
   "${object-deps}"
   "${cxx-sources}"
   "${cxx-headers}"
@@ -96,13 +93,13 @@ target_link_libraries(
 
 if(METIER_QML_INTERFACE)
   target_link_libraries(
-    "${PROJECT_NAME}" 
-    PRIVATE 
-      Qt5::Qml 
+    "${PROJECT_NAME}"
+    PRIVATE
+      Qt5::Qml
       Qt5::QSvgPlugin
       Qt5::QSvgIconPlugin
       Qt5::Quick
-      Qt5::Svg 
+      Qt5::Svg
   )
   qt5_import_qml_plugins("${PROJECT_NAME}")
 else()
@@ -130,44 +127,57 @@ if(METIER_USE_DEFAULT_BLOCKCHAIN)
 endif()
 
 if(APPLE)
-  install(TARGETS "${PROJECT_NAME}" BUNDLE DESTINATION . COMPONENT METIER-BUNDLE)
+  install(
+    TARGETS "${PROJECT_NAME}" BUNDLE DESTINATION . COMPONENT METIER-BUNDLE
+  )
 else()
   install(TARGETS "${PROJECT_NAME}" COMPONENT METIER_BIN)
 endif()
 
 if(APPLE)
-# To generate the .dmg file, execute the following command in the build folder:
-#  cpack -G DragNDrop
-#
-# Execute the command after cmake --build, but before cmake --install.
+  # To generate the .dmg file, execute the following command in the build
+  # folder: cpack -G DragNDrop
+  #
+  # Execute the command after cmake --build, but before cmake --install.
 
   set(CPACK_DRAGNDROP_COMPONENT_INSTALL TRUE)
   set(CPACK_COMPONENTS_GROUPING ONE_PER_GROUP)
-  set(CPACK_DMG_METIER-BUNDLE_FILE_NAME "metier-${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}")
-  set(CPACK_DMG_METIER-CTL_FILE_NAME "metierctl-${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}")
+  set(CPACK_DMG_METIER-BUNDLE_FILE_NAME
+      "metier-${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}"
+  )
+  set(CPACK_DMG_METIER-CTL_FILE_NAME
+      "metierctl-${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}"
+  )
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
-  list(REMOVE_ITEM CPACK_COMPONENTS_ALL secp256k1)
-  
+  list(
+    REMOVE_ITEM
+    CPACK_COMPONENTS_ALL
+    secp256k1
+  )
+
   set(CPACK_PACKAGE_NAME metier)
   set(CPACK_PACKAGE_VERSION_MAJOR ${METIER_VERSION_MAJOR})
   set(CPACK_PACKAGE_VERSION_MINOR ${METIER_VERSION_MINOR})
   set(CPACK_PACKAGE_VERSION_PATCH ${METIER_VERSION_PATCH})
 
-  set(RESOURCE_FILES
-    "${APP_ICON_RESOURCE}")
+  set(RESOURCE_FILES "${APP_ICON_RESOURCE}")
 
-  set_target_properties("${PROJECT_NAME}" PROPERTIES
-    MACOSX_BUNDLE TRUE
-    MACOSX_BUNDLE_BUNDLE_NAME "${METIER_APPSTREAM_NAME}"
-    MACOSX_BUNDLE_BUNDLE_VERSION "${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}"
-    MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2021 Open Transactions"
-    MACOSX_BUNDLE_SHORT_VERSION_STRING "${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}"
-    MACOSX_BUNDLE_GUI_IDENTIFIER "${METIER_APPSTREAM_ID}"
-    MACOSX_BUNDLE_ICON_FILE "app-1024.icns"
-    RESOURCE "${RESOURCE_FILES}"
-    )
-    
+  set_target_properties(
+    "${PROJECT_NAME}"
+    PROPERTIES
+      MACOSX_BUNDLE TRUE
+      MACOSX_BUNDLE_BUNDLE_NAME "${METIER_APPSTREAM_NAME}"
+      MACOSX_BUNDLE_BUNDLE_VERSION
+      "${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}"
+      MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2021 Open Transactions"
+      MACOSX_BUNDLE_SHORT_VERSION_STRING
+      "${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}"
+      MACOSX_BUNDLE_GUI_IDENTIFIER "${METIER_APPSTREAM_ID}"
+      MACOSX_BUNDLE_ICON_FILE "app-1024.icns"
+      RESOURCE "${RESOURCE_FILES}"
+  )
+
   set(CPACK_GENERATOR "DRAGNDROP")
   include(CPack)
 endif()
