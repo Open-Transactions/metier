@@ -58,6 +58,7 @@ auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     auto& args = const_cast<ot::ArgList&>(ot_args_);
     args["qt"].emplace("true");
     args[OPENTXS_ARG_HOME].emplace(absolute.toStdString());
+    args[OPENTXS_ARG_BLOCK_STORAGE_LEVEL].emplace("1");
 #ifdef DEFAULT_SYNC_SERVER
     args[OPENTXS_ARG_BLOCKCHAIN_SYNC].emplace(DEFAULT_SYNC_SERVER);
 #endif
