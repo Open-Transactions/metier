@@ -15,6 +15,13 @@
 #include "otwrap/imp.hpp"
 #include "util/convertblockchain.hpp"
 
+#include "QR-Code-generator/cpp/QrCode.hpp"
+namespace qr = qrcodegen;
+
+#include <QDesktopServices>
+#include <QNetworkReply>
+#include <QUrl>
+
 namespace metier
 {
 OTWrap::OTWrap(QGuiApplication& parent, App& app, int& argc, char** argv)
@@ -163,6 +170,14 @@ auto OTWrap::enabledCurrencyCount() -> int
     return static_cast<int>(imp_.enabled_chains_.count());
 }
 
+auto OTWrap::getQRcodeBase64(const QString input_string) -> QString
+{
+    qr::QrCode qr0 = qr::QrCode::encodeText(
+        input_string.toStdString().c_str(), qr::QrCode::Ecc::MEDIUM);
+    QString xml_svg = QString::fromStdString(qr0.toSvgString(4));
+    return xml_svg.toUtf8().toBase64();
+}
+
 auto OTWrap::getRecoveryWords() -> QStringList
 {
     return imp_.getRecoveryWords();
@@ -190,6 +205,11 @@ auto OTWrap::longestBlockchainName() -> int
 }
 
 auto OTWrap::longestSeedWord() -> int { return imp_.longest_seed_word_; }
+
+auto OTWrap::openSystemBrowserLink(QString url_link) -> void
+{
+    QDesktopServices::openUrl(QUrl(url_link, QUrl::StrictMode));
+}
 
 auto OTWrap::profileModel() -> model::Profile*
 {
