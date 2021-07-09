@@ -10,6 +10,7 @@ boost-exception
 boost-filesystem
 boost-interprocess
 boost-iostreams
+boost-json
 boost-lexical-cast
 boost-multiprecision
 boost-program-options
