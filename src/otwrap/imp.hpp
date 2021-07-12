@@ -24,6 +24,7 @@
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
+#include "otwrap/notary.hpp"
 #include "otwrap/passwordcallback.hpp"
 #include "rpc/rpc.hpp"
 #include "util/claim.hpp"
@@ -238,6 +239,9 @@ public:
             if (id->empty()) { return false; }
         }
 
+        api_.OTX().StartIntroductionServer(nym_id_);
+        api_.Schedule(std::chrono::minutes{5}, [&] { api_.OTX().Refresh(); });
+
         return true;
     }
     auto validateNym() const noexcept
@@ -313,6 +317,7 @@ public:
             if (false == api_.Config().Save()) { return false; }
 
             nymID.SetString(id->Get());
+            api_.OTX().StartIntroductionServer(nym_id_);
 
             return true;
         }
@@ -685,8 +690,24 @@ public:
 
         Ownership::Claim(mainnet_model_.get());
         Ownership::Claim(seed_type_.get());
+        check_introduction_notary();
         ready(true);
     }
+
     ~Imp() { rpc_socket_->Close(); }
+
+private:
+    auto check_introduction_notary() noexcept -> void
+    {
+        const auto armored = [&] {
+            auto out = api_.Factory().Armored();
+            out->LoadFromString(ot::String::Factory(default_notary_contract_));
+
+            return out;
+        }();
+        const auto proto = api_.Factory().Data(armored);
+        const auto contract = api_.Wallet().Server(proto->Bytes());
+        api_.OTX().SetIntroductionServer(contract);
+    }
 };
 }  // namespace metier

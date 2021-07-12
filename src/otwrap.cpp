@@ -7,20 +7,19 @@
 
 #include <opentxs/opentxs.hpp>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QGuiApplication>
+#include <QNetworkReply>
+#include <QUrl>
 #include <algorithm>
 #include <utility>
 
+#include "QR-Code-generator/cpp/QrCode.hpp"
 #include "models/blockchainchooser.hpp"
 #include "otwrap/imp.hpp"
 #include "util/convertblockchain.hpp"
 
-#include "QR-Code-generator/cpp/QrCode.hpp"
 namespace qr = qrcodegen;
-
-#include <QDesktopServices>
-#include <QNetworkReply>
-#include <QUrl>
 
 namespace metier
 {

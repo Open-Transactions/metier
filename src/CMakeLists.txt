@@ -29,9 +29,13 @@ if(NOT METIER_QML_INTERFACE)
 endif()
 
 set(cxx-sources
+    "otwrap/imp.hpp"
+    "otwrap/notary.cpp"
+    "otwrap/notary.hpp"
+    "otwrap/passwordcallback.cpp"
+    "otwrap/passwordcallback.hpp"
     "main.cpp"
     "otwrap.cpp"
-    "otwrap/passwordcallback.cpp"
 )
 set(cxx-headers "otwrap/imp.hpp" "otwrap/passwordcallback.hpp")
 set(moc-headers "app.hpp" "otwrap.hpp")
