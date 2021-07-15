@@ -104,7 +104,7 @@ struct BlockchainSend::Imp {
         auto failed{false};
 
         {
-            auto lock = std::lock_guard(lock_);
+            auto lock = std::lock_guard<std::mutex>(lock_);
             key_ = model_.sendToAddress(
                 address->text(),
                 amount->text(),
@@ -121,7 +121,7 @@ struct BlockchainSend::Imp {
     }
     auto updateSendResult(int key, int code, const QString& txid) -> void
     {
-        auto lock = std::lock_guard(lock_);
+        auto lock = std::lock_guard<std::mutex>(lock_);
 
         if (false == key_.has_value()) { return; }
         if (key_.value() != key) { return; }
