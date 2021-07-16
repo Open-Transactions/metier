@@ -7,7 +7,7 @@
 
 namespace metier
 {
-const char* default_notary_contract_{
+const char* introduction_notary_contract_{
     R"(-----BEGIN OT ARMORED SERVER CONTRACT-----
 Version: Open Transactions 1.13.0
 Comment: http://opentransactions.org
@@ -51,4 +51,6 @@ IHByb3ZpZGVkIGZvciBjb250cmFjdCBhbmQgbnltIGxvb2t1cEIgGj9BS8IjqWMe0fuGcc36
 QTljUVcYBSAFKkBISidzOdI0rhCucCkmiTCwDVZWWwh7IzBOnKi2JVd+sRaXCIuFdBsk3qT5
 zMLlSlhAXVqPevoUo40e3GdUTx1k
 -----END OT ARMORED SERVER CONTRACT-----)"};
+
+const char* messaging_notary_contract_{nullptr};
 }  // namespace metier

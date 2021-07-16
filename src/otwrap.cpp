@@ -58,6 +58,22 @@ auto OTWrap::accountListModelQML() -> QObject*
     return const_cast<model::AccountList*>(accountListModel());
 }
 
+auto OTWrap::activityThreadModel(const QString& id) -> ActivityThread*
+{
+    return imp_.activityThreadModel(
+        imp_.api_.Factory().Identifier(id.toStdString()));
+}
+
+auto OTWrap::activityThreadModelQML(const QString& id) -> QObject*
+{
+    return const_cast<ActivityThread*>(activityThreadModel(id));
+}
+
+auto OTWrap::addContact(QString label, QString id) -> QString
+{
+    return contactListModel()->addContact(label, id);
+}
+
 auto OTWrap::blockchainChooserModel(const bool testnet) -> QAbstractItemModel*
 {
     if (testnet) {
@@ -138,6 +154,16 @@ auto OTWrap::checkStartupConditions() -> void
 auto OTWrap::checkAccounts() -> void { imp_.validateBlockchains(); }
 
 auto OTWrap::Cleanup() noexcept -> void { ot::Cleanup(); }
+
+auto OTWrap::contactListModel() -> ContactList*
+{
+    return imp_.contactListModel();
+}
+
+auto OTWrap::contactListModelQML() -> QObject*
+{
+    return const_cast<ContactList*>(contactListModel());
+}
 
 auto OTWrap::convertBlockchainAccountID(const QString& id) -> int
 {

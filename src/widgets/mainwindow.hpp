@@ -36,9 +36,16 @@ private slots:
     void accountListUpdated(
         const QItemSelection& current,
         const QItemSelection& previous);
+    void canMessage(bool value);
+    void clearActivityThread();
+    void contactListUpdated(
+        const QItemSelection& current,
+        const QItemSelection& previous);
     void initModels();
+    void sendMessage();
     void showAccountActivity(int chain);
     void showAccountActivity(QString account);
+    void showActivityThread(QString contact);
     void showBlockchainChooser();
     void showBlockchainStatistics();
     void showLicenseViewer();

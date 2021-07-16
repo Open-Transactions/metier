@@ -7,5 +7,6 @@
 
 namespace metier
 {
-extern const char* default_notary_contract_;
+extern const char* introduction_notary_contract_;
+extern const char* messaging_notary_contract_;
 }  // namespace metier
