@@ -19,6 +19,7 @@
 #include "ui_mainwindow.h"
 #include "util/resizer.hpp"
 #include "util/scopeguard.hpp"
+#include "widgets/addcontact.hpp"
 #include "widgets/blockchainchooser.hpp"
 #include "widgets/licenses.hpp"
 #include "widgets/mainwindow/chaintoolboxmanager.hpp"
@@ -41,14 +42,28 @@ struct MainWindow::Imp {
 
     auto init_models(MainWindow* parent) noexcept
     {
-        auto& view = *ui_->accountList;
-        view.setModel(ot_.accountListModel());
-        auto* selection = view.selectionModel();
-        connect(
-            selection,
-            &QItemSelectionModel::selectionChanged,
-            parent,
-            &MainWindow::accountListUpdated);
+        {
+            auto& view = *ui_->accountList;
+            view.setModel(ot_.accountListModel());
+            auto* selection = view.selectionModel();
+            connect(
+                selection,
+                &QItemSelectionModel::selectionChanged,
+                parent,
+                &MainWindow::accountListUpdated);
+        }
+
+        {
+            auto& view = *ui_->contactListView;
+            view.setModel(ot_.contactListModel());
+            auto* selection = view.selectionModel();
+            connect(
+                selection,
+                &QItemSelectionModel::selectionChanged,
+                parent,
+                &MainWindow::contactListUpdated);
+        }
+
         profile_ = ot_.profileModel();
         connect(profile_, &model::Profile::updated, [&] { repaintProfile(); });
         repaintProfile();
@@ -97,13 +112,34 @@ struct MainWindow::Imp {
             auto& header = *accountActivity.horizontalHeader();
             header.setSectionResizeMode(QHeaderView::ResizeToContents);
         }
+
         ui_->header->setMinimumHeight(138);
         ui_->header->setMaximumHeight(138);
         auto& paymentCode = *ui_->paymentCode;
         util::set_minimum_size(paymentCode, 72, 1);
         ui_->identity->setMaximumWidth(paymentCode.minimumWidth());
         paymentCode.setStyleSheet("* { background-color: rgba(0, 0, 0, 0); }");
+
+        {
+            {
+                auto& activityThread = *ui_->activityThreadView;
+                auto& header = *activityThread.horizontalHeader();
+                header.setSectionResizeMode(QHeaderView::ResizeToContents);
+            }
+
+            ui_->contactListFrame->setMaximumWidth(util::line_width(
+                *ui_->contactListView, ot_.longestBlockchainName() + 16));
+            ui_->messageEdit->setMaximumHeight(
+                util::line_height(*ui_->contactListView, {3, 2}) * 2);
+            ui_->messageEdit->setEnabled(false);
+            ui_->sendMessage->setEnabled(false);
+            auto* addContact = ui_->addContact;
+            addContact->connect(addContact, &QPushButton::clicked, [=]() {
+                show_add_contact();
+            });
+        }
     }
+
     Imp() = delete;
     Imp(const Imp&) = delete;
     Imp(Imp&&) = delete;
@@ -136,6 +172,15 @@ private:
         connect(model, &Model::syncProgressUpdated, [=](int value, int max) {
             receive_progress_update(chain, value, max);
         });
+    }
+    auto show_add_contact() noexcept -> void
+    {
+        auto dialog = std::make_unique<AddContact>(ot_);
+        auto postcondition = ScopeGuard{[&dialog]() {
+            dialog->deleteLater();
+            dialog.release();
+        }};
+        dialog->exec();
     }
 };
 }  // namespace metier::widget

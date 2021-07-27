@@ -13,6 +13,7 @@
 #include <QGuiApplication>
 #include <QStandardPaths>
 #include <algorithm>
+#include <cstring>
 #include <map>
 #include <mutex>
 #include <set>
@@ -152,6 +153,8 @@ public:
     const ot::OTZMQListenCallback rpc_cb_;
     ot::OTZMQRouterSocket rpc_socket_;
     const opentxs::api::client::Manager& api_;
+    const ot::OTServerID introduction_notary_id_;
+    const ot::OTServerID messaging_notary_id_;
     const std::string seed_id_;
     const ot::OTNymID nym_id_;
     const int longest_seed_word_;
@@ -239,6 +242,7 @@ public:
             if (id->empty()) { return false; }
         }
 
+        check_registration();
         api_.OTX().StartIntroductionServer(nym_id_);
         api_.Schedule(std::chrono::minutes{5}, [&] { api_.OTX().Refresh(); });
 
@@ -385,6 +389,19 @@ public:
         ready().get();
 
         return api_.UI().AccountActivityQt(nym_id_, id);
+    }
+    auto activityThreadModel(const ot::Identifier& id) noexcept
+        -> ActivityThread*
+    {
+        ready().get();
+
+        return api_.UI().ActivityThreadQt(nym_id_, id);
+    }
+    auto contactListModel() noexcept -> ContactList*
+    {
+        ready().get();
+
+        return api_.UI().ContactListQt(nym_id_);
     }
     auto createNym(QString alias) noexcept -> void
     {
@@ -632,6 +649,32 @@ public:
             return out;
         }())
         , api_(ot_.StartClient(ot_args_, 0))
+        , introduction_notary_id_([&] {
+            try {
+                const auto contract =
+                    import_contract(introduction_notary_contract_);
+                auto out = api_.Factory().ServerID();
+                out->Assign(contract->ID()->Bytes());
+
+                return out;
+            } catch (...) {
+
+                return api_.Factory().ServerID();
+            }
+        }())
+        , messaging_notary_id_([&] {
+            try {
+                const auto contract =
+                    import_contract(messaging_notary_contract_);
+                auto out = api_.Factory().ServerID();
+                out->Assign(contract->ID()->Bytes());
+
+                return out;
+            } catch (...) {
+
+                return api_.Factory().ServerID();
+            }
+        }())
         , seed_id_()
         , nym_id_(api_.Factory().NymID())
         , longest_seed_word_([&]() -> auto {
@@ -697,17 +740,71 @@ public:
     ~Imp() { rpc_socket_->Close(); }
 
 private:
-    auto check_introduction_notary() noexcept -> void
+    auto check_introduction_notary() const noexcept -> void
     {
+        if (introduction_notary_id_->empty()) { return; }
+
+        api_.OTX().SetIntroductionServer(
+            api_.Wallet().Server(introduction_notary_id_));
+    }
+
+    auto check_registration() const noexcept -> bool
+    {
+        if (nym_id_->empty()) { return false; }
+        if (messaging_notary_id_->empty()) { return false; }
+
+        {
+            const auto reason = api_.Factory().PasswordPrompt(
+                "Checking or updating public contact data");
+            auto nym = api_.Wallet().mutable_Nym(nym_id_, reason);
+            const auto notary = nym.PreferredOTServer();
+
+            if (notary.empty()) {
+                nym.AddPreferredOTServer(
+                    messaging_notary_id_->str(), true, reason);
+            }
+        }
+
+        const auto isRegistered = [&](const auto& server) {
+            auto context = api_.Wallet().ServerContext(nym_id_, server);
+
+            if (context) { return (0 != context->Request()); }
+
+            return false;
+        };
+        const auto check = [&](const auto& server) {
+            if (false == isRegistered(server)) {
+                const auto [id, future] =
+                    api_.OTX().RegisterNym(nym_id_, server);
+
+                if (0 > id) { return false; }
+            }
+
+            return true;
+        };
+
+        auto output = check(messaging_notary_id_);
+        output &= check(introduction_notary_id_);
+
+        return output;
+    }
+
+    auto import_contract(const char* text) const noexcept(false)
+        -> ot::OTServerContract
+    {
+        if ((nullptr == text) || (0 == std::strlen(text))) {
+            throw std::runtime_error{"invalid contract"};
+        }
+
         const auto armored = [&] {
             auto out = api_.Factory().Armored();
-            out->LoadFromString(ot::String::Factory(default_notary_contract_));
+            out->LoadFromString(ot::String::Factory(text));
 
             return out;
         }();
         const auto proto = api_.Factory().Data(armored);
-        const auto contract = api_.Wallet().Server(proto->Bytes());
-        api_.OTX().SetIntroductionServer(contract);
+
+        return api_.Wallet().Server(proto->Bytes());
     }
 };
 }  // namespace metier

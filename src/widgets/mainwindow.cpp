@@ -56,9 +56,9 @@ MainWindow::MainWindow(QWidget* parent, OTWrap& ot) noexcept
     showBlockchainStatistics();
 }
 
-void MainWindow::accountListUpdated(
+auto MainWindow::accountListUpdated(
     const QItemSelection& current,
-    [[maybe_unused]] const QItemSelection& previous)
+    [[maybe_unused]] const QItemSelection& previous) -> void
 {
     const auto indices = current.indexes();
 
@@ -76,7 +76,65 @@ void MainWindow::accountListUpdated(
     imp_.updateProgress();
 }
 
+auto MainWindow::canMessage(bool value) -> void
+{
+    auto& edit = *imp_.ui_->messageEdit;
+    auto& send = *imp_.ui_->sendMessage;
+    edit.setEnabled(value);
+    send.setEnabled(value);
+}
+
+auto MainWindow::clearActivityThread() -> void
+{
+    auto& view = *imp_.ui_->activityThreadView;
+    auto& edit = *imp_.ui_->messageEdit;
+    auto& send = *imp_.ui_->sendMessage;
+
+    if (auto* model = view.model(); nullptr != model) { model->disconnect(); }
+
+    edit.disconnect();
+    send.disconnect();
+    edit.setEnabled(false);
+    send.setEnabled(false);
+    edit.setPlainText({});
+}
+
+auto MainWindow::contactListUpdated(
+    const QItemSelection& current,
+    [[maybe_unused]] const QItemSelection& previous) -> void
+{
+    const auto indices = current.indexes();
+
+    if (0 == indices.size()) {
+        clearActivityThread();
+    } else {
+        auto& contactList = *imp_.ui_->contactListView;
+        const auto& index = indices.first();
+        const auto& model = *contactList.model();
+        const auto accountID =
+            model.data(index, ot::ui::ContactListQt::IDRole).toString();
+        showActivityThread(accountID);
+    }
+}
+
 auto MainWindow::initModels() -> void { imp_.init_models(this); }
+
+auto MainWindow::sendMessage() -> void
+{
+    using Model = opentxs::ui::ActivityThreadQt;
+    auto& view = *imp_.ui_->activityThreadView;
+    auto& edit = *imp_.ui_->messageEdit;
+
+    if (auto* model = view.model(); nullptr != model) {
+        auto* thread = dynamic_cast<Model*>(model);
+
+        if (nullptr == thread) { return; }
+
+        thread->setDraft(edit.toPlainText());
+        thread->sendDraft();
+        edit.setPlainText(thread->draft());
+    }
+}
 
 auto MainWindow::setProgressMax(int max) -> void { emit progMaxUpdated(max); }
 
@@ -95,6 +153,38 @@ auto MainWindow::showAccountActivity(QString account) -> void
 {
     auto& accountActivity = *imp_.ui_->accountActivity;
     accountActivity.setModel(imp_.ot_.accountActivityModel(account));
+}
+
+auto MainWindow::showActivityThread(QString contact) -> void
+{
+    using Model = opentxs::ui::ActivityThreadQt;
+    auto& view = *imp_.ui_->activityThreadView;
+    auto& edit = *imp_.ui_->messageEdit;
+    auto& send = *imp_.ui_->sendMessage;
+    edit.disconnect();
+    send.disconnect();
+
+    if (auto* model = view.model(); nullptr != model) {
+        model->disconnect();
+        this->disconnect(model);
+        dynamic_cast<Model*>(model)->setDraft(edit.toPlainText());
+    }
+
+    auto* model = imp_.ot_.activityThreadModel(contact);
+
+    if (nullptr == model) {
+        clearActivityThread();
+
+        return;
+    }
+
+    const auto canMessage = model->canMessage();
+    connect(model, &Model::canMessageUpdate, this, &MainWindow::canMessage);
+    connect(&send, &QAbstractButton::clicked, this, &MainWindow::sendMessage);
+    view.setModel(model);
+    edit.setEnabled(canMessage);
+    send.setEnabled(canMessage);
+    edit.setPlainText(model->draft());
 }
 
 auto MainWindow::showBlockchainChooser() -> void

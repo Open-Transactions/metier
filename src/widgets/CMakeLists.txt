@@ -5,6 +5,7 @@
 
 set(cxx-sources
     "enterpassphrase/imp.cpp"
+    "addcontact.cpp"
     "blockchainchooser.cpp"
     "blockchainsend.cpp"
     "enterpassphrase.cpp"
@@ -29,6 +30,7 @@ set(cxx-headers
     "showseed/imp.hpp"
 )
 set(moc-headers
+    "addcontact.hpp"
     "blockchainchooser.hpp"
     "blockchainsend.hpp"
     "enterpassphrase.hpp"

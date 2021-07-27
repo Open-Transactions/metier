@@ -20,6 +20,8 @@ namespace opentxs
 namespace ui
 {
 class AccountActivityQt;
+class ActivityThreadQt;
+class ContactListQt;
 class SeedValidator;
 }  // namespace ui
 }  // namespace opentxs
@@ -64,14 +66,18 @@ public slots:
 public:
     using BlockchainList = QVector<int>;
     using AccountActivity = opentxs::ui::AccountActivityQt;
+    using ActivityThread = opentxs::ui::ActivityThreadQt;
+    using ContactList = opentxs::ui::ContactListQt;
 
     static auto Cleanup() noexcept -> void;
 
     AccountActivity* accountActivityModel(const QString& id);
     AccountActivity* accountActivityModel(const int chain);
+    ActivityThread* activityThreadModel(const QString& id);
     model::AccountList* accountListModel();
     QAbstractItemModel* blockchainChooserModel(const bool testnet);
     QAbstractItemModel* blockchainStatisticsModel();
+    ContactList* contactListModel();
     model::Profile* profileModel();
     model::SeedLanguage* seedLanguageModel(const int type);
     model::SeedSize* seedSizeModel(const int type);
@@ -82,14 +88,17 @@ public:
 
     Q_INVOKABLE QObject* accountActivityModelQML(const QString& id);
     Q_INVOKABLE QObject* accountListModelQML();
+    Q_INVOKABLE QObject* activityThreadModelQML(const QString& id);
     Q_INVOKABLE QObject* blockchainChooserModelQML(bool testnet);
     Q_INVOKABLE QObject* blockchainStatisticsModelQML();
+    Q_INVOKABLE QObject* contactListModelQML();
     Q_INVOKABLE QObject* profileModelQML();
     Q_INVOKABLE QObject* seedLanguageModelQML(const int type);
     Q_INVOKABLE QObject* seedSizeModelQML(const int type);
     Q_INVOKABLE QObject* seedTypeModelQML();
     Q_INVOKABLE QObject* seedWordValidatorQML(const int type, const int lang);
 
+    Q_INVOKABLE QString addContact(QString label, QString id);
     Q_INVOKABLE int convertBlockchainAccountID(const QString& id);
     Q_INVOKABLE QStringList
     createNewSeed(const int type, const int lang, const int strength);
