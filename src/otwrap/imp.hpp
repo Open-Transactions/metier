@@ -244,7 +244,7 @@ public:
 
         check_registration();
         api_.OTX().StartIntroductionServer(nym_id_);
-        api_.Schedule(std::chrono::minutes{5}, [&] { api_.OTX().Refresh(); });
+        api_.Schedule(std::chrono::seconds{30}, [&] { api_.OTX().Refresh(); });
 
         return true;
     }
