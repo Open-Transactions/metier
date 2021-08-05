@@ -12,6 +12,7 @@
   <url type="bugtracker">https://github.com/Open-Transactions/metier/issues</url>
   <launchable type="desktop-id">@METIER_APPSTREAM_ID@.desktop</launchable>
   <releases>
+    <release version="21.3" date="2021-08-05" />
     <release version="21.2" date="2021-06-29" />
     <release version="21.1" date="2021-04-07" />
   </releases>
@@ -26,5 +27,7 @@
       <image type="source" width="1920" height="1080">http://opentransactions.org/wiki/images/b/b9/Metier-screenshot.png</image>
     </screenshot>
  </screenshots>
- <content_rating type="oars-1.1" />
+ <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+ </content_rating>
 </component>
