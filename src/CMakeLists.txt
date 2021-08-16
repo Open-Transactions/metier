@@ -184,4 +184,11 @@ if(APPLE)
 
   set(CPACK_GENERATOR "DRAGNDROP")
   include(CPack)
+elseif(WIN32)
+  set_target_properties(
+    "${PROJECT_NAME}"
+    PROPERTIES
+      RESOURCE "${RESOURCE_FILES}"
+      WIN32_EXECUTABLE TRUE
+  )
 endif()

@@ -5,6 +5,8 @@
 
 #include "app.hpp"  // IWYU pragma: associated
 
+#include <QThread>
+
 #include <otwrap.hpp>
 #include <iostream>
 #include <mutex>
@@ -41,8 +43,9 @@ auto App::displayFirstRun() -> void { imp_.displayFirstRun(); }
 
 auto App::displayMainWindow() -> void
 {
-    imp_.init_ = true;
     imp_.displayMainWindow();
+    imp_.init_ = true;
+    imp_.init_promise_.set_value();
 }
 
 auto App::displayNamePrompt() -> void { imp_.displayNamePrompt(); }
@@ -64,10 +67,15 @@ auto App::getPassword(QString prompt, QString key) -> QString
 
 auto App::needPasswordPrompt(QString prompt, bool once) -> void
 {
-    if (imp_.init_) {
-        emit passwordPrompt(prompt, once);
+    if (QThread::currentThread() == this->thread()) {
+        if (imp_.init_) {
+            emit passwordPrompt(prompt, once);
+        } else {
+            imp_.displayPasswordPrompt(prompt, once);
+        }
     } else {
-        imp_.displayPasswordPrompt(prompt, once);
+        imp_.init_future_.get();
+        emit passwordPrompt(prompt, once);
     }
 }
 
