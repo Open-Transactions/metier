@@ -34,8 +34,13 @@ struct SyncProgress {
 
     auto update(const ot::blockchain::Type chain, const Progress value) noexcept
     {
-        ot::Lock lock{lock_};
-        progress_[chain] = value;
+        try {
+            ot::Lock lock{lock_};
+
+            progress_[chain] = value;
+        } catch ([[maybe_unused]] const std::system_error& e) {
+            return;
+        }
     }
 
     SyncProgress() noexcept

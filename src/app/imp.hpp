@@ -7,6 +7,8 @@
 
 #include "app.hpp"  // IWYU pragma: associated
 
+#include <future>
+
 namespace metier
 {
 class OTWrap;
@@ -17,7 +19,9 @@ namespace metier
 struct App::Imp {
     static std::unique_ptr<App> singleton_;
 
-    bool init_{false};
+    std::atomic_bool init_{false};
+    std::promise<void> init_promise_{};
+    std::future<void> init_future_{init_promise_.get_future()};
 
     static auto factory(App& parent, int& argc, char** argv) noexcept
         -> std::unique_ptr<Imp>;
