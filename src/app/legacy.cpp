@@ -147,7 +147,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
         : QApplication(argc, argv)
         , parent_(parent)
         , password_()
-        , icon_(":/assets/app_icon.png")
+        , icon_(":/qwidget/assets/app_icon.png")
         , first_run_complete_(false)
         , ot_()
         , first_run_()
@@ -162,7 +162,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
     ~LegacyApp() final = default;
 };
 
-auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept
+auto App::Imp::factory_widgets(App& parent, int& argc, char** argv) noexcept
     -> std::unique_ptr<Imp>
 {
     return std::make_unique<LegacyApp>(parent, argc, argv);

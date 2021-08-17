@@ -62,7 +62,7 @@
        </property>
        <property name="icon">
         <iconset resource="../resource.qrc">
-         <normaloff>:/assets/Basic-Copy-icon.png</normaloff>:/assets/Basic-Copy-icon.png</iconset>
+         <normaloff>:/qwidget/assets/Basic-Copy-icon.png</normaloff>:/qwidget/assets/Basic-Copy-icon.png</iconset>
        </property>
       </widget>
      </item>

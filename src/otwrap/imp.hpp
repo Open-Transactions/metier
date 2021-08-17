@@ -19,7 +19,6 @@
 #include <set>
 #include <string>
 
-#include "deps/opentxs/tests/Cli.hpp"
 #include "models/accountlist.hpp"
 #include "models/profile.hpp"
 #include "models/seedlang.hpp"
@@ -34,12 +33,12 @@
 
 namespace ot = opentxs;
 
-static const auto ot_args_ = ot::ArgList{};
+static const auto ot_args_ = ot::Options{};
 
 auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
-    -> const ot::ArgList&;
+    -> const ot::Options&;
 auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
-    -> const ot::ArgList&
+    -> const ot::Options&
 {
     parent.setOrganizationDomain(METIER_APP_DOMAIN);
     parent.setApplicationName(METIER_APP_NAME);
@@ -57,17 +56,13 @@ auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
         qFatal("Failed to create opentxs data folder");
     }
 
-    auto& args = const_cast<ot::ArgList&>(ot_args_);
-    args["qt"].emplace("true");
-    args[OPENTXS_ARG_HOME].emplace(absolute.toStdString());
-    args[OPENTXS_ARG_BLOCK_STORAGE_LEVEL].emplace("1");
+    auto& args = const_cast<ot::Options&>(ot_args_);
+    args.ParseCommandLine(argc, argv);
+    args.SetHome(absolute.toStdString().c_str());
+    args.SetBlockchainStorageLevel(1);
 #ifdef DEFAULT_SYNC_SERVER
-    args[OPENTXS_ARG_BLOCKCHAIN_SYNC].emplace(DEFAULT_SYNC_SERVER);
+    args.AddBlockchainSyncServer(DEFAULT_SYNC_SERVER);
 #endif
-    auto parser = ArgumentParser{};
-    parser.parse(argc, argv, args);
-
-    if (parser.show_help_) { std::cout << parser.options() << '\n'; }
 
     return ot_args_;
 }
@@ -227,19 +222,7 @@ public:
         ot::Lock lock(lock_);
 
         for (const auto chain : api_.Network().Blockchain().EnabledChains()) {
-            const auto accounts =
-                api_.Blockchain().SubaccountList(nym_id_, chain);
-
-            if (0 < accounts.size()) { continue; }
-
-            const auto prompt = std::string{"Creating a new "} +
-                                ot::blockchain::DisplayString(chain) +
-                                " account";
-            auto reason = api_.Factory().PasswordPrompt(prompt);
-            const auto id = api_.Blockchain().NewHDSubaccount(
-                nym_id_, ot::BlockchainAccountType::BIP44, chain, reason);
-
-            if (id->empty()) { return false; }
+            if (false == make_accounts(chain)) { return false; }
         }
 
         check_registration();
@@ -498,7 +481,11 @@ public:
 
         return words.split(' ', Qt::SkipEmptyParts);
     }
-    auto importSeed(int type, int lang, QString input) -> void
+    auto importSeed(
+        int type,
+        int lang,
+        const QString& input,
+        const QString& password) -> void
     {
         ready().get();
         ot::Lock lock(lock_);
@@ -515,7 +502,8 @@ public:
         auto reason =
             api_.Factory().PasswordPrompt("Import a Metier wallet seed");
         const auto words = api_.Factory().SecretFromText(input.toStdString());
-        const auto passphrase = api_.Factory().Secret(0);
+        const auto passphrase =
+            api_.Factory().SecretFromText(password.toStdString());
         id = seeds.ImportSeed(
             words,
             passphrase,
@@ -805,6 +793,67 @@ private:
         const auto proto = api_.Factory().Data(armored);
 
         return api_.Wallet().Server(proto->Bytes());
+    }
+
+    auto make_accounts(const ot::blockchain::Type chain) const noexcept -> bool
+    {
+        using Chain = ot::blockchain::Type;
+        using Protocol = ot::blockchain::crypto::HDProtocol;
+
+        const auto want = [&] {
+            auto out = std::set<Protocol>{};
+            out.emplace(Protocol::BIP_44);
+
+            if (ot::blockchain::HasSegwit(chain)) {
+                out.emplace(Protocol::BIP_49);
+                out.emplace(Protocol::BIP_84);
+            }
+
+            return out;
+        }();
+        const auto have = [&] {
+            auto out = std::set<Protocol>{};
+            const auto& account = api_.Blockchain().Account(nym_id_, chain);
+
+            for (const auto& hd : account.GetHD()) {
+                out.emplace(hd.Standard());
+            }
+
+            return out;
+        }();
+        const auto need = [&] {
+            auto out = std::vector<Protocol>{};
+            std::set_difference(
+                want.begin(),
+                want.end(),
+                have.begin(),
+                have.end(),
+                std::back_inserter(out));
+
+            return out;
+        }();
+
+        for (const auto& type : need) {
+            const auto prompt = std::string{"Creating a new "} +
+                                ot::blockchain::DisplayString(chain) +
+                                " account";
+            const auto reason = api_.Factory().PasswordPrompt(prompt);
+            const auto id = [&] {
+                if ((Chain::PKT == chain) && (Protocol::BIP_84 == type)) {
+
+                    return api_.Blockchain().NewHDSubaccount(
+                        nym_id_, type, Chain::Bitcoin, chain, reason);
+                } else {
+
+                    return api_.Blockchain().NewHDSubaccount(
+                        nym_id_, type, chain, reason);
+                }
+            }();
+
+            if (id->empty()) { return false; }
+        }
+
+        return true;
     }
 };
 }  // namespace metier

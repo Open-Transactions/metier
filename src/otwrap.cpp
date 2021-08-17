@@ -208,9 +208,10 @@ auto OTWrap::getRecoveryWords() -> QStringList
     return imp_.getRecoveryWords();
 }
 
-auto OTWrap::importSeed(int type, int lang, QString words) -> void
+auto OTWrap::importSeed(int type, int lang, QString words, QString password)
+    -> void
 {
-    imp_.importSeed(type, lang, words);
+    imp_.importSeed(type, lang, words, password);
     checkStartupConditions();
 }
 

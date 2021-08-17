@@ -3,10 +3,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-set(cxx-sources "")
+set(cxx-sources "focuser.cpp" "resizer.cpp")
 set(cxx-headers
     "claim.hpp"
     "convertblockchain.hpp"
+    "focuser.hpp"
+    "resizer.hpp"
     "scopeguard.hpp"
 )
 
@@ -21,14 +23,6 @@ else()
     APPEND
     cxx-sources
     "claim_legacy.cpp"
-    "focuser.cpp"
-    "resizer.cpp"
-  )
-  list(
-    APPEND
-    cxx-headers
-    "focuser.hpp"
-    "resizer.hpp"
   )
 endif()
 
