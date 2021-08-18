@@ -158,7 +158,7 @@ private:
     }
 };
 
-auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept
+auto App::Imp::factory_qml(App& parent, int& argc, char** argv) noexcept
     -> std::unique_ptr<Imp>
 {
     return std::make_unique<QmlApp>(parent, argc, argv);

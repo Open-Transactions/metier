@@ -21,12 +21,9 @@ add_subdirectory(app)
 add_subdirectory(cli)
 add_subdirectory(models)
 add_subdirectory(rpc)
+add_subdirectory(ui)
 add_subdirectory(util)
-
-if(NOT METIER_QML_INTERFACE)
-  add_subdirectory(ui)
-  add_subdirectory(widgets)
-endif()
+add_subdirectory(widgets)
 
 set(cxx-sources
     "otwrap/imp.hpp"
@@ -46,18 +43,14 @@ set(object-deps
     $<TARGET_OBJECTS:metier-models>
     $<TARGET_OBJECTS:metier-rpc>
     $<TARGET_OBJECTS:metier-util>
+    $<TARGET_OBJECTS:metier-widgets>
     $<TARGET_OBJECTS:qr-code-generator>
 )
 
+qt5_add_resources(rcc-sources "skin/default/resources.qrc")
+
 if(METIER_QML_INTERFACE)
   qt5_add_resources(rcc-sources "skin/qml/resources.qrc")
-else()
-  qt5_add_resources(rcc-sources "skin/default/resources.qrc")
-  list(
-    APPEND
-    object-deps
-    $<TARGET_OBJECTS:metier-widgets>
-  )
 endif()
 
 add_executable(
@@ -89,6 +82,7 @@ target_link_libraries(
     Qt5::Core
     Qt5::Gui
     Qt5::Network
+    Qt5::Widgets
     Threads::Threads
     metier-rpc
     opentxs
@@ -106,8 +100,6 @@ if(METIER_QML_INTERFACE)
       Qt5::Svg
   )
   qt5_import_qml_plugins("${PROJECT_NAME}")
-else()
-  target_link_libraries("${PROJECT_NAME}" PRIVATE metier-ui Qt5::Widgets)
 endif()
 
 target_compile_definitions(
@@ -186,9 +178,7 @@ if(APPLE)
   include(CPack)
 elseif(WIN32)
   set_target_properties(
-    "${PROJECT_NAME}"
-    PROPERTIES
-      RESOURCE "${RESOURCE_FILES}"
-      WIN32_EXECUTABLE TRUE
+    "${PROJECT_NAME}" PROPERTIES RESOURCE "${RESOURCE_FILES}" WIN32_EXECUTABLE
+                                                              TRUE
   )
 endif()

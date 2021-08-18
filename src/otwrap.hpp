@@ -61,7 +61,7 @@ public slots:
     void checkAccounts();
     void checkStartupConditions();
     void createNym(QString alias);
-    void importSeed(int type, int lang, QString words);
+    void importSeed(int type, int lang, QString words, QString password);
 
 public:
     using BlockchainList = QVector<int>;

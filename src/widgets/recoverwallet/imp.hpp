@@ -141,7 +141,7 @@ struct RecoverWallet::Imp {
         }
 
         words.chop(1);
-        ot_.importSeed(getStyle(), getLanguage(), words);
+        ot_.importSeed(getStyle(), getLanguage(), words, ui_->password->text());
         parent_->hide();
     }
     auto reflowDialog(const int lines) -> void
