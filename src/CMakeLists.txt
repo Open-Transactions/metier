@@ -47,11 +47,17 @@ set(object-deps
     $<TARGET_OBJECTS:qr-code-generator>
 )
 
-qt5_add_resources(rcc-sources "skin/default/resources.qrc")
+set(METIER_RCC_SOURCES "skin/default/qwidget.qrc")
 
 if(METIER_QML_INTERFACE)
-  qt5_add_resources(rcc-sources "skin/qml/resources.qrc")
+  list(
+    APPEND
+    METIER_RCC_SOURCES
+    "skin/qml/resources.qrc"
+  )
 endif()
+
+qt5_add_resources(rcc-sources "${METIER_RCC_SOURCES}")
 
 add_executable(
   "${PROJECT_NAME}" MACOSX_BUNDLE
