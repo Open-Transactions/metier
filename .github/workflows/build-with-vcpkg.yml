@@ -1,0 +1,122 @@
+name: BuildWithVcpkg
+
+on:
+  push:
+    branches:
+      - master
+      - '*-release'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [macos-10.15]
+        include:
+          - platform: 'macos-10.15'
+            vcpkg_triplet: 'x64-osx'
+            cmake_extra: ''
+            artifact_ext: '.dmg'
+            release_artifacts: '*.dmg'
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+        submodules: 'recursive'
+    - name: Install extra dependencies
+      if: matrix.platform == 'macos-10.15'
+      run: brew install automake
+    - name: Install the Apple certificate #and provisioning profile
+      if: matrix.platform == 'macos-10.15'
+      env:
+        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        APIKEY_BASE64: ${{ secrets.APIKEY_BASE64 }}
+        APIKEY_ID: ${{ secrets.APIKEY_ID }}
+      run: |
+        # create variables
+        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+        APIKEY_PATH="$HOME/private_keys/AuthKey_${APIKEY_ID}.p8"
+
+        mkdir $HOME/private_keys
+
+        # import certificate and provisioning profile from secrets
+        echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode --output $CERTIFICATE_PATH
+        echo -n "$APIKEY_BASE64" | base64 --decode --output $APIKEY_PATH
+
+        # create temporary keychain
+        security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+        # import certificate to keychain
+        security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security list-keychain -d user -s $KEYCHAIN_PATH
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.12
+      with:
+        cmake-version: 'latest'
+    - name: Run vcpkg
+      uses: lukka/run-vcpkg@v7
+      with:
+        vcpkgArguments: '--triplet ${{ matrix.vcpkg_triplet }} --overlay-ports=${{ github.workspace }}/deps/opentxs/vcpkg/ports --overlay-triplets=${{ github.workspace }}/deps/opentxs/vcpkg/triplets @${{ github.workspace }}/deps/vcpkg.qml.txt'
+        vcpkgDirectory: '${{ github.workspace }}/deps/vcpkg'
+    - name: Compile
+      uses: lukka/run-cmake@v3
+      with:
+        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+        useVcpkgToolchainFile: true
+        vcpkgTriplet: '${{ matrix.vcpkg_triplet }}'
+        buildDirectory: '${{ github.workspace }}/build'
+        cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Release -DMETIER_PEDANTIC_BUILD=OFF -DMETIER_BUNDLED_OPENTXS=ON -DMETIER_QML_INTERFACE=ON ${{ matrix.cmake_extra }}'
+        buildWithCMake: true
+        buildWithCMakeArgs: '-- -k 0'
+    - name: Packaging info
+      if: matrix.platform == 'macos-10.15'
+      run: |
+        cat ${{ github.workspace }}/build/release_version.txt >> $GITHUB_ENV
+        cat ${{ github.workspace }}/build/app_name.txt >> $GITHUB_ENV
+        cat ${{ github.workspace }}/build/cli_name.txt >> $GITHUB_ENV
+        cat ${{ github.workspace }}/build/bundle_id.txt >> $GITHUB_ENV
+    - name: Codesign
+      if: matrix.platform == 'macos-10.15'
+      env:
+        SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
+      run: |
+        codesign --deep -o runtime -f -s "$SIGNING_IDENTITY" "${{ github.workspace }}/build/src/${{ env.app_name }}.app"
+        codesign --deep -o runtime -f -s "$SIGNING_IDENTITY" "${{ github.workspace }}/build/src/cli/${{ env.cli_name }}"
+    - name: DiskImage
+      if: matrix.platform == 'macos-10.15'
+      run: |
+        cpack -G DragNDrop --config ${{ github.workspace }}/build/CPackConfig.cmake
+    - name: Notarize
+      if: matrix.platform == 'macos-10.15'
+      env:
+        BUNDLE_ID: ${{ secrets.BUNDLE_ID }}
+        APIKEY_ID: ${{ secrets.APIKEY_ID }}
+        API_ISSUER: ${{ secrets.API_ISSUER }}
+      run: |
+        xcrun altool --notarize-app -f "${{ env.app_name }}-${{ env.release_version }}.dmg" --primary-bundle-id "${{ env.bundle_id }}" --apiKey "$APIKEY_ID" --apiIssuer "$API_ISSUER"
+        xcrun altool --notarize-app -f "${{ env.cli_name }}-${{ env.release_version }}.dmg" --primary-bundle-id "${{ env.bundle_id }}" --apiKey "$APIKEY_ID" --apiIssuer "$API_ISSUER"
+    - name: Upload app
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.app_name }}${{ matrix.artifact_ext }}
+        path: ${{ github.workspace }}/${{ env.app_name }}-${{ env.release_version }}${{ matrix.artifact_ext }}
+    - name: Upload cli
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.cli_name }}${{ matrix.artifact_ext }}
+        path: ${{ github.workspace }}/${{ env.cli_name }}-${{ env.release_version }}${{ matrix.artifact_ext }}
+    - name: Github Release
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: ${{ matrix.release_artifacts }}
+        commit: release
+        tag: ${{ env.release_version }}-release
+        token: ${{ secrets.GITHUB_TOKEN }}
+
