@@ -46,8 +46,7 @@ Licenses::Licenses(QWidget* parent)
 
     {
         auto& right = *ui_->licenseText;
-        auto font = QFont{"monospace"};
-        font.setStyleHint(QFont::Monospace);
+        auto font = QFont(QFontDatabase::systemFont(QFontDatabase::FixedFont).family());
         right.setFont(font);
         util::set_minimum_size(right, 83, 25);
     }

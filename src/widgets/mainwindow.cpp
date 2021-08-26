@@ -34,7 +34,9 @@ MainWindow::MainWindow(QWidget* parent, OTWrap& ot) noexcept
     , imp_p_(std::make_unique<Imp>(this, ot))
     , imp_(*imp_p_)
 {
-    setWindowTitle(METIER_APPSTREAM_NAME);
+    qRegisterMetaType<QVector<int>>();
+
+    setWindowTitle(QString::fromLocal8Bit(METIER_APPSTREAM_NAME));
     auto* quit = imp_.ui_->action_file_quit;
     auto* bc = imp_.ui_->action_settings_blockchain;
     auto* words = imp_.ui_->action_settings_recovery_phrase;
