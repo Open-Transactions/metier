@@ -5,6 +5,7 @@
 
 qt5_wrap_ui(
   METIER_UI
+  "accountstatus.ui"
   "addcontact.ui"
   "blockchainchooser.ui"
   "blockchainsend.ui"

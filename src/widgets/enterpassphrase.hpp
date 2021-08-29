@@ -27,12 +27,14 @@ public:
 
     auto secret() const noexcept -> QString;
 
-    EnterPassphrase(
-        QWidget* parent,
-        const QString& displayString,
-        Mode mode) noexcept;
+    EnterPassphrase(const QString& displayString, Mode mode) noexcept;
 
     ~EnterPassphrase() final;
+
+private slots:
+    void cancel();
+    void check_one();
+    void check_two();
 
 private:
     std::unique_ptr<Imp> imp_p_;

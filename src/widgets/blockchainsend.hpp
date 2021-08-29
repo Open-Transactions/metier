@@ -33,9 +33,11 @@ public:
     ~BlockchainSend() final;
 
 private slots:
+    void finished();
     void updateAddress(const QString&);
     void updateAmount(int);
     void updateSendResult(int, int, QString);
+    void verify();
 
 private:
     struct Imp;

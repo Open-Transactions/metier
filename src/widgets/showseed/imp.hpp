@@ -30,7 +30,6 @@ struct ShowSeed::Imp {
     QDialog* parent_;
     std::unique_ptr<Ui::ShowSeed> ui_;
 
-    auto finish() -> void { parent_->close(); }
     auto reflowDialog(const int lines) -> void
     {
         util::set_minimum_size(
@@ -43,12 +42,11 @@ struct ShowSeed::Imp {
         , ui_(std::make_unique<Ui::ShowSeed>())
     {
         ui_->setupUi(parent_);
-
-        {
-            auto* done = ui_->completionButtons->button(QDialogButtonBox::Ok);
-            connect(done, &QPushButton::clicked, [this]() { finish(); });
-        }
-
+        connect(
+            ui_->completionButtons->button(QDialogButtonBox::Ok),
+            &QPushButton::clicked,
+            parent_,
+            &QDialog::close);
         auto text = std::stringstream{};
         auto counter{-1};
 

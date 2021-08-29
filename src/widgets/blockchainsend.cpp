@@ -35,9 +35,9 @@ BlockchainSend::BlockchainSend(QWidget* parent, Model* model)
     auto* vAmount = imp_.amount_validator_;
     auto* scale = ui.scale;
     connect(cancel, &QPushButton::clicked, this, &QWidget::close);
-    connect(address, &QLineEdit::textChanged, [this]() { imp_.checkOk(); });
-    connect(amount, &QLineEdit::textChanged, [this]() { imp_.checkOk(); });
-    connect(ok, &QPushButton::clicked, [this]() { imp_.handle_ok(); });
+    connect(address, &QLineEdit::textChanged, this, &BlockchainSend::verify);
+    connect(amount, &QLineEdit::textChanged, this, &BlockchainSend::verify);
+    connect(ok, &QPushButton::clicked, this, &BlockchainSend::finished);
     connect(
         scale,
         QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -53,6 +53,8 @@ BlockchainSend::BlockchainSend(QWidget* parent, Model* model)
         vAmount, &AmountV::scaleChanged, this, &BlockchainSend::updateAmount);
 }
 
+auto BlockchainSend::finished() -> void { imp_.handle_ok(); }
+
 auto BlockchainSend::updateAddress(const QString& in) -> void
 {
     imp_.updateStatus(in);
@@ -67,6 +69,8 @@ auto BlockchainSend::updateSendResult(int key, int code, QString txid) -> void
 {
     imp_.updateSendResult(key, code, txid);
 }
+
+auto BlockchainSend::verify() -> void { imp_.checkOk(); }
 
 BlockchainSend::~BlockchainSend()
 {

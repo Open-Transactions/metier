@@ -13,7 +13,7 @@
 
 namespace metier::model
 {
-SeedType::SeedType(Data&& data) noexcept
+SeedType::SeedType(QObject* parent, Data&& data) noexcept
     : data_(std::move(data))
     , max_(std::accumulate(
           data_.begin(),
@@ -23,6 +23,7 @@ SeedType::SeedType(Data&& data) noexcept
               return prev + static_cast<int>(next.first.size());
           }))
 {
+    moveToThread(parent->thread());
 }
 
 auto SeedType::data(const QModelIndex& index, int role) const -> QVariant

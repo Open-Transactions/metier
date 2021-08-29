@@ -6,7 +6,6 @@
 set(cxx-sources
     "accountlist.cpp"
     "licenses.cpp"
-    "profile.cpp"
     "seedlang.cpp"
     "seedsize.cpp"
     "seedtype.cpp"
@@ -16,7 +15,6 @@ set(moc-headers
     "accountlist.hpp"
     "blockchainchooser.hpp"
     "licenses.hpp"
-    "profile.hpp"
     "seedlang.hpp"
     "seedsize.hpp"
     "seedtype.hpp"

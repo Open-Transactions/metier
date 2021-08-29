@@ -20,7 +20,6 @@
 #include <string>
 
 #include "models/accountlist.hpp"
-#include "models/profile.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
@@ -63,6 +62,7 @@ auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
 #ifdef DEFAULT_SYNC_SERVER
     args.AddBlockchainSyncServer(DEFAULT_SYNC_SERVER);
 #endif
+    args.SetQtRootObject(&parent);
 
     return ot_args_;
 }
@@ -159,7 +159,6 @@ public:
     std::map<int, std::unique_ptr<model::SeedLanguage>> seed_language_;
     std::map<int, std::unique_ptr<model::SeedSize>> seed_size_;
     std::unique_ptr<model::AccountList> account_list_;
-    std::unique_ptr<model::Profile> profile_;
     std::unique_ptr<model::BlockchainChooser> mainnet_model_;
 
     template <typename OutputType, typename InputType>
@@ -247,20 +246,6 @@ public:
 
                     pointer = std::make_unique<model::AccountList>(
                         api_.UI().AccountListQt(nym_id_));
-
-                    OT_ASSERT(pointer);
-
-                    Ownership::Claim(pointer.get());
-                }
-            }
-            {
-                auto& pointer =
-                    const_cast<std::unique_ptr<model::Profile>&>(profile_);
-
-                if (!pointer) {
-
-                    pointer = std::make_unique<model::Profile>(
-                        api_.UI().ProfileQt(nym_id_));
 
                     OT_ASSERT(pointer);
 
@@ -372,6 +357,14 @@ public:
         ready().get();
 
         return api_.UI().AccountActivityQt(nym_id_, id);
+    }
+    auto accountStatusModel(const int chain) noexcept
+        -> ot::ui::BlockchainAccountStatusQt*
+    {
+        ready().get();
+
+        return api_.UI().BlockchainAccountStatusQt(
+            nym_id_, util::convert(chain));
     }
     auto activityThreadModel(const ot::Identifier& id) noexcept
         -> ActivityThread*
@@ -526,6 +519,12 @@ public:
 
         success = true;
     }
+    auto profileModel() noexcept -> ot::ui::ProfileQt*
+    {
+        ready().get();
+
+        return api_.UI().ProfileQt(nym_id_);
+    }
     auto seedLanguageModel(const int type) -> model::SeedLanguage*
     {
         ready().get();
@@ -547,6 +546,7 @@ public:
         auto [it, added] = seed_language_.try_emplace(
             type,
             std::make_unique<model::SeedLanguage>(
+                &qt_parent_,
                 transform<model::SeedLanguage::Data>(
                     api_.Seeds().AllowedLanguages(style))));
         auto& pModel = it->second;
@@ -578,8 +578,10 @@ public:
 
         auto [it, added] = seed_size_.try_emplace(
             type,
-            std::make_unique<model::SeedSize>(transform<model::SeedSize::Data>(
-                api_.Seeds().AllowedSeedStrength(style))));
+            std::make_unique<model::SeedSize>(
+                &qt_parent_,
+                transform<model::SeedSize::Data>(
+                    api_.Seeds().AllowedSeedStrength(style))));
         auto& pModel = it->second;
 
         OT_ASSERT(pModel);
@@ -708,14 +710,15 @@ public:
             return api_.Network().Blockchain().EnabledChains();
         }())
         , seed_type_(std::make_unique<model::SeedType>(
+              &parent,
               transform<model::SeedType::Data>(
                   api_.Seeds().AllowedSeedTypes())))
         , seed_language_()
         , seed_size_()
         , account_list_()
-        , profile_()
         , mainnet_model_(std::make_unique<model::BlockchainChooser>(
               api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Main)))
+        , qt_parent_(parent)
     {
         OT_ASSERT(seed_type_);
 
@@ -728,6 +731,8 @@ public:
     ~Imp() { rpc_socket_->Close(); }
 
 private:
+    QGuiApplication& qt_parent_;
+
     auto check_introduction_notary() const noexcept -> void
     {
         if (introduction_notary_id_->empty()) { return; }
@@ -840,6 +845,7 @@ private:
             const auto reason = api_.Factory().PasswordPrompt(prompt);
             const auto id = [&] {
                 if ((Chain::PKT == chain) && (Protocol::BIP_84 == type)) {
+                    // TODO only do this if the primary seed is a pktwallet type
 
                     return api_.Blockchain().NewHDSubaccount(
                         nym_id_, type, Chain::Bitcoin, chain, reason);

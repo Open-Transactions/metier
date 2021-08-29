@@ -11,7 +11,8 @@ namespace po = boost::program_options;
 
 namespace metier
 {
-auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept -> std::unique_ptr<Imp>
+auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept
+    -> std::unique_ptr<Imp>
 {
     static constexpr auto advanced{"advanced"};
     [[maybe_unused]] auto use_advanced{false};
@@ -20,7 +21,7 @@ auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept -> std::uni
         auto out = po::options_description{text};
         out.add_options()(
             advanced,
-            po::value<bool>()->implicit_value("true"),
+            po::value<bool>()->implicit_value(true),
             "Use advanced gui");
 
         return out;
@@ -34,7 +35,7 @@ auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept -> std::uni
                           .run();
         po::store(parsed, variables);
         po::notify(variables);
-    } catch (po::error& e) {
+    } catch (po::error&) {
     }
 
     for (const auto& [name, value] : variables) {

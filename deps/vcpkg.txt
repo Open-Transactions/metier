@@ -1,4 +1,5 @@
 boost-asio
+boost-beast
 boost-bind
 boost-circular-buffer
 boost-container
@@ -24,6 +25,5 @@ openssl
 pcre2
 protobuf
 qt5-base
-secp256k1
 sqlite3
 zeromq[sodium]

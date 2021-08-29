@@ -13,7 +13,7 @@
 
 namespace metier::model
 {
-SeedLanguage::SeedLanguage(Data&& data) noexcept
+SeedLanguage::SeedLanguage(QObject* parent, Data&& data) noexcept
     : data_(std::move(data))
     , max_(std::accumulate(
           data_.begin(),
@@ -23,6 +23,7 @@ SeedLanguage::SeedLanguage(Data&& data) noexcept
               return prev + static_cast<int>(next.first.size());
           }))
 {
+    moveToThread(parent->thread());
 }
 
 auto SeedLanguage::data(const QModelIndex& index, int role) const -> QVariant

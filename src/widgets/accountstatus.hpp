@@ -15,25 +15,26 @@ namespace metier
 class OTWrap;
 }  // namespace metier
 
+namespace Ui
+{
+class accountStatus;
+}
+
 namespace metier::widget
 {
-class NewSeed final : public QDialog
+class AccountStatus final : public QDialog
 {
     Q_OBJECT
-public:
-    NewSeed(QObject* parent, OTWrap& ot) noexcept;
 
-    ~NewSeed() final;
+public:
+    AccountStatus(QWidget* parent, OTWrap& ot, int chain) noexcept;
+
+    ~AccountStatus() final;
 
 private:
     struct Imp;
 
     std::unique_ptr<Imp> imp_p_;
     Imp& imp_;
-
-    NewSeed(const NewSeed&) = delete;
-    NewSeed(NewSeed&&) = delete;
-    NewSeed& operator=(const NewSeed&) = delete;
-    NewSeed& operator=(NewSeed&&) = delete;
 };
 }  // namespace metier::widget

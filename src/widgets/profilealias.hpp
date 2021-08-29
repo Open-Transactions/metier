@@ -27,7 +27,7 @@ signals:
     void gotAlias(QString alias);
 
 public:
-    ProfileAlias(QWidget* parent);
+    ProfileAlias(QObject* parent);
 
     ~ProfileAlias() final;
 

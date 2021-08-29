@@ -9,11 +9,12 @@
 
 namespace metier::widget
 {
-RecoverWallet::RecoverWallet(OTWrap& ot) noexcept
+RecoverWallet::RecoverWallet(QObject* parent, OTWrap& ot) noexcept
     : QDialog(nullptr)
     , imp_p_(std::make_unique<Imp>(this, ot))
     , imp_(*imp_p_)
 {
+    moveToThread(parent->thread());
 }
 
 RecoverWallet::~RecoverWallet() = default;

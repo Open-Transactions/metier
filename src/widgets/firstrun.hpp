@@ -28,7 +28,7 @@ signals:
     void wantOld();
 
 public:
-    FirstRun(QWidget* parent) noexcept;
+    FirstRun(QObject* parent) noexcept;
 
     ~FirstRun() final;
 

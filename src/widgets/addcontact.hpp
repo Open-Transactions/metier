@@ -26,11 +26,14 @@ class AddContact final : public QDialog
 {
     Q_OBJECT
 
-signals:
+public slots:
     void addContact(QString label, QString data);
 
+private slots:
+    void addContactPrivate();
+
 public:
-    AddContact(OTWrap& ot);
+    AddContact(QObject* parent, OTWrap& ot);
 
     ~AddContact() final;
 

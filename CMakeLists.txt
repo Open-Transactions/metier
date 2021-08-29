@@ -18,7 +18,7 @@ set(METIER_CLI_COMMAND "metierctl")
 
 set(METIER_VERSION_MAJOR 21)
 set(METIER_VERSION_MINOR 3)
-set(METIER_VERSION_PATCH 2)
+set(METIER_VERSION_PATCH 3)
 list(
   APPEND
   CMAKE_MODULE_PATH
@@ -138,9 +138,7 @@ find_package(
   Boost
   1.75.0
   REQUIRED
-  COMPONENTS
-    date_time
-    program_options
+  COMPONENTS date_time program_options
 )
 find_package(
   Qt5

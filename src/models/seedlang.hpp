@@ -25,7 +25,7 @@ public:
     auto rowCount(const QModelIndex& parent) const -> int final;
     auto suggestedWidthInCharacters() const noexcept -> int { return max_; }
 
-    SeedLanguage(Data&& data) noexcept;
+    SeedLanguage(QObject* parent, Data&& data) noexcept;
     ~SeedLanguage() final = default;
 
 private:

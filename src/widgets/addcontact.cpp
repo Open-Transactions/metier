@@ -15,11 +15,12 @@
 
 namespace metier::widget
 {
-AddContact::AddContact(OTWrap& ot)
+AddContact::AddContact(QObject* parent, OTWrap& ot)
     : QDialog(nullptr)
     , ui_(std::make_unique<Ui::AddContact>())
     , ot_(ot)
 {
+    moveToThread(parent->thread());
     ui_->setupUi(this);
     auto* label = ui_->contactLabelText;
     label->setMaximumHeight(util::line_height(*label, {3, 2}));
@@ -29,12 +30,19 @@ AddContact::AddContact(OTWrap& ot)
     util::set_minimum_size(*id, 55, 1, {3, 2});
     auto* ok = ui_->buttonBox->button(QDialogButtonBox::Ok);
     auto* cancel = ui_->buttonBox->button(QDialogButtonBox::Cancel);
-    connect(ok, &QPushButton::clicked, [&] {
-        ot_.addContact(
-            ui_->contactLabelText->text(), ui_->paymentCodeText->text());
-        close();
-    });
-    connect(cancel, &QPushButton::clicked, [&] { close(); });
+    connect(ok, &QPushButton::clicked, this, &AddContact::addContactPrivate);
+    connect(cancel, &QPushButton::clicked, this, &QDialog::close);
+}
+
+auto AddContact::addContact(QString label, QString value) -> void
+{
+    ot_.addContact(std::move(label), std::move(value));
+    close();
+}
+
+auto AddContact::addContactPrivate() -> void
+{
+    addContact(ui_->contactLabelText->text(), ui_->paymentCodeText->text());
 }
 
 AddContact::~AddContact() = default;

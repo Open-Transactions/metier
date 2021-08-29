@@ -29,13 +29,13 @@ namespace metier::widget
 {
 using OTModel = opentxs::ui::AccountListQt;
 
-MainWindow::MainWindow(QWidget* parent, OTWrap& ot) noexcept
-    : QMainWindow(parent)
+MainWindow::MainWindow(QObject* parent, OTWrap& ot) noexcept
+    : QMainWindow(nullptr)
     , imp_p_(std::make_unique<Imp>(this, ot))
     , imp_(*imp_p_)
 {
+    moveToThread(parent->thread());
     qRegisterMetaType<QVector<int>>();
-
     setWindowTitle(QString::fromLocal8Bit(METIER_APPSTREAM_NAME));
     auto* quit = imp_.ui_->action_file_quit;
     auto* bc = imp_.ui_->action_settings_blockchain;
@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget* parent, OTWrap& ot) noexcept
     connect(&ot, &OTWrap::nymReady, this, &MainWindow::initModels);
     connect(&ot, &OTWrap::readyForMainWindow, this, &MainWindow::updateToolbox);
     connect(&ot, &OTWrap::chainsChanged, this, &MainWindow::updateToolbox);
-    connect(quit, &QAction::triggered, []() { QCoreApplication::exit(); });
+    connect(quit, &QAction::triggered, this, &MainWindow::exit);
     connect(bc, &QAction::triggered, this, &MainWindow::showBlockchainChooser);
     connect(words, &QAction::triggered, this, &MainWindow::showRecoveryWords);
     connect(bcdone, &QPushButton::clicked, &ot, &OTWrap::checkAccounts);
@@ -119,6 +119,8 @@ auto MainWindow::contactListUpdated(
     }
 }
 
+auto MainWindow::exit() -> void { QCoreApplication::exit(); }
+
 auto MainWindow::initModels() -> void { imp_.init_models(this); }
 
 auto MainWindow::sendMessage() -> void
@@ -144,6 +146,8 @@ auto MainWindow::setProgressValue(int value) -> void
 {
     emit progValueUpdated(value);
 }
+
+auto MainWindow::showAddContact() -> void { imp_.showAddContact(); }
 
 auto MainWindow::showAccountActivity(int chain) -> void
 {
@@ -223,6 +227,13 @@ auto MainWindow::changeChain() -> void
     }
 
     imp_.updateProgress();
+}
+
+auto MainWindow::updateName(QString value) -> void { imp_.updateName(value); }
+
+auto MainWindow::updatePaymentCode(QString value) -> void
+{
+    imp_.updatePaymentCode(value);
 }
 
 auto MainWindow::updateToolbox() -> void

@@ -9,11 +9,12 @@
 
 namespace metier::widget
 {
-NewSeed::NewSeed(OTWrap& ot) noexcept
+NewSeed::NewSeed(QObject* parent, OTWrap& ot) noexcept
     : QDialog(nullptr)
     , imp_p_(std::make_unique<Imp>(this, ot))
     , imp_(*imp_p_)
 {
+    moveToThread(parent->thread());
 }
 
 NewSeed::~NewSeed() = default;

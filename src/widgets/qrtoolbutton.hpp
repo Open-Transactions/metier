@@ -39,7 +39,7 @@ public:
     int getQRWidth() const;
     bool asImage(QImage& output, int size);
 
-    QrToolButton(QWidget* parent = nullptr);
+    QrToolButton(QWidget* parent);
 
     ~QrToolButton() final;
 

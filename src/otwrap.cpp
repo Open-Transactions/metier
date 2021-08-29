@@ -58,6 +58,28 @@ auto OTWrap::accountListModelQML() -> QObject*
     return const_cast<model::AccountList*>(accountListModel());
 }
 
+auto OTWrap::accountStatusModel(const int chain)
+    -> opentxs::ui::BlockchainAccountStatusQt*
+{
+    return imp_.accountStatusModel(chain);
+}
+
+auto OTWrap::accountStatusModel(const QString& id)
+    -> opentxs::ui::BlockchainAccountStatusQt*
+{
+    return accountStatusModel(convertBlockchainAccountID(id));
+}
+
+auto OTWrap::accountStatusModelQML(const int chain) -> QObject*
+{
+    return accountStatusModel(chain);
+}
+
+auto OTWrap::accountStatusModelQML(const QString& id) -> QObject*
+{
+    return accountStatusModel(id);
+}
+
 auto OTWrap::activityThreadModel(const QString& id) -> ActivityThread*
 {
     return imp_.activityThreadModel(
@@ -237,11 +259,9 @@ auto OTWrap::openSystemBrowserLink(QString url_link) -> void
     QDesktopServices::openUrl(QUrl(url_link, QUrl::StrictMode));
 }
 
-auto OTWrap::profileModel() -> model::Profile*
+auto OTWrap::profileModel() -> opentxs::ui::ProfileQt*
 {
-    OT_ASSERT(imp_.profile_);
-
-    return imp_.profile_.get();
+    return imp_.profileModel();
 }
 
 auto OTWrap::profileModelQML() -> QObject* { return profileModel(); }

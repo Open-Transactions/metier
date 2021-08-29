@@ -11,5 +11,6 @@ AccountList::AccountList(QAbstractItemModel* source) noexcept
     : ot_super(nullptr)
 {
     setSourceModel(source);
+    moveToThread(source->thread());
 }
 }  // namespace metier::model

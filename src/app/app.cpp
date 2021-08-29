@@ -5,9 +5,8 @@
 
 #include "app.hpp"  // IWYU pragma: associated
 
-#include <QThread>
-
 #include <otwrap.hpp>
+#include <QThread>
 #include <iostream>
 #include <mutex>
 
@@ -81,7 +80,7 @@ auto App::needPasswordPrompt(QString prompt, bool once) -> void
 
 auto App::run() -> int { return imp_.run(); }
 
-auto App::Get(int argc, char* argv[]) noexcept -> App*
+auto App::Get(int& argc, char** argv) noexcept -> App*
 {
     static std::mutex mutex{};
     std::lock_guard<std::mutex> lock(mutex);
