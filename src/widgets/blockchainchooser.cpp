@@ -19,11 +19,12 @@ constexpr auto enabled_column_width_{10};
 
 namespace metier::widget
 {
-BlockchainChooser::BlockchainChooser(QWidget* parent, OTWrap& ot)
-    : QDialog(parent)
+BlockchainChooser::BlockchainChooser(QObject* parent, OTWrap& ot)
+    : QDialog(nullptr)
     , ot_(ot)
     , ui_(std::make_unique<Ui::BlockchainChooser>())
 {
+    moveToThread(parent->thread());
     ui_->setupUi(this);
     const auto longestBlockchainName = ot_.longestBlockchainName();
 
@@ -53,7 +54,7 @@ BlockchainChooser::BlockchainChooser(QWidget* parent, OTWrap& ot)
     auto* ok = ui_->buttons->button(QDialogButtonBox::Ok);
     connect(&ot_, &OTWrap::chainsChanged, this, &BlockchainChooser::check);
     connect(&ot_, &OTWrap::chainsChanged, this, &BlockchainChooser::check);
-    connect(ok, &QPushButton::clicked, [this]() { hide(); });
+    connect(ok, &QPushButton::clicked, this, &BlockchainChooser::hide);
     init();
 }
 

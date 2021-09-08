@@ -41,8 +41,10 @@ private slots:
     void contactListUpdated(
         const QItemSelection& current,
         const QItemSelection& previous);
+    void exit();
     void initModels();
     void sendMessage();
+    void showAddContact();
     void showAccountActivity(int chain);
     void showAccountActivity(QString account);
     void showActivityThread(QString contact);
@@ -52,9 +54,11 @@ private slots:
     void showRecoveryWords();
     void changeChain();
     void updateToolbox();
+    void updateName(QString value);
+    void updatePaymentCode(QString value);
 
 public:
-    MainWindow(QWidget* parent, OTWrap& ot) noexcept;
+    MainWindow(QObject* parent, OTWrap& ot) noexcept;
 
     ~MainWindow() final;
 

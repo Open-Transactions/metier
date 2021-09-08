@@ -32,7 +32,7 @@ private slots:
 public:
     struct Imp;
 
-    static App* Get(int argc = 0, char* argv[] = nullptr) noexcept;
+    static App* Get(int& argc, char** argv) noexcept;
     static void Cleanup() noexcept;
 
     auto confirmPassword(QString prompt, QString key) -> QString;

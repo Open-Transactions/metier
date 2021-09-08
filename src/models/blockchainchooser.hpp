@@ -22,6 +22,7 @@ public:
     BlockchainChooser(QAbstractItemModel* parent) noexcept
     {
         setSourceModel(parent);
+        moveToThread(parent->thread());
     }
 
     ~BlockchainChooser() final = default;

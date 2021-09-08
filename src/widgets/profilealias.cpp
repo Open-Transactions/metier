@@ -13,17 +13,18 @@
 
 namespace metier::widget
 {
-ProfileAlias::ProfileAlias(QWidget* parent)
-    : QDialog(parent)
+ProfileAlias::ProfileAlias(QObject* parent)
+    : QDialog(nullptr)
     , ui_(std::make_unique<Ui::ProfileAlias>())
 {
+    moveToThread(parent->thread());
     ui_->setupUi(this);
     auto* alias = ui_->alias;
     alias->setMaximumHeight(util::line_height(*alias, {3, 2}));
     util::set_minimum_size(*alias, 10, 1, {3, 2});
-    connect(alias, &QPlainTextEdit::textChanged, [this]() { check(); });
-    connect(ui_->confirm, &QToolButton::clicked, [this]() { confirm(); });
-    connect(this, &ProfileAlias::gotAlias, [this]() { hide(); });
+    connect(alias, &QPlainTextEdit::textChanged, this, &ProfileAlias::check);
+    connect(ui_->confirm, &QToolButton::clicked, this, &ProfileAlias::confirm);
+    connect(this, &ProfileAlias::gotAlias, this, &ProfileAlias::hide);
 }
 
 auto ProfileAlias::check() noexcept -> void

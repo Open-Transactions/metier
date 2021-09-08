@@ -86,7 +86,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
     {
         using Widget = metier::widget::EnterPassphrase;
         auto dialog = std::make_unique<Widget>(
-            nullptr, prompt, once ? Widget::Mode::Once : Widget::Mode::Twice);
+            prompt, once ? Widget::Mode::Once : Widget::Mode::Twice);
         auto postcondition = metier::ScopeGuard{[&dialog]() {
             dialog->deleteLater();
             dialog.release();
@@ -109,13 +109,12 @@ struct LegacyApp final : public App::Imp, public QApplication {
     auto init(int& argc, char** argv) noexcept -> void final
     {
         ot_ = std::make_unique<OTWrap>(*this, parent_, argc, argv);
-        first_run_ = std::make_unique<widget::FirstRun>(nullptr);
-        new_seed_ = std::make_unique<widget::NewSeed>(*ot_);
-        recover_wallet_ = std::make_unique<widget::RecoverWallet>(*ot_);
-        profile_alias_ = std::make_unique<widget::ProfileAlias>(nullptr);
-        blockchains_ =
-            std::make_unique<widget::BlockchainChooser>(nullptr, *ot_);
-        main_window_ = std::make_unique<widget::MainWindow>(nullptr, *ot_);
+        first_run_ = std::make_unique<widget::FirstRun>(this);
+        new_seed_ = std::make_unique<widget::NewSeed>(this, *ot_);
+        recover_wallet_ = std::make_unique<widget::RecoverWallet>(this, *ot_);
+        profile_alias_ = std::make_unique<widget::ProfileAlias>(this);
+        blockchains_ = std::make_unique<widget::BlockchainChooser>(this, *ot_);
+        main_window_ = std::make_unique<widget::MainWindow>(this, *ot_);
         auto* ot = ot_.get();
         auto* first = first_run_.get();
         auto* alias = profile_alias_.get();

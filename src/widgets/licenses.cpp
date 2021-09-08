@@ -20,7 +20,7 @@ namespace metier::widget
 {
 Licenses::Licenses(QWidget* parent)
     : QDialog(parent)
-    , model_(std::make_unique<model::Licenses>())
+    , model_(std::make_unique<model::Licenses>(parent))
     , ui_(std::make_unique<Ui::licenseViewer>())
 {
     ui_->setupUi(this);
@@ -46,7 +46,8 @@ Licenses::Licenses(QWidget* parent)
 
     {
         auto& right = *ui_->licenseText;
-        auto font = QFont(QFontDatabase::systemFont(QFontDatabase::FixedFont).family());
+        auto font =
+            QFont(QFontDatabase::systemFont(QFontDatabase::FixedFont).family());
         right.setFont(font);
         util::set_minimum_size(right, 83, 25);
     }

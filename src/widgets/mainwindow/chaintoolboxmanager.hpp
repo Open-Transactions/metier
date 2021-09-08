@@ -19,6 +19,7 @@
 #include "util/convertblockchain.hpp"
 #include "util/resizer.hpp"
 #include "util/scopeguard.hpp"
+#include "widgets/accountstatus.hpp"
 #include "widgets/blockchainchooser.hpp"
 #include "widgets/blockchainsend.hpp"
 #include "widgets/licenses.hpp"
@@ -169,23 +170,27 @@ private:
         -> std::pair<std::unique_ptr<QWidget>, std::string>
     {
         auto output = std::make_pair<std::unique_ptr<QWidget>, std::string>(
-            std::make_unique<QWidget>(), ot::blockchain::DisplayString(chain));
+            std::make_unique<QWidget>(toolbox_),
+            ot::blockchain::DisplayString(chain));
         auto& [widget, description] = output;
         auto layout = std::make_unique<QGridLayout>(widget.get());
         auto view = std::make_unique<QTableView>(widget.get());
         auto receive = std::make_unique<QPushButton>(widget.get());
         auto send = std::make_unique<QPushButton>(widget.get());
+        auto details = std::make_unique<QPushButton>(widget.get());
         auto postcondition = ScopeGuard{[&]() {
             layout.release();
             view.release();
             receive.release();
             send.release();
+            details.release();
         }};
         const auto widgetName = ot::blockchain::TickerSymbol(chain) + "Tab";
         const auto layoutName = widgetName + "Layout";
         const auto viewName = widgetName + "AccountSummary";
         const auto receiveName = widgetName + "Receive";
         const auto sendName = widgetName + "Send";
+        const auto detailsName = widgetName + "Details";
         widget->setObjectName(QString::fromUtf8(widgetName.c_str()));
         layout->setObjectName(QString::fromUtf8(layoutName.c_str()));
         view->setObjectName(QString::fromUtf8(viewName.c_str()));
@@ -200,12 +205,29 @@ private:
             QCoreApplication::translate("MainWindow", "Send", nullptr));
         send->connect(
             send.get(), &QPushButton::clicked, [=]() { show_send(chain); });
+        details->setObjectName(QString::fromUtf8(detailsName.c_str()));
+        details->setText(
+            QCoreApplication::translate("MainWindow", "Details", nullptr));
+        details->connect(details.get(), &QPushButton::clicked, [=]() {
+            show_details(chain);
+        });
         layout->addWidget(view.get(), 0, 0, 1, 2);
         layout->addWidget(receive.get(), 1, 0, 1, 1);
         layout->addWidget(send.get(), 1, 1, 1, 1);
+        layout->addWidget(details.get(), 2, 1, 1, 1);
         progress_cb_(chain);
 
         return output;
+    }
+    auto show_details(const ot::blockchain::Type chain) noexcept -> void
+    {
+        auto dialog = std::make_unique<AccountStatus>(
+            parent_, ot_, static_cast<int>(chain));
+        auto postcondition = ScopeGuard{[&dialog]() {
+            dialog->deleteLater();
+            dialog.release();
+        }};
+        dialog->exec();
     }
     auto show_receiving(const ot::blockchain::Type chain) noexcept -> void
     {

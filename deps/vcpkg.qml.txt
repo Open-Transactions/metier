@@ -1,4 +1,5 @@
 boost-asio
+boost-beast
 boost-bind
 boost-circular-buffer
 boost-container
@@ -29,6 +30,5 @@ qt5-graphicaleffects
 qt5-imageformats
 qt5-quickcontrols2
 qt5-svg
-secp256k1
 sqlite3
 zeromq[sodium]

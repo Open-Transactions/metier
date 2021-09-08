@@ -14,6 +14,8 @@
 
 namespace metier::model
 {
+Licenses::Licenses(QObject* parent) noexcept { moveToThread(parent->thread()); }
+
 auto Licenses::data(const QModelIndex& index, int role) const -> QVariant
 {
     static const auto& data = MetierLicenseData();

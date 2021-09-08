@@ -21,7 +21,9 @@ namespace ui
 {
 class AccountActivityQt;
 class ActivityThreadQt;
+class BlockchainAccountStatusQt;
 class ContactListQt;
+class ProfileQt;
 class SeedValidator;
 }  // namespace ui
 }  // namespace opentxs
@@ -31,7 +33,6 @@ namespace metier
 namespace model
 {
 class AccountList;
-class Profile;
 class SeedLanguage;
 class SeedSize;
 class SeedType;
@@ -73,12 +74,15 @@ public:
 
     AccountActivity* accountActivityModel(const QString& id);
     AccountActivity* accountActivityModel(const int chain);
+    opentxs::ui::BlockchainAccountStatusQt* accountStatusModel(const int chain);
+    opentxs::ui::BlockchainAccountStatusQt* accountStatusModel(
+        const QString& accountID);
     ActivityThread* activityThreadModel(const QString& id);
     model::AccountList* accountListModel();
     QAbstractItemModel* blockchainChooserModel(const bool testnet);
     QAbstractItemModel* blockchainStatisticsModel();
     ContactList* contactListModel();
-    model::Profile* profileModel();
+    opentxs::ui::ProfileQt* profileModel();
     model::SeedLanguage* seedLanguageModel(const int type);
     model::SeedSize* seedSizeModel(const int type);
     model::SeedType* seedTypeModel();
@@ -88,6 +92,8 @@ public:
 
     Q_INVOKABLE QObject* accountActivityModelQML(const QString& id);
     Q_INVOKABLE QObject* accountListModelQML();
+    Q_INVOKABLE QObject* accountStatusModelQML(const QString& accountID);
+    Q_INVOKABLE QObject* accountStatusModelQML(int chain);
     Q_INVOKABLE QObject* activityThreadModelQML(const QString& id);
     Q_INVOKABLE QObject* blockchainChooserModelQML(bool testnet);
     Q_INVOKABLE QObject* blockchainStatisticsModelQML();
@@ -111,6 +117,7 @@ public:
     Q_INVOKABLE int longestSeedWord();
     Q_INVOKABLE void openSystemBrowserLink(QString url_link);
     BlockchainList validBlockchains();
+    Q_INVOKABLE QString versionString(int suffix = 0);
 
     explicit OTWrap(QGuiApplication& parent, App& app, int& argc, char** argv);
 

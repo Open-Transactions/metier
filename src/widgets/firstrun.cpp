@@ -11,15 +11,16 @@
 
 namespace metier::widget
 {
-FirstRun::FirstRun(QWidget* parent) noexcept
-    : QDialog(parent)
+FirstRun::FirstRun(QObject* parent) noexcept
+    : QDialog(nullptr)
     , ui(std::make_unique<Ui::FirstRunDialog>())
 {
+    moveToThread(parent->thread());
     ui->setupUi(this);
-    connect(ui->create, &QPushButton::clicked, [this]() { create(); });
-    connect(ui->restore, &QPushButton::clicked, [this]() { recover(); });
-    connect(this, &FirstRun::wantNew, [this]() { hide(); });
-    connect(this, &FirstRun::wantOld, [this]() { hide(); });
+    connect(ui->create, &QPushButton::clicked, this, &FirstRun::create);
+    connect(ui->restore, &QPushButton::clicked, this, &FirstRun::recover);
+    connect(this, &FirstRun::wantNew, this, &QDialog::hide);
+    connect(this, &FirstRun::wantOld, this, &QDialog::hide);
 }
 
 auto FirstRun::create() -> void { emit wantNew(); }

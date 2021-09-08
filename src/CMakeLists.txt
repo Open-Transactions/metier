@@ -25,7 +25,14 @@ add_subdirectory(ui)
 add_subdirectory(util)
 add_subdirectory(widgets)
 
+configure_file(
+  "otwrap/version.cpp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/otwrap/version.cpp"
+  @ONLY
+)
+
 set(cxx-sources
+    "${CMAKE_CURRENT_BINARY_DIR}/otwrap/version.cpp"
     "otwrap/imp.hpp"
     "otwrap/notary.cpp"
     "otwrap/notary.hpp"

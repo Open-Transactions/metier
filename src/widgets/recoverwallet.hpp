@@ -15,13 +15,15 @@ namespace metier
 class OTWrap;
 }  // namespace metier
 
+class QLineEdit;
+
 namespace metier::widget
 {
 class RecoverWallet final : public QDialog
 {
     Q_OBJECT
 public:
-    RecoverWallet(OTWrap& ot) noexcept;
+    RecoverWallet(QObject* parent, OTWrap& ot) noexcept;
 
     ~RecoverWallet() final;
 

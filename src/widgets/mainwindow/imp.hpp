@@ -14,7 +14,6 @@
 #include <tuple>
 
 #include "models/accountlist.hpp"
-#include "models/profile.hpp"
 #include "otwrap.hpp"
 #include "ui_mainwindow.h"
 #include "util/resizer.hpp"
@@ -38,7 +37,6 @@ struct MainWindow::Imp {
     std::set<std::uintptr_t> registered_chains_;
     SyncProgress sync_progress_;
     ChainToolboxManager chain_toolbox_;
-    model::Profile* profile_;
 
     auto init_models(MainWindow* parent) noexcept
     {
@@ -64,21 +62,42 @@ struct MainWindow::Imp {
                 &MainWindow::contactListUpdated);
         }
 
-        profile_ = ot_.profileModel();
-        connect(profile_, &model::Profile::updated, [&] { repaintProfile(); });
-        repaintProfile();
+        using Profile = opentxs::ui::ProfileQt;
+        auto profile = ot_.profileModel();
+        connect(
+            profile,
+            &Profile::displayNameChanged,
+            parent,
+            &MainWindow::updateName);
+        connect(
+            profile,
+            &Profile::paymentCodeChanged,
+            parent,
+            &MainWindow::updatePaymentCode);
+        updateName(profile->displayName());
+        updatePaymentCode(profile->paymentCode());
         updateProgress();
     }
-    auto repaintProfile() noexcept -> void
+    auto showAddContact() noexcept -> void
     {
-        OT_ASSERT(nullptr != profile_);
-
+        auto dialog = std::make_unique<AddContact>(&parent_, ot_);
+        auto postcondition = ScopeGuard{[&dialog]() {
+            dialog->deleteLater();
+            dialog.release();
+        }};
+        dialog->exec();
+    }
+    auto updateName(QString value) noexcept -> void
+    {
         auto& name = *ui_->profileName;
+        name.setText(value);
+    }
+    auto updatePaymentCode(QString value) -> void
+    {
         auto& code = *ui_->paymentCode;
         auto& qr = *ui_->qrCode;
-        name.setText(profile_->displayName());
-        code.setText(profile_->paymentCode());
-        qr.setString(profile_->paymentCode());
+        code.setText(value);
+        qr.setString(value);
     }
     auto updateProgress() noexcept -> void
     {
@@ -102,7 +121,6 @@ struct MainWindow::Imp {
               ui_->accountList,
               ui_->moneyToolbox,
               [this](const auto chain) { register_progress(chain); })
-        , profile_()
     {
         ui_->setupUi(parent);
         ui_->moneyToolbox->setMaximumWidth(util::line_width(
@@ -133,10 +151,11 @@ struct MainWindow::Imp {
                 util::line_height(*ui_->contactListView, {3, 2}) * 2);
             ui_->messageEdit->setEnabled(false);
             ui_->sendMessage->setEnabled(false);
-            auto* addContact = ui_->addContact;
-            addContact->connect(addContact, &QPushButton::clicked, [=]() {
-                show_add_contact();
-            });
+            connect(
+                ui_->addContact,
+                &QPushButton::clicked,
+                &parent_,
+                &MainWindow::showAddContact);
         }
     }
 
@@ -172,15 +191,6 @@ private:
         connect(model, &Model::syncProgressUpdated, [=](int value, int max) {
             receive_progress_update(chain, value, max);
         });
-    }
-    auto show_add_contact() noexcept -> void
-    {
-        auto dialog = std::make_unique<AddContact>(ot_);
-        auto postcondition = ScopeGuard{[&dialog]() {
-            dialog->deleteLater();
-            dialog.release();
-        }};
-        dialog->exec();
     }
 };
 }  // namespace metier::widget

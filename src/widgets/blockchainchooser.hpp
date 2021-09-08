@@ -33,7 +33,7 @@ class BlockchainChooser final : public QDialog
 public:
     auto Ok() noexcept -> QPushButton*;
 
-    BlockchainChooser(QWidget* parent, OTWrap& ot);
+    BlockchainChooser(QObject* parent, OTWrap& ot);
 
     ~BlockchainChooser() final;
 

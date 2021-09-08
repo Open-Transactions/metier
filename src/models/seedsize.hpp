@@ -25,7 +25,7 @@ public:
     auto rowCount(const QModelIndex& parent) const -> int final;
     auto suggestedWidthInCharacters() const noexcept -> int { return max_; }
 
-    SeedSize(Data&& data) noexcept;
+    SeedSize(QObject* parent, Data&& data) noexcept;
 
 private:
     using ot_super = QAbstractListModel;
