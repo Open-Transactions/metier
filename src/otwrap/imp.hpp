@@ -63,6 +63,8 @@ auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     args.AddBlockchainSyncServer(DEFAULT_SYNC_SERVER);
 #endif
     args.SetQtRootObject(&parent);
+    args.SetIpv4ConnectionMode(ot::Options::ConnectionMode::on);
+    args.SetIpv6ConnectionMode(ot::Options::ConnectionMode::automatic);
 
     return ot_args_;
 }
