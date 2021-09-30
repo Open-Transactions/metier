@@ -18,8 +18,8 @@ set(METIER_CLI_COMMAND "metierctl")
 set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 21)
-set(METIER_VERSION_MINOR 3)
-set(METIER_VERSION_PATCH 5)
+set(METIER_VERSION_MINOR 4)
+set(METIER_VERSION_PATCH 0)
 list(
   APPEND
   CMAKE_MODULE_PATH
@@ -94,7 +94,7 @@ if(${CMAKE_CXX_COMPILER_ID}
 endif()
 
 if(NOT MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept -Wno-c++20-compat")
 endif()
 
 # -----------------------------------------------------------------------------

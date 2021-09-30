@@ -17,7 +17,6 @@
 
 #include "models/accountlist.hpp"
 #include "models/blockchainchooser.hpp"
-#include "models/profile.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
