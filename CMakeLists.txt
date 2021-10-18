@@ -20,6 +20,26 @@ set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 set(METIER_VERSION_MAJOR 21)
 set(METIER_VERSION_MINOR 4)
 set(METIER_VERSION_PATCH 2)
+
+execute_process(
+  COMMAND
+    echo
+    release_version=${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}
+  OUTPUT_FILE release_version.txt
+)
+execute_process(
+  COMMAND echo app_name=${METIER_GUI_OUTPUT_NAME}
+  OUTPUT_FILE ${PROJECT_BINARY_DIR}/app_name.txt
+)
+execute_process(
+  COMMAND echo cli_name=${METIER_CLI_COMMAND}
+  OUTPUT_FILE ${PROJECT_BINARY_DIR}/cli_name.txt
+)
+execute_process(
+  COMMAND echo bundle_id=${METIER_APPSTREAM_ID}
+  OUTPUT_FILE ${PROJECT_BINARY_DIR}/bundle_id.txt
+)
+
 list(
   APPEND
   CMAKE_MODULE_PATH
