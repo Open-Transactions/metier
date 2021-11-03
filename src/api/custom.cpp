@@ -15,7 +15,9 @@ const char* messaging_notary_contract_{nullptr};
 
 auto SeedEndpoints() noexcept -> const std::vector<const char*>&
 {
-    static const auto data = std::vector<const char*>{};
+    static const auto data = std::vector<const char*>{
+        "tcp://ot01.matterfi.net:8814",
+    };
 
     return data;
 }

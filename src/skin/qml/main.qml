@@ -1,5 +1,7 @@
 import QtQuick 2.0
 
+import com.TreeModelAdaptor 1.0
+
 Rectangle {
     id: page
     width: 320; height: 480

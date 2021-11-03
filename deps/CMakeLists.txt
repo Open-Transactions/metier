@@ -79,5 +79,9 @@ if(METIER_BUNDLED_OPENTXS)
         FORCE
   )
 
+  if(NOT WIN32)
+    set(CMAKE_UNITY_BUILD ON)
+  endif()
+
   add_subdirectory(opentxs)
 endif()

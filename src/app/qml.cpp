@@ -5,6 +5,7 @@
 
 #include "app/imp.hpp"  // IWYU pragma: associated
 
+#include <libmatterfi/treemodeladaptor/treemodeladaptor.hpp>
 #include <opentxs/interface/qt/IdentityManager.hpp>
 #include <opentxs/interface/qt/SeedValidator.hpp>
 #include <QGuiApplication>
@@ -168,6 +169,9 @@ public:
         , model_init_(false)
         , models_set_(model_promise_.get_future())
     {
+        qmlRegisterType<TreeModelAdaptor>(
+            "com.TreeModelAdaptor", 1, 0, "TreeModelAdaptor");
+
         {
             auto* app = &startup_;
             Ownership::Claim(app);

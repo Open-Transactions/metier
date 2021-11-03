@@ -94,7 +94,7 @@ option(
 option(
   METIER_QML_INTERFACE
   "Use Qt Quick interface instead of Qt Widgets"
-  OFF
+  ON
 )
 
 # -----------------------------------------------------------------------------

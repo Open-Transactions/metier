@@ -1,0 +1,7 @@
+<RCC>    
+  <!-- TreeView model adaptor -->
+  <qresource prefix="/treeview">
+    <file>TableViewColumn.qml</file>
+    <file>TreeView.qml</file>
+  </qresource>
+</RCC>
