@@ -19,7 +19,7 @@ set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 21)
 set(METIER_VERSION_MINOR 4)
-set(METIER_VERSION_PATCH 3)
+set(METIER_VERSION_PATCH 4)
 
 execute_process(
   COMMAND
@@ -109,7 +109,7 @@ if(${CMAKE_CXX_COMPILER_ID}
    Clang
 )
   set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -Wno-redundant-parens -Wno-extra-semi-stmt"
+      "${CMAKE_CXX_FLAGS} -Wno-redundant-parens -Wno-extra-semi-stmt -Wno-reserved-identifier"
   )
 endif()
 

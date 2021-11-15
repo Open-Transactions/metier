@@ -7,6 +7,7 @@
 
 #include "otwrap.hpp"  // IWYU pragma: associated
 
+#include <opentxs/client/NymData.hpp>
 #include <opentxs/opentxs.hpp>
 #include <QDebug>
 #include <QDir>
@@ -149,7 +150,7 @@ public:
     const opentxs::api::Context& ot_;
     const ot::OTZMQListenCallback rpc_cb_;
     ot::OTZMQRouterSocket rpc_socket_;
-    const opentxs::api::client::Manager& api_;
+    const opentxs::api::session::Client& api_;
     const ot::OTServerID introduction_notary_id_;
     const ot::OTServerID messaging_notary_id_;
     const std::string seed_id_;
@@ -249,7 +250,7 @@ public:
                     pointer = std::make_unique<model::AccountList>(
                         api_.UI().AccountListQt(nym_id_));
 
-                    OT_ASSERT(pointer);
+                    assert(pointer);
 
                     Ownership::Claim(pointer.get());
                 }
@@ -349,7 +350,7 @@ public:
     {
         ready().get();
         const auto& account =
-            api_.Blockchain().Account(nym_id_, util::convert(chain));
+            api_.Crypto().Blockchain().Account(nym_id_, util::convert(chain));
 
         return api_.UI().AccountActivityQt(nym_id_, account.AccountID());
     }
@@ -393,7 +394,7 @@ public:
         const auto reason =
             api_.Factory().PasswordPrompt("Generate a new Metier identity");
 
-        OT_ASSERT(false == seed_id_.empty());
+        assert(false == seed_id_.empty());
 
         const auto pNym =
             api_.Wallet().Nym(reason, alias.toStdString(), {seed_id_, 0});
@@ -426,10 +427,10 @@ public:
         auto postcondition = ScopeGuard{[&]() {
             if (false == success) { id = {}; }
         }};
-        const auto& seeds = api_.Seeds();
+        const auto& seeds = api_.Crypto().Seed();
 
-        OT_ASSERT(id.empty());
-        OT_ASSERT(seeds.DefaultSeed().empty());
+        assert(id.empty());
+        assert(seeds.DefaultSeed().empty());
 
         const auto invalid = [](const int in) -> auto
         {
@@ -469,7 +470,7 @@ public:
     {
         ready().get();
         ot::Lock lock(lock_);
-        const auto& seeds = api_.Seeds();
+        const auto& seeds = api_.Crypto().Seed();
         const auto reason =
             api_.Factory().PasswordPrompt("Loading recovery words for backup");
         const auto words = QString{seeds.Words(seed_id_, reason).c_str()};
@@ -489,10 +490,10 @@ public:
         auto postcondition = ScopeGuard{[&]() {
             if (false == success) { id = {}; }
         }};
-        const auto& seeds = api_.Seeds();
+        const auto& seeds = api_.Crypto().Seed();
 
-        OT_ASSERT(id.empty());
-        OT_ASSERT(seeds.DefaultSeed().empty());
+        assert(id.empty());
+        assert(seeds.DefaultSeed().empty());
 
         auto reason =
             api_.Factory().PasswordPrompt("Import a Metier wallet seed");
@@ -550,10 +551,10 @@ public:
             std::make_unique<model::SeedLanguage>(
                 &qt_parent_,
                 transform<model::SeedLanguage::Data>(
-                    api_.Seeds().AllowedLanguages(style))));
+                    api_.Crypto().Seed().AllowedLanguages(style))));
         auto& pModel = it->second;
 
-        OT_ASSERT(pModel);
+        assert(pModel);
 
         auto output = pModel.get();
         Ownership::Claim(output);
@@ -583,10 +584,10 @@ public:
             std::make_unique<model::SeedSize>(
                 &qt_parent_,
                 transform<model::SeedSize::Data>(
-                    api_.Seeds().AllowedSeedStrength(style))));
+                    api_.Crypto().Seed().AllowedSeedStrength(style))));
         auto& pModel = it->second;
 
-        OT_ASSERT(pModel);
+        assert(pModel);
 
         auto output = pModel.get();
         Ownership::Claim(output);
@@ -607,7 +608,7 @@ public:
     auto wordCount(const int type, const int strength) -> int
     {
         ready().get();
-        const auto output = api_.Seeds().WordCount(
+        const auto output = api_.Crypto().Seed().WordCount(
             static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type)),
             static_cast<ot::crypto::SeedStrength>(
                 static_cast<std::size_t>(strength)));
@@ -640,7 +641,7 @@ public:
 
             return out;
         }())
-        , api_(ot_.StartClient(ot_args_, 0))
+        , api_(ot_.StartClientSession(ot_args_, 0))
         , introduction_notary_id_([&] {
             try {
                 const auto contract =
@@ -670,7 +671,7 @@ public:
         , seed_id_()
         , nym_id_(api_.Factory().NymID())
         , longest_seed_word_([&]() -> auto {
-            const auto& api = api_.Seeds();
+            const auto& api = api_.Crypto().Seed();
             auto output = int{};
             const auto types = api.AllowedSeedTypes();
 
@@ -694,9 +695,9 @@ public:
             auto* test =
                 api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Test);
 
-            OT_ASSERT(nullptr != full);
-            OT_ASSERT(nullptr != main);
-            OT_ASSERT(nullptr != test);
+            assert(nullptr != full);
+            assert(nullptr != main);
+            assert(nullptr != test);
 
             using Model = ot::ui::BlockchainSelectionQt;
             connect(
@@ -714,7 +715,7 @@ public:
         , seed_type_(std::make_unique<model::SeedType>(
               &parent,
               transform<model::SeedType::Data>(
-                  api_.Seeds().AllowedSeedTypes())))
+                  api_.Crypto().Seed().AllowedSeedTypes())))
         , seed_language_()
         , seed_size_()
         , account_list_()
@@ -722,7 +723,7 @@ public:
               api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Main)))
         , qt_parent_(parent)
     {
-        OT_ASSERT(seed_type_);
+        assert(seed_type_);
 
         Ownership::Claim(mainnet_model_.get());
         Ownership::Claim(seed_type_.get());
@@ -820,7 +821,8 @@ private:
         }();
         const auto have = [&] {
             auto out = std::set<Protocol>{};
-            const auto& account = api_.Blockchain().Account(nym_id_, chain);
+            const auto& account =
+                api_.Crypto().Blockchain().Account(nym_id_, chain);
 
             for (const auto& hd : account.GetHD()) {
                 out.emplace(hd.Standard());
@@ -849,11 +851,11 @@ private:
                 if ((Chain::PKT == chain) && (Protocol::BIP_84 == type)) {
                     // TODO only do this if the primary seed is a pktwallet type
 
-                    return api_.Blockchain().NewHDSubaccount(
+                    return api_.Crypto().Blockchain().NewHDSubaccount(
                         nym_id_, type, Chain::Bitcoin, chain, reason);
                 } else {
 
-                    return api_.Blockchain().NewHDSubaccount(
+                    return api_.Crypto().Blockchain().NewHDSubaccount(
                         nym_id_, type, chain, reason);
                 }
             }();

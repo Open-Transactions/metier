@@ -13,10 +13,12 @@ namespace metier
 {
 auto OTWrap::versionString(int suffix) -> QString
 {
+// clang-format off
     static constexpr auto name_{u8"@METIER_APPSTREAM_NAME@"};
     static constexpr auto major_{@METIER_VERSION_MAJOR@};
     static constexpr auto minor_{@METIER_VERSION_MINOR@};
     static constexpr auto patch_{@METIER_VERSION_PATCH@};
+// clang-format on
 
     static const auto version = [&]() -> QString {
         auto out = std::stringstream{};
