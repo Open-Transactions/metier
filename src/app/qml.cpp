@@ -123,11 +123,11 @@ public:
         qml_.show();
     }
 
-    auto run() -> int final 
+    auto run() -> int final
     {
         setWindowIcon(QIcon(":/qwidget/assets/app_icon.png"));
 
-        return exec(); 
+        return exec();
     }
 
     auto otwrap() noexcept -> OTWrap* final { return ot_.get(); }

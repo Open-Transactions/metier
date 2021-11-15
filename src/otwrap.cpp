@@ -48,7 +48,7 @@ auto OTWrap::accountActivityModel(const int chain) -> AccountActivity*
 
 auto OTWrap::accountListModel() -> model::AccountList*
 {
-    OT_ASSERT(imp_.account_list_);
+    assert(imp_.account_list_);
 
     return imp_.account_list_.get();
 }
@@ -190,7 +190,8 @@ auto OTWrap::contactListModelQML() -> QObject*
 auto OTWrap::convertBlockchainAccountID(const QString& id) -> int
 {
     const auto accountID = imp_.api_.Factory().Identifier(id.toStdString());
-    const auto [chain, owner] = imp_.api_.Blockchain().LookupAccount(accountID);
+    const auto [chain, owner] =
+        imp_.api_.Crypto().Blockchain().LookupAccount(accountID);
 
     return static_cast<int>(chain);
 }
