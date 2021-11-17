@@ -397,7 +397,7 @@ public:
         assert(false == seed_id_.empty());
 
         const auto pNym =
-            api_.Wallet().Nym(reason, alias.toStdString(), {seed_id_, 0});
+            api_.Wallet().Nym({seed_id_, 0}, reason, alias.toStdString());
 
         if (!pNym) { return; }
 
