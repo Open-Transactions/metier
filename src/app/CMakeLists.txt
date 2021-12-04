@@ -34,9 +34,9 @@ target_link_libraries(
   metier-app
   PRIVATE
     Boost::headers
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
+    Qt::Core
+    Qt::Gui
+    Qt::Widgets
     opentxs
 )
 target_compile_definitions(metier-app PRIVATE METIER_APP_NAME="${PROJECT_NAME}")
@@ -48,7 +48,7 @@ if(NOT METIER_BUNDLED_OPENTXS)
 endif()
 
 if(METIER_QML_INTERFACE)
-  target_link_libraries(metier-app PRIVATE Qt5::Qml Qt5::Quick)
+  target_link_libraries(metier-app PRIVATE Qt::Qml Qt::Quick)
   target_compile_definitions(metier-app PRIVATE METIER_QML_INTERFACE=1)
 else()
   target_compile_definitions(metier-app PRIVATE METIER_QML_INTERFACE=0)

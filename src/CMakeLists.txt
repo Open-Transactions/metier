@@ -92,10 +92,10 @@ target_link_libraries(
   PRIVATE
     ${Boost_LIBRARIES}
     Boost::program_options
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Network
-    Qt5::Widgets
+    Qt::Core
+    Qt::Gui
+    Qt::Network
+    Qt::Widgets
     Threads::Threads
     metier-rpc
     opentxs
@@ -106,11 +106,11 @@ if(METIER_QML_INTERFACE)
   target_link_libraries(
     "${PROJECT_NAME}"
     PRIVATE
-      Qt5::Qml
-      Qt5::QSvgPlugin
-      Qt5::QSvgIconPlugin
-      Qt5::Quick
-      Qt5::Svg
+      Qt::Qml
+      Qt::QSvgPlugin
+      Qt::QSvgIconPlugin
+      Qt::Quick
+      Qt::Svg
   )
   qt5_import_qml_plugins("${PROJECT_NAME}")
 endif()
@@ -136,9 +136,7 @@ if(METIER_USE_DEFAULT_BLOCKCHAIN)
 endif()
 
 if(APPLE)
-  install(
-    TARGETS "${PROJECT_NAME}" BUNDLE DESTINATION . COMPONENT APP-BUNDLE
-  )
+  install(TARGETS "${PROJECT_NAME}" BUNDLE DESTINATION . COMPONENT APP-BUNDLE)
 else()
   install(TARGETS "${PROJECT_NAME}" COMPONENT APP)
 endif()
@@ -193,15 +191,13 @@ if(APPLE)
 elseif(WIN32)
   set_target_properties(
     "${PROJECT_NAME}"
-    PROPERTIES 
+    PROPERTIES
       OUTPUT_NAME "${METIER_GUI_OUTPUT_NAME}"
       RESOURCE "${RESOURCE_FILES}"
       WIN32_EXECUTABLE TRUE
   )
 else()
   set_target_properties(
-    "${PROJECT_NAME}"
-    PROPERTIES
-      OUTPUT_NAME "${METIER_GUI_OUTPUT_NAME}"
+    "${PROJECT_NAME}" PROPERTIES OUTPUT_NAME "${METIER_GUI_OUTPUT_NAME}"
   )
 endif()
