@@ -162,7 +162,10 @@ find_package(
   COMPONENTS date_time program_options
 )
 find_package(
-  Qt5
+  QT
+  NAMES
+    Qt6
+    Qt5
   COMPONENTS
     Core
     Gui
@@ -173,7 +176,7 @@ find_package(
 
 if(METIER_QML_INTERFACE)
   find_package(
-    Qt5
+    Qt${QT_VERSION_MAJOR}
     COMPONENTS
       Qml
       Quick
@@ -216,8 +219,8 @@ if(METIER_BUNDLED_OPENTXS)
   find_package(Protobuf QUIET)
   find_package(lmdb QUIET)
   find_package(
-    Qt5
-    COMPONENTS Core Gui
+    Qt${QT_VERSION_MAJOR}
+    COMPONENTS Core Gui Qml Widgets
     QUIET
   )
 else()
@@ -246,11 +249,12 @@ else()
   find_package(Protobuf QUIET)
   find_package(lmdb QUIET)
   find_package(
-    Qt5 QUIET
+    Qt${QT_VERSION_MAJOR} QUIET
     COMPONENTS
       Core
       Gui
       Qml
+      Widgets
   )
   find_package(SQLite3 QUIET)
   find_package(opendht QUIET)

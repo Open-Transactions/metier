@@ -205,17 +205,17 @@ public:
 
         return api_.Storage().SeedList().empty();
     }
-    auto rpc(zmq::Message& in) const noexcept -> void
+    auto rpc(zmq::Message&& in) const noexcept -> void
     {
         const auto body = in.Body();
 
         if (1u != body.size()) { qInfo() << "Invalid message"; }
 
         const auto& cmd = body.at(0);
-        auto out = ot_.ZMQ().ReplyMessage(in);
+        auto out = zmq::reply_to_message(std::move(in));
 
-        if (ot_.RPC(cmd.Bytes(), out->AppendBytes())) {
-            rpc_socket_->Send(out);
+        if (ot_.RPC(cmd.Bytes(), out.AppendBytes())) {
+            rpc_socket_->Send(std::move(out));
         }
     }
     auto validateBlockchains() const noexcept -> bool
@@ -626,7 +626,8 @@ public:
                   caller_.SetCallback(&callback_);
                   return &caller_;
               }()))
-        , rpc_cb_(zmq::ListenCallback::Factory([this](auto& in) { rpc(in); }))
+        , rpc_cb_(zmq::ListenCallback::Factory(
+              [this](auto&& in) { rpc(std::move(in)); }))
         , rpc_socket_([this] {
             using Dir = zmq::socket::Socket::Direction;
             auto out = ot_.ZMQ().RouterSocket(rpc_cb_, Dir::Bind);

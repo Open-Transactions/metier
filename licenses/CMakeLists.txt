@@ -28,8 +28,8 @@ target_link_libraries(
   PRIVATE
     opentxs
     protobuf::libprotobuf-lite
-    Qt5::Core
-    Qt5::Gui
+    Qt::Core
+    Qt::Gui
 )
 
 if(NOT METIER_BUNDLED_OPENTXS)

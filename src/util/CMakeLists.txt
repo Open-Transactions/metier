@@ -27,10 +27,10 @@ else()
 endif()
 
 add_library(metier-util OBJECT "${cxx-sources}" "${cxx-headers}")
-target_link_libraries(metier-util PRIVATE Qt5::Widgets)
+target_link_libraries(metier-util PRIVATE Qt::Widgets)
 
 if(METIER_QML_INTERFACE)
-  target_link_libraries(metier-util PRIVATE Qt5::Qml)
+  target_link_libraries(metier-util PRIVATE Qt::Qml)
 else()
 
 endif()

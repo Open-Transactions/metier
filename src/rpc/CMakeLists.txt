@@ -4,4 +4,4 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 target_sources(metier-rpc PRIVATE "rpc.cpp" "rpc.hpp")
-target_link_libraries(metier-rpc PUBLIC Qt5::Core)
+target_link_libraries(metier-rpc PUBLIC Qt::Core)
