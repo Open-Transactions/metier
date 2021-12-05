@@ -17,7 +17,7 @@ if(METIER_QML_INTERFACE)
     "qml.cpp"
   )
   set(moc-headers "qml.hpp")
-  qt5_wrap_cpp(moc-sources "${moc-headers}")
+  qt_wrap_cpp(moc-sources "${moc-headers}")
 else()
   set(moc-headers "")
   set(moc-sources "")
