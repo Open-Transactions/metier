@@ -46,7 +46,7 @@ set(moc-headers
     "recoverwallet.hpp"
     "showseed.hpp"
 )
-qt5_wrap_cpp(moc-sources "${moc-headers}")
+qt_wrap_cpp(moc-sources "${moc-headers}")
 
 add_library(
   metier-widgets OBJECT

@@ -43,7 +43,7 @@ set(cxx-sources
 )
 set(cxx-headers "otwrap/imp.hpp" "otwrap/passwordcallback.hpp")
 set(moc-headers "app.hpp" "otwrap.hpp")
-qt5_wrap_cpp(moc-sources "${moc-headers}")
+qt_wrap_cpp(moc-sources "${moc-headers}")
 set(object-deps
     $<TARGET_OBJECTS:metier-app>
     $<TARGET_OBJECTS:metier-license>
@@ -64,7 +64,7 @@ if(METIER_QML_INTERFACE)
   )
 endif()
 
-qt5_add_resources(rcc-sources "${METIER_RCC_SOURCES}")
+qt_add_resources(rcc-sources "${METIER_RCC_SOURCES}")
 
 add_executable(
   "${PROJECT_NAME}" MACOSX_BUNDLE
@@ -107,12 +107,20 @@ if(METIER_QML_INTERFACE)
     "${PROJECT_NAME}"
     PRIVATE
       Qt::Qml
-      Qt::QSvgPlugin
-      Qt::QSvgIconPlugin
       Qt::Quick
       Qt::Svg
   )
-  qt5_import_qml_plugins("${PROJECT_NAME}")
+
+  if("${QT_VERSION_MAJOR}"
+     EQUAL
+     "5"
+  )
+    target_link_libraries(
+      "${PROJECT_NAME}" PRIVATE Qt5::QSvgPlugin Qt5::QSvgIconPlugin
+    )
+  endif()
+
+  qt_import_qml_plugins("${PROJECT_NAME}")
 endif()
 
 target_compile_definitions(
