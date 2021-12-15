@@ -90,8 +90,8 @@
       ],
       "sources": [
         {
-          "url": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.16.0.tar.gz",
-          "sha256": "7892a35d979304a404400a101c46ce90e85ec9e2a766a86041bb361f626247f5",
+          "url": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.19.1.tar.gz",
+          "sha256": "87407cd28e7a9c95d9f61a098a53cf031109d451a7763e7dd1253abf8b4df422",
           "type": "archive"
         }
       ],
@@ -146,7 +146,7 @@
       "sources": [
         {
           "url": "https://github.com/Open-Transactions/opentxs",
-          "commit": "6872e1b6010ac49b72e575cbb6eaca8491f4878e",
+          "commit": "cc7a4ea07cda08cb7374c9701f5c0ffe88327b1c",
           "type": "git",
           "disable-shallow-clone": true
         }
