@@ -228,8 +228,6 @@ public:
         }
 
         check_registration();
-        api_.OTX().StartIntroductionServer(nym_id_);
-        api_.Schedule(std::chrono::minutes{2}, [&] { api_.OTX().Refresh(); });
 
         return true;
     }
@@ -292,7 +290,6 @@ public:
             if (false == api_.Config().Save()) { return false; }
 
             nymID.SetString(id->Get());
-            api_.OTX().StartIntroductionServer(nym_id_);
 
             return true;
         }
@@ -748,6 +745,7 @@ private:
     auto check_registration() const noexcept -> bool
     {
         if (nym_id_->empty()) { return false; }
+        if (introduction_notary_id_->empty()) { return false; }
         if (messaging_notary_id_->empty()) { return false; }
 
         {
