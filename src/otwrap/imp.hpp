@@ -7,7 +7,6 @@
 
 #include "otwrap.hpp"  // IWYU pragma: associated
 
-#include <opentxs/client/NymData.hpp>
 #include <opentxs/opentxs.hpp>
 #include <QDebug>
 #include <QDir>
