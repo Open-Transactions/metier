@@ -30,7 +30,7 @@ private:
 };
 
 PasswordCallback::PasswordCallback(App& app)
-    : opentxs::OTCallback()
+    : opentxs::PasswordCallback()
     , imp_(std::make_unique<Imp>(app))
 {
     assert(imp_);

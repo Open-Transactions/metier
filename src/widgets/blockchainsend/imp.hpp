@@ -9,10 +9,10 @@
 
 #include <opentxs/blockchain/SendResult.hpp>
 #include <opentxs/blockchain/Types.hpp>
-#include <opentxs/ui/qt/AccountActivity.hpp>
-#include <opentxs/ui/qt/AmountValidator.hpp>
-#include <opentxs/ui/qt/DestinationValidator.hpp>
-#include <opentxs/ui/qt/DisplayScale.hpp>
+#include <opentxs/core/ui/qt/AccountActivity.hpp>
+#include <opentxs/core/ui/qt/AmountValidator.hpp>
+#include <opentxs/core/ui/qt/DestinationValidator.hpp>
+#include <opentxs/core/ui/qt/DisplayScale.hpp>
 #include <QApplication>
 #include <QLabel>
 #include <QLineEdit>
