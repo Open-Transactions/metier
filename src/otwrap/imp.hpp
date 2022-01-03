@@ -145,13 +145,13 @@ public:
     };
 
     PasswordCallback callback_;
-    opentxs::OTCaller caller_;
+    opentxs::PasswordCaller caller_;
     const opentxs::api::Context& ot_;
     const ot::OTZMQListenCallback rpc_cb_;
     ot::OTZMQRouterSocket rpc_socket_;
     const opentxs::api::session::Client& api_;
-    const ot::OTServerID introduction_notary_id_;
-    const ot::OTServerID messaging_notary_id_;
+    const ot::OTNotaryID introduction_notary_id_;
+    const ot::OTNotaryID messaging_notary_id_;
     const std::string seed_id_;
     const ot::OTNymID nym_id_;
     const int longest_seed_word_;

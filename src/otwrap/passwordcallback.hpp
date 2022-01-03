@@ -15,7 +15,7 @@ class App;
 
 namespace metier
 {
-class PasswordCallback final : public opentxs::OTCallback
+class PasswordCallback final : public opentxs::PasswordCallback
 {
 public:
     void runOne(
