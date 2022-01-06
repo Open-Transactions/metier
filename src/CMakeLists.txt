@@ -129,13 +129,6 @@ target_compile_definitions(
 )
 target_compile_definitions(metier-rpc PRIVATE METIER_APP_NAME="${PROJECT_NAME}")
 
-if(METIER_USE_SYNC_SERVER)
-  target_compile_definitions(
-    "${PROJECT_NAME}"
-    PRIVATE DEFAULT_SYNC_SERVER="${METIER_DEFAULT_SYNC_SERVER}"
-  )
-endif()
-
 if(METIER_USE_DEFAULT_BLOCKCHAIN)
   target_compile_definitions(
     "${PROJECT_NAME}"

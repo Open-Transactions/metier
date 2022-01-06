@@ -10,4 +10,6 @@ namespace metier
 const char* introduction_notary_contract_{nullptr};
 
 const char* messaging_notary_contract_{nullptr};
+
+std::vector<char*> seed_server_endpoints{};
 }  // namespace metier
