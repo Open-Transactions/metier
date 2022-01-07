@@ -59,9 +59,11 @@ auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     args.ParseCommandLine(argc, argv);
     args.SetHome(absolute.toStdString().c_str());
     args.SetBlockchainStorageLevel(1);
-#ifdef DEFAULT_SYNC_SERVER
-    args.AddBlockchainSyncServer(DEFAULT_SYNC_SERVER);
-#endif
+
+    for (const auto* endpoint : metier::seed_server_endpoints_) {
+        args.AddBlockchainSyncServer(endpoint);
+    }
+
     args.SetQtRootObject(&parent);
     args.SetIpv4ConnectionMode(ot::Options::ConnectionMode::on);
     args.SetIpv6ConnectionMode(ot::Options::ConnectionMode::automatic);

@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include <vector>
+
 namespace metier
 {
 extern const char* introduction_notary_contract_;
 extern const char* messaging_notary_contract_;
+static std::vector<char*> seed_server_endpoints_;
 }  // namespace metier

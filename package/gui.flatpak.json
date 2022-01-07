@@ -130,40 +130,10 @@
       ]
     },
     {
-      "name": "opentxs",
-      "buildsystem": "cmake-ninja",
-      "builddir": true,
-      "config-opts": [
-        "-DBUILD_SHARED_LIBS=ON",
-        "-DOT_CRYPTO_SUPPORTED_KEY_RSA=ON",
-        "-DOT_CRYPTO_USING_PACKETCRYPT=OFF",
-        "-DOT_CASH_USING_LUCRE=ON",
-        "-DOT_WITH_QT=ON",
-        "-DOT_WITH_QML=OFF",
-        "-DOT_ENABLE_RPC=ON",
-        "-DOT_BUNDLED_SECP256K1=ON"
-      ],
-      "sources": [
-        {
-          "url": "https://github.com/Open-Transactions/opentxs",
-          "commit": "a677bae639bde2c250e865b6095f2461780ed724",
-          "type": "git",
-          "disable-shallow-clone": true
-        }
-      ],
-      "cleanup": [
-        "/include",
-        "/lib/debug",
-        "/lib/opentxs",
-        "/lib/pkgconfig"
-      ]
-    },
-    {
       "name": "metier",
       "buildsystem": "cmake-ninja",
       "builddir": true,
       "config-opts": [
-          "-DMETIER_DEFAULT_SYNC_SERVER=tcp://54.39.129.45:8814"
       ],
       "sources": [
         {
