@@ -122,6 +122,15 @@ auto OTWrap::blockchainStatisticsModelQML() -> QObject*
     return blockchainStatisticsModel();
 }
 
+auto OTWrap::chainIsDisabled(int chain) -> void
+{
+    imp_.chain_is_disabled(chain);
+}
+
+auto OTWrap::chainIsEnabled(int chain) -> void { imp_.chain_is_enabled(chain); }
+
+auto OTWrap::checkChains(int chain) -> void { imp_.check_chains(chain); }
+
 auto OTWrap::checkStartupConditions() -> void
 {
     if (imp_.needSeed()) {

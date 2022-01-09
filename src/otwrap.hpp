@@ -59,7 +59,10 @@ signals:
     void readyForMainWindow();
 
 public slots:
+    void chainIsDisabled(int chain);
+    void chainIsEnabled(int chain);
     void checkAccounts();
+    void checkChains(int chain);
     void checkStartupConditions();
     void createNym(QString alias);
     void importSeed(int type, int lang, QString words, QString password);

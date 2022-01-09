@@ -13,7 +13,9 @@
 #include <QGuiApplication>
 #include <QStandardPaths>
 #include <algorithm>
+#include <atomic>
 #include <cstring>
+#include <future>
 #include <map>
 #include <mutex>
 #include <set>
@@ -94,6 +96,7 @@ namespace zmq = opentxs::network::zeromq;
 struct OTWrap::Imp {
 private:
     OTWrap& parent_;
+    QGuiApplication& qt_parent_;
 
 public:
     struct EnabledChains {
@@ -146,6 +149,11 @@ public:
         Vector enabled_{};
     };
 
+    using SeedLanguageMap =
+        std::map<ot::crypto::SeedStyle, std::unique_ptr<model::SeedLanguage>>;
+    using SeedSizeMap =
+        std::map<ot::crypto::SeedStyle, std::unique_ptr<model::SeedSize>>;
+
     PasswordCallback callback_;
     opentxs::PasswordCaller caller_;
     const opentxs::api::Context& ot_;
@@ -155,13 +163,15 @@ public:
     const ot::OTNotaryID introduction_notary_id_;
     const ot::OTNotaryID messaging_notary_id_;
     const std::string seed_id_;
-    const ot::OTNymID nym_id_;
     const int longest_seed_word_;
+    const SeedLanguageMap seed_language_;
+    const SeedSizeMap seed_size_;
     mutable std::mutex lock_;
+    mutable std::atomic_bool have_nym_;
+    mutable std::promise<ot::OTNymID> nym_id_promise_;
+    std::shared_future<ot::OTNymID> nym_id_value_;
     EnabledChains enabled_chains_;
     std::unique_ptr<model::SeedType> seed_type_;
-    std::map<int, std::unique_ptr<model::SeedLanguage>> seed_language_;
-    std::map<int, std::unique_ptr<model::SeedSize>> seed_size_;
     std::unique_ptr<model::AccountList> account_list_;
     std::unique_ptr<model::BlockchainChooser> mainnet_model_;
 
@@ -236,8 +246,9 @@ public:
     {
         ready().get();
         ot::Lock lock(lock_);
-        auto postcondition = ScopeGuard{[this] {
-            if (nym_id_->empty()) { return; }
+        auto nymID = api_.Factory().NymID();
+        auto postcondition = ScopeGuard{[&] {
+            if (nymID->empty()) { return; }
 
             {
                 auto& pointer =
@@ -245,20 +256,21 @@ public:
                         account_list_);
 
                 if (!pointer) {
-
                     pointer = std::make_unique<model::AccountList>(
-                        api_.UI().AccountListQt(nym_id_));
+                        api_.UI().AccountListQt(nymID));
 
                     assert(pointer);
 
                     Ownership::Claim(pointer.get());
                 }
+
+                nym_id_promise_.set_value(std::move(nymID));
+                have_nym_ = true;
             }
         }};
 
-        if (false == nym_id_->empty()) { return true; }
+        if (have_nym_) { return true; }
 
-        auto& nymID = const_cast<ot::identifier::Nym&>(nym_id_.get());
         auto id = ot::String::Factory();
         bool notUsed{false};
         api_.Config().Check_str(
@@ -269,7 +281,7 @@ public:
             notUsed);
 
         if (id->Exists()) {
-            nymID.SetString(id->Get());
+            nymID->SetString(id->Get());
 
             return true;
         }
@@ -290,7 +302,7 @@ public:
 
             if (false == api_.Config().Save()) { return false; }
 
-            nymID.SetString(id->Get());
+            nymID->SetString(id->Get());
 
             return true;
         }
@@ -347,48 +359,55 @@ public:
     auto accountActivityModel(const int chain) noexcept -> AccountActivity*
     {
         ready().get();
+        const auto& nymID = nym_id_value_.get().get();
         const auto& account =
-            api_.Crypto().Blockchain().Account(nym_id_, util::convert(chain));
+            api_.Crypto().Blockchain().Account(nymID, util::convert(chain));
 
-        return api_.UI().AccountActivityQt(nym_id_, account.AccountID());
+        return api_.UI().AccountActivityQt(nymID, account.AccountID());
     }
     auto accountActivityModel(const ot::Identifier& id) noexcept
         -> AccountActivity*
     {
         ready().get();
+        const auto& nymID = nym_id_value_.get().get();
 
-        return api_.UI().AccountActivityQt(nym_id_, id);
+        return api_.UI().AccountActivityQt(nymID, id);
     }
     auto accountStatusModel(const int chain) noexcept
         -> ot::ui::BlockchainAccountStatusQt*
     {
         ready().get();
+        const auto& nymID = nym_id_value_.get().get();
 
-        return api_.UI().BlockchainAccountStatusQt(
-            nym_id_, util::convert(chain));
+        return api_.UI().BlockchainAccountStatusQt(nymID, util::convert(chain));
     }
     auto activityThreadModel(const ot::Identifier& id) noexcept
         -> ActivityThread*
     {
         ready().get();
+        const auto& nymID = nym_id_value_.get().get();
 
-        return api_.UI().ActivityThreadQt(nym_id_, id);
+        return api_.UI().ActivityThreadQt(nymID, id);
+    }
+    auto chain_is_disabled(int chain) noexcept -> void
+    {
+        enabled_chains_.remove(static_cast<ot::blockchain::Type>(chain));
+    }
+    auto chain_is_enabled(int chain) noexcept -> void
+    {
+        enabled_chains_.add(static_cast<ot::blockchain::Type>(chain));
     }
     auto contactListModel() noexcept -> ContactList*
     {
         ready().get();
+        const auto& nymID = nym_id_value_.get().get();
 
-        return api_.UI().ContactListQt(nym_id_);
+        return api_.UI().ContactListQt(nymID);
     }
     auto createNym(QString alias) noexcept -> void
     {
         ready().get();
         ot::Lock lock(lock_);
-        auto success{false};
-        auto& id = const_cast<ot::identifier::Nym&>(nym_id_.get());
-        auto postcondition = ScopeGuard{[&]() {
-            if (false == success) { id.Release(); }
-        }};
         const auto reason =
             api_.Factory().PasswordPrompt("Generate a new Metier identity");
 
@@ -411,7 +430,8 @@ public:
         if (false == config) { return; }
         if (false == api_.Config().Save()) { return; }
 
-        id.Assign(nym.ID());
+        nym_id_promise_.set_value(nym.ID());
+        have_nym_ = true;
     }
     auto createNewSeed(
         const int type,
@@ -523,74 +543,35 @@ public:
     auto profileModel() noexcept -> ot::ui::ProfileQt*
     {
         ready().get();
+        const auto& nymID = nym_id_value_.get().get();
 
-        return api_.UI().ProfileQt(nym_id_);
+        return api_.UI().ProfileQt(nymID);
     }
     auto seedLanguageModel(const int type) -> model::SeedLanguage*
     {
         ready().get();
-        ot::Lock lock(lock_);
-        {
-            auto it = seed_language_.find(type);
 
-            if (seed_language_.end() != it) { return it->second.get(); }
-        }
+        try {
 
-        if ((0 > type) || (std::numeric_limits<std::uint8_t>::max() < type)) {
+            return seed_language_.at(static_cast<ot::crypto::SeedStyle>(type))
+                .get();
+        } catch (...) {
 
             return nullptr;
         }
-
-        const auto style =
-            static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type));
-
-        auto [it, added] = seed_language_.try_emplace(
-            type,
-            std::make_unique<model::SeedLanguage>(
-                &qt_parent_,
-                transform<model::SeedLanguage::Data>(
-                    api_.Crypto().Seed().AllowedLanguages(style))));
-        auto& pModel = it->second;
-
-        assert(pModel);
-
-        auto output = pModel.get();
-        Ownership::Claim(output);
-
-        return output;
     }
     auto seedSizeModel(const int type) -> model::SeedSize*
     {
         ready().get();
-        ot::Lock lock(lock_);
-        {
-            auto it = seed_size_.find(type);
 
-            if (seed_size_.end() != it) { return it->second.get(); }
-        }
+        try {
 
-        if ((0 > type) || (std::numeric_limits<std::uint8_t>::max() < type)) {
+            return seed_size_.at(static_cast<ot::crypto::SeedStyle>(type))
+                .get();
+        } catch (...) {
 
             return nullptr;
         }
-
-        const auto style =
-            static_cast<ot::crypto::SeedStyle>(static_cast<std::uint8_t>(type));
-
-        auto [it, added] = seed_size_.try_emplace(
-            type,
-            std::make_unique<model::SeedSize>(
-                &qt_parent_,
-                transform<model::SeedSize::Data>(
-                    api_.Crypto().Seed().AllowedSeedStrength(style))));
-        auto& pModel = it->second;
-
-        assert(pModel);
-
-        auto output = pModel.get();
-        Ownership::Claim(output);
-
-        return output;
     }
     auto seedWordValidator(const int type, const int lang)
         -> const opentxs::ui::SeedValidator*
@@ -616,6 +597,7 @@ public:
 
     Imp(QGuiApplication& parent, App& app, OTWrap& me, int& argc, char** argv)
         : parent_(me)
+        , qt_parent_(parent)
         , callback_(app)
         , caller_()
         , ot_(ot::InitContext(
@@ -668,7 +650,6 @@ public:
             }
         }())
         , seed_id_()
-        , nym_id_(api_.Factory().NymID())
         , longest_seed_word_([&]() -> auto {
             const auto& api = api_.Crypto().Seed();
             auto output = int{};
@@ -685,7 +666,52 @@ public:
 
             return output;
         }())
+        , seed_language_([this] {
+            auto out = SeedLanguageMap{};
+            const auto& api = api_.Crypto().Seed();
+            const auto types = api.AllowedSeedTypes();
+
+            for (const auto& [style, description] : types) {
+                auto [it, added] = out.try_emplace(
+                    style,
+                    std::make_unique<model::SeedLanguage>(
+                        &qt_parent_,
+                        transform<model::SeedLanguage::Data>(
+                            api_.Crypto().Seed().AllowedLanguages(style))));
+                auto& pModel = it->second;
+
+                assert(pModel);
+
+                Ownership::Claim(pModel.get());
+            }
+
+            return out;
+        }())
+        , seed_size_([this] {
+            auto out = SeedSizeMap{};
+            const auto& api = api_.Crypto().Seed();
+            const auto types = api.AllowedSeedTypes();
+
+            for (const auto& [style, description] : types) {
+                auto [it, added] = out.try_emplace(
+                    style,
+                    std::make_unique<model::SeedSize>(
+                        &qt_parent_,
+                        transform<model::SeedSize::Data>(
+                            api_.Crypto().Seed().AllowedSeedStrength(style))));
+                auto& pModel = it->second;
+
+                assert(pModel);
+
+                Ownership::Claim(pModel.get());
+            }
+
+            return out;
+        }())
         , lock_()
+        , have_nym_(false)
+        , nym_id_promise_()
+        , nym_id_value_(nym_id_promise_.get_future())
         , enabled_chains_([&] {
             auto* full =
                 api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::All);
@@ -700,14 +726,14 @@ public:
 
             using Model = ot::ui::BlockchainSelectionQt;
             connect(
-                full, &Model::enabledChanged, [&](int c) { check_chains(c); });
-            connect(full, &Model::chainEnabled, [&](const int chain) {
-                enabled_chains_.add(static_cast<ot::blockchain::Type>(chain));
-            });
-            connect(full, &Model::chainDisabled, [&](const int chain) {
-                enabled_chains_.remove(
-                    static_cast<ot::blockchain::Type>(chain));
-            });
+                full, &Model::enabledChanged, &parent_, &OTWrap::checkChains);
+            connect(
+                full, &Model::chainEnabled, &parent_, &OTWrap::chainIsEnabled);
+            connect(
+                full,
+                &Model::chainDisabled,
+                &parent_,
+                &OTWrap::chainIsDisabled);
 
             return api_.Network().Blockchain().EnabledChains();
         }())
@@ -715,12 +741,9 @@ public:
               &parent,
               transform<model::SeedType::Data>(
                   api_.Crypto().Seed().AllowedSeedTypes())))
-        , seed_language_()
-        , seed_size_()
         , account_list_()
         , mainnet_model_(std::make_unique<model::BlockchainChooser>(
               api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Main)))
-        , qt_parent_(parent)
     {
         assert(seed_type_);
 
@@ -733,7 +756,6 @@ public:
     ~Imp() { rpc_socket_->Close(); }
 
 private:
-    QGuiApplication& qt_parent_;
 
     auto check_introduction_notary() const noexcept -> void
     {
@@ -745,14 +767,16 @@ private:
 
     auto check_registration() const noexcept -> bool
     {
-        if (nym_id_->empty()) { return false; }
+        if (false == have_nym_) { return false; }
         if (introduction_notary_id_->empty()) { return false; }
         if (messaging_notary_id_->empty()) { return false; }
+
+        const auto& nymID = nym_id_value_.get().get();
 
         {
             const auto reason = api_.Factory().PasswordPrompt(
                 "Checking or updating public contact data");
-            auto nym = api_.Wallet().mutable_Nym(nym_id_, reason);
+            auto nym = api_.Wallet().mutable_Nym(nymID, reason);
             const auto notary = nym.PreferredOTServer();
 
             if (notary.empty()) {
@@ -762,7 +786,7 @@ private:
         }
 
         const auto isRegistered = [&](const auto& server) {
-            auto context = api_.Wallet().ServerContext(nym_id_, server);
+            auto context = api_.Wallet().ServerContext(nymID, server);
 
             if (context) { return (0 != context->Request()); }
 
@@ -770,8 +794,7 @@ private:
         };
         const auto check = [&](const auto& server) {
             if (false == isRegistered(server)) {
-                const auto [id, future] =
-                    api_.OTX().RegisterNym(nym_id_, server);
+                const auto [id, future] = api_.OTX().RegisterNym(nymID, server);
 
                 if (0 > id) { return false; }
             }
@@ -807,6 +830,7 @@ private:
     {
         using Chain = ot::blockchain::Type;
         using Protocol = ot::blockchain::crypto::HDProtocol;
+        const auto& nymID = nym_id_value_.get().get();
 
         const auto want = [&] {
             auto out = std::set<Protocol>{};
@@ -822,7 +846,7 @@ private:
         const auto have = [&] {
             auto out = std::set<Protocol>{};
             const auto& account =
-                api_.Crypto().Blockchain().Account(nym_id_, chain);
+                api_.Crypto().Blockchain().Account(nymID, chain);
 
             for (const auto& hd : account.GetHD()) {
                 out.emplace(hd.Standard());
@@ -852,11 +876,11 @@ private:
                     // TODO only do this if the primary seed is a pktwallet type
 
                     return api_.Crypto().Blockchain().NewHDSubaccount(
-                        nym_id_, type, Chain::Bitcoin, chain, reason);
+                        nymID, type, Chain::Bitcoin, chain, reason);
                 } else {
 
                     return api_.Crypto().Blockchain().NewHDSubaccount(
-                        nym_id_, type, chain, reason);
+                        nymID, type, chain, reason);
                 }
             }();
 
