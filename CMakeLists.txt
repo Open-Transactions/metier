@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The Open-Transactions developers
+# Copyright (c) 2019-2022 The Open-Transactions developers
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -17,9 +17,9 @@ set(METIER_APP_DOMAIN "opentransactions.org")
 set(METIER_CLI_COMMAND "metierctl")
 set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
-set(METIER_VERSION_MAJOR 21)
-set(METIER_VERSION_MINOR 5)
-set(METIER_VERSION_PATCH 3)
+set(METIER_VERSION_MAJOR 22)
+set(METIER_VERSION_MINOR 0)
+set(METIER_VERSION_PATCH 0)
 
 execute_process(
   COMMAND
