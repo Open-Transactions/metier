@@ -7,7 +7,7 @@
 
 #include "widgets/recoverwallet.hpp"  // IWYU pragma: associated
 
-#include <opentxs/core/ui/qt/SeedValidator.hpp>
+#include <opentxs/interface/qt/SeedValidator.hpp>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>

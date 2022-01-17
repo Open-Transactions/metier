@@ -4,7 +4,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 set(cxx-sources
-    "accountlist.cpp"
     "licenses.cpp"
     "seedlang.cpp"
     "seedsize.cpp"
@@ -12,7 +11,6 @@ set(cxx-sources
 )
 set(cxx-headers "")
 set(moc-headers
-    "accountlist.hpp"
     "blockchainchooser.hpp"
     "licenses.hpp"
     "seedlang.hpp"

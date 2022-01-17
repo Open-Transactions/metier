@@ -28,7 +28,9 @@ struct AccountStatus::Imp {
             &QPushButton::clicked,
             parent_,
             &QDialog::close);
-        ui_->accountView->setModel(ot.accountStatusModel(chain));
+        const auto accountID = ot.blockchainTypeToAccountID(chain);
+        ui_->accountView->setModel(
+            ot.identityManager()->getAccountStatus(accountID));
         ui_->accountView->expandAll();
         util::set_minimum_size(*(ui_->accountView), 75, 16, {1, 1});
     }

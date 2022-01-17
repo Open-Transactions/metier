@@ -133,6 +133,7 @@ struct ChainToolboxManager {
         , lock_()
         , progress_cb_(progress)
         , ot_(ot)
+        , identity_manager_(ot_.identityManager())
         , account_list_(accountList)
         , toolbox_(toolbox)
         , items_({dummyIndex})  // NOTE: dummy index represents overview tab
@@ -145,6 +146,7 @@ private:
     mutable std::recursive_mutex lock_;
     const RegisterProgress progress_cb_;
     OTWrap& ot_;
+    opentxs::ui::IdentityManagerQt* identity_manager_;
     AccountList& account_list_;
     ToolBox& toolbox_;
     std::vector<int> items_;
@@ -231,7 +233,9 @@ private:
     }
     auto show_receiving(const ot::blockchain::Type chain) noexcept -> void
     {
-        auto* model = ot_.accountActivityModel(static_cast<int>(chain));
+        const auto accountID =
+            ot_.blockchainTypeToAccountID(static_cast<int>(chain));
+        auto* model = identity_manager_->getAccountActivity(accountID);
 
         if (nullptr == model) { return; }
 
@@ -245,7 +249,9 @@ private:
     }
     auto show_send(const ot::blockchain::Type chain) noexcept -> void
     {
-        auto* model = ot_.accountActivityModel(static_cast<int>(chain));
+        const auto accountID =
+            ot_.blockchainTypeToAccountID(static_cast<int>(chain));
+        auto* model = identity_manager_->getAccountActivity(accountID);
 
         if (nullptr == model) { return; }
 

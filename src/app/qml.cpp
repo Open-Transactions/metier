@@ -5,7 +5,7 @@
 
 #include "imp.hpp"  // IWYU pragma: associated
 
-#include <opentxs/core/ui/qt/SeedValidator.hpp>
+#include <opentxs/interface/qt/SeedValidator.hpp>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -15,7 +15,6 @@
 #include <atomic>
 #include <future>
 
-#include "models/accountlist.hpp"
 #include "models/blockchainchooser.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"

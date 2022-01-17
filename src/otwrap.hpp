@@ -19,12 +19,9 @@ namespace opentxs
 {
 namespace ui
 {
-class AccountActivityQt;
-class ActivityThreadQt;
-class BlockchainAccountStatusQt;
-class ContactListQt;
-class ProfileQt;
+class IdentityManagerQt;
 class SeedValidator;
+class IdentityManager;
 }  // namespace ui
 }  // namespace opentxs
 
@@ -32,7 +29,6 @@ namespace metier
 {
 namespace model
 {
-class AccountList;
 class SeedLanguage;
 class SeedSize;
 class SeedType;
@@ -49,6 +45,7 @@ class OTWrap final : public QObject
     Q_PROPERTY(int enabledCurrencyCount READ enabledCurrencyCount)
     Q_PROPERTY(int longestBlockchainName READ longestBlockchainName)
     Q_PROPERTY(int longestSeedWord READ longestSeedWord)
+    Q_PROPERTY(QObject* identityManager READ identityManagerQML CONSTANT)
 
 signals:
     void chainsChanged(int enabledCount);
@@ -69,23 +66,12 @@ public slots:
 
 public:
     using BlockchainList = QVector<int>;
-    using AccountActivity = opentxs::ui::AccountActivityQt;
-    using ActivityThread = opentxs::ui::ActivityThreadQt;
-    using ContactList = opentxs::ui::ContactListQt;
 
     static auto Cleanup() noexcept -> void;
 
-    AccountActivity* accountActivityModel(const QString& id);
-    AccountActivity* accountActivityModel(const int chain);
-    opentxs::ui::BlockchainAccountStatusQt* accountStatusModel(const int chain);
-    opentxs::ui::BlockchainAccountStatusQt* accountStatusModel(
-        const QString& accountID);
-    ActivityThread* activityThreadModel(const QString& id);
-    model::AccountList* accountListModel();
     QAbstractItemModel* blockchainChooserModel(const bool testnet);
     QAbstractItemModel* blockchainStatisticsModel();
-    ContactList* contactListModel();
-    opentxs::ui::ProfileQt* profileModel();
+    auto identityManager() noexcept -> opentxs::ui::IdentityManagerQt*;
     model::SeedLanguage* seedLanguageModel(const int type);
     model::SeedSize* seedSizeModel(const int type);
     model::SeedType* seedTypeModel();
@@ -93,22 +79,17 @@ public:
         const int type,
         const int lang);
 
-    Q_INVOKABLE QObject* accountActivityModelQML(const QString& id);
-    Q_INVOKABLE QObject* accountListModelQML();
-    Q_INVOKABLE QObject* accountStatusModelQML(const QString& accountID);
-    Q_INVOKABLE QObject* accountStatusModelQML(int chain);
-    Q_INVOKABLE QObject* activityThreadModelQML(const QString& id);
     Q_INVOKABLE QObject* blockchainChooserModelQML(bool testnet);
     Q_INVOKABLE QObject* blockchainStatisticsModelQML();
-    Q_INVOKABLE QObject* contactListModelQML();
-    Q_INVOKABLE QObject* profileModelQML();
+    Q_INVOKABLE QObject* identityManagerQML();
     Q_INVOKABLE QObject* seedLanguageModelQML(const int type);
     Q_INVOKABLE QObject* seedSizeModelQML(const int type);
     Q_INVOKABLE QObject* seedTypeModelQML();
     Q_INVOKABLE QObject* seedWordValidatorQML(const int type, const int lang);
 
+    Q_INVOKABLE int accountIDtoBlockchainType(const QString& id);
     Q_INVOKABLE QString addContact(QString label, QString id);
-    Q_INVOKABLE int convertBlockchainAccountID(const QString& id);
+    Q_INVOKABLE QString blockchainTypeToAccountID(int type);
     Q_INVOKABLE QStringList
     createNewSeed(const int type, const int lang, const int strength);
     Q_INVOKABLE QStringList getRecoveryWords();

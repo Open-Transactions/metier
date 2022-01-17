@@ -21,7 +21,6 @@
 #include <set>
 #include <string>
 
-#include "models/accountlist.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
@@ -34,11 +33,14 @@
 
 namespace ot = opentxs;
 
+namespace metier
+{
+constexpr auto seed_id_key{"seedid"};
+constexpr auto nym_id_key{"nymid"};
+
 static const auto ot_args_ = ot::Options{};
 
-auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
-    -> const ot::Options&;
-auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
+static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     -> const ot::Options&
 {
     parent.setOrganizationDomain(METIER_APP_DOMAIN);
@@ -73,8 +75,7 @@ auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     return ot_args_;
 }
 
-auto ready(bool complete = false) noexcept -> std::shared_future<void>;
-auto ready(bool complete) noexcept -> std::shared_future<void>
+static auto ready(bool complete = false) noexcept -> std::shared_future<void>
 {
     static auto mutex = std::mutex{};
     auto lock = std::lock_guard<std::mutex>{mutex};
@@ -85,11 +86,6 @@ auto ready(bool complete) noexcept -> std::shared_future<void>
 
     return future;
 }
-
-namespace metier
-{
-constexpr auto seed_id_key{"seedid"};
-constexpr auto nym_id_key{"nymid"};
 
 namespace zmq = opentxs::network::zeromq;
 
@@ -168,11 +164,8 @@ public:
     const SeedSizeMap seed_size_;
     mutable std::mutex lock_;
     mutable std::atomic_bool have_nym_;
-    mutable std::promise<ot::OTNymID> nym_id_promise_;
-    std::shared_future<ot::OTNymID> nym_id_value_;
     EnabledChains enabled_chains_;
     std::unique_ptr<model::SeedType> seed_type_;
-    std::unique_ptr<model::AccountList> account_list_;
     std::unique_ptr<model::BlockchainChooser> mainnet_model_;
 
     template <typename OutputType, typename InputType>
@@ -194,7 +187,6 @@ public:
         validateBlockchains();
         emit parent_.chainsChanged(count);
     }
-
     auto enableDefaultChain() const noexcept -> bool
     {
 #ifdef METIER_DEFAULT_BLOCKCHAIN
@@ -203,6 +195,12 @@ public:
 #else
         return false;
 #endif
+    }
+    auto identityManager() const noexcept -> ot::ui::IdentityManagerQt*
+    {
+        static auto* model = api_.UI().IdentityManagerQt();
+
+        return model;
     }
     auto needNym() const noexcept
     {
@@ -251,20 +249,8 @@ public:
             if (nymID->empty()) { return; }
 
             {
-                auto& pointer =
-                    const_cast<std::unique_ptr<model::AccountList>&>(
-                        account_list_);
-
-                if (!pointer) {
-                    pointer = std::make_unique<model::AccountList>(
-                        api_.UI().AccountListQt(nymID));
-
-                    assert(pointer);
-
-                    Ownership::Claim(pointer.get());
-                }
-
-                nym_id_promise_.set_value(std::move(nymID));
+                identityManager()->setActiveNym(
+                    QString::fromStdString(nymID->str()));
                 have_nym_ = true;
             }
         }};
@@ -356,38 +342,20 @@ public:
         return false;
     }
 
-    auto accountActivityModel(const int chain) noexcept -> AccountActivity*
+    auto blockchainTypeToAccountID(int chain) noexcept -> QString
     {
-        ready().get();
-        const auto& nymID = nym_id_value_.get().get();
+        const auto active = identityManager()->getActiveNym();
+
+        if (active.isEmpty()) { return {}; }
+
+        const auto nymID = api_.Factory().NymID(active.toStdString());
+
+        if (nymID->empty()) { return {}; }
+
         const auto& account =
             api_.Crypto().Blockchain().Account(nymID, util::convert(chain));
 
-        return api_.UI().AccountActivityQt(nymID, account.AccountID());
-    }
-    auto accountActivityModel(const ot::Identifier& id) noexcept
-        -> AccountActivity*
-    {
-        ready().get();
-        const auto& nymID = nym_id_value_.get().get();
-
-        return api_.UI().AccountActivityQt(nymID, id);
-    }
-    auto accountStatusModel(const int chain) noexcept
-        -> ot::ui::BlockchainAccountStatusQt*
-    {
-        ready().get();
-        const auto& nymID = nym_id_value_.get().get();
-
-        return api_.UI().BlockchainAccountStatusQt(nymID, util::convert(chain));
-    }
-    auto activityThreadModel(const ot::Identifier& id) noexcept
-        -> ActivityThread*
-    {
-        ready().get();
-        const auto& nymID = nym_id_value_.get().get();
-
-        return api_.UI().ActivityThreadQt(nymID, id);
+        return QString::fromStdString(account.AccountID().str());
     }
     auto chain_is_disabled(int chain) noexcept -> void
     {
@@ -396,13 +364,6 @@ public:
     auto chain_is_enabled(int chain) noexcept -> void
     {
         enabled_chains_.add(static_cast<ot::blockchain::Type>(chain));
-    }
-    auto contactListModel() noexcept -> ContactList*
-    {
-        ready().get();
-        const auto& nymID = nym_id_value_.get().get();
-
-        return api_.UI().ContactListQt(nymID);
     }
     auto createNym(QString alias) noexcept -> void
     {
@@ -430,7 +391,7 @@ public:
         if (false == config) { return; }
         if (false == api_.Config().Save()) { return; }
 
-        nym_id_promise_.set_value(nym.ID());
+        identityManager()->setActiveNym(QString::fromStdString(nym.ID().str()));
         have_nym_ = true;
     }
     auto createNewSeed(
@@ -539,13 +500,6 @@ public:
         if (false == api_.Config().Save()) { return; }
 
         success = true;
-    }
-    auto profileModel() noexcept -> ot::ui::ProfileQt*
-    {
-        ready().get();
-        const auto& nymID = nym_id_value_.get().get();
-
-        return api_.UI().ProfileQt(nymID);
     }
     auto seedLanguageModel(const int type) -> model::SeedLanguage*
     {
@@ -710,8 +664,6 @@ public:
         }())
         , lock_()
         , have_nym_(false)
-        , nym_id_promise_()
-        , nym_id_value_(nym_id_promise_.get_future())
         , enabled_chains_([&] {
             auto* full =
                 api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::All);
@@ -741,7 +693,6 @@ public:
               &parent,
               transform<model::SeedType::Data>(
                   api_.Crypto().Seed().AllowedSeedTypes())))
-        , account_list_()
         , mainnet_model_(std::make_unique<model::BlockchainChooser>(
               api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Main)))
     {
@@ -756,7 +707,6 @@ public:
     ~Imp() { rpc_socket_->Close(); }
 
 private:
-
     auto check_introduction_notary() const noexcept -> void
     {
         if (introduction_notary_id_->empty()) { return; }
@@ -767,11 +717,14 @@ private:
 
     auto check_registration() const noexcept -> bool
     {
-        if (false == have_nym_) { return false; }
         if (introduction_notary_id_->empty()) { return false; }
         if (messaging_notary_id_->empty()) { return false; }
 
-        const auto& nymID = nym_id_value_.get().get();
+        const auto active = identityManager()->getActiveNym();
+
+        if (active.isEmpty()) { return false; }
+
+        const auto nymID = api_.Factory().NymID(active.toStdString());
 
         {
             const auto reason = api_.Factory().PasswordPrompt(
@@ -830,8 +783,8 @@ private:
     {
         using Chain = ot::blockchain::Type;
         using Protocol = ot::blockchain::crypto::HDProtocol;
-        const auto& nymID = nym_id_value_.get().get();
-
+        const auto nymID = api_.Factory().NymID(
+            identityManager()->getActiveNym().toStdString());
         const auto want = [&] {
             auto out = std::set<Protocol>{};
             out.emplace(Protocol::BIP_44);
