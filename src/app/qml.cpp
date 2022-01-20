@@ -180,3 +180,21 @@ auto QmlInterface::doDisplayNamePrompt() -> void { emit displayNamePrompt(); }
 
 QmlInterface::~QmlInterface() = default;
 }  // namespace metier
+
+namespace metier
+{
+auto App::Imp::choose_interface(
+    App& parent,
+    int& argc,
+    char** argv,
+    bool advanced) noexcept -> std::unique_ptr<Imp>
+{
+    if (advanced) {
+
+        return factory_widgets(parent, argc, argv);
+    } else {
+
+        return factory_qml(parent, argc, argv);
+    }
+}
+}  // namespace metier

@@ -6,6 +6,7 @@
 #include <boost/program_options.hpp>
 
 #include "app/imp.hpp"
+#include "otwrap.hpp"
 
 namespace po = boost::program_options;
 
@@ -15,9 +16,9 @@ auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept
     -> std::unique_ptr<Imp>
 {
     static constexpr auto advanced{"advanced"};
-    [[maybe_unused]] auto use_advanced{false};
+    auto use_advanced{false};
     const auto options = [] {
-        const auto text = std::string{METIER_APP_NAME} + " options";
+        const auto text = OTWrap::Name().toStdString() + " options";
         auto out = po::options_description{text};
         out.add_options()(
             advanced,
@@ -47,16 +48,6 @@ auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept
         }
     }
 
-#if METIER_QML_INTERFACE
-    if (use_advanced) {
-
-        return factory_widgets(parent, argc, argv);
-    } else {
-
-        return factory_qml(parent, argc, argv);
-    }
-#else
-    return factory_widgets(parent, argc, argv);
-#endif
+    return choose_interface(parent, argc, argv, use_advanced);
 }
 }  // namespace metier

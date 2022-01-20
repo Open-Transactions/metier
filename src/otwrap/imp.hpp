@@ -24,7 +24,7 @@
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "otwrap/notary.hpp"
+#include "otwrap/custom.hpp"
 #include "otwrap/passwordcallback.hpp"
 #include "rpc/rpc.hpp"
 #include "util/claim.hpp"
@@ -43,8 +43,8 @@ static const auto ot_args_ = ot::Options{};
 static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     -> const ot::Options&
 {
-    parent.setOrganizationDomain(METIER_APP_DOMAIN);
-    parent.setApplicationName(METIER_APP_NAME);
+    parent.setOrganizationDomain(OTWrap::Domain());
+    parent.setApplicationName(OTWrap::Name());
     auto path =
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
@@ -64,7 +64,7 @@ static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     args.SetHome(absolute.toStdString().c_str());
     args.SetBlockchainStorageLevel(1);
 
-    for (const auto* endpoint : metier::seed_server_endpoints_) {
+    for (const auto* endpoint : metier::SeedEndpoints()) {
         args.AddBlockchainSyncServer(endpoint);
     }
 
@@ -189,12 +189,13 @@ public:
     }
     auto enableDefaultChain() const noexcept -> bool
     {
-#ifdef METIER_DEFAULT_BLOCKCHAIN
-        return api_.Network().Blockchain().Enable(
-            util::convert(METIER_DEFAULT_BLOCKCHAIN));
-#else
-        return false;
-#endif
+        auto output{true};
+
+        for (const auto chain : DefaultBlockchains()) {
+            output &= api_.Network().Blockchain().Enable(chain);
+        }
+
+        return output;
     }
     auto identityManager() const noexcept -> ot::ui::IdentityManagerQt*
     {

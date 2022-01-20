@@ -11,6 +11,27 @@
 
 namespace metier
 {
+auto OTWrap::Domain() noexcept -> QString
+{
+    // clang-format off
+    return QString::fromLocal8Bit(u8"@METIER_APP_DOMAIN@");
+    // clang-format on
+}
+
+auto OTWrap::Name() noexcept -> QString
+{
+    // clang-format off
+    return QString::fromLocal8Bit(u8"@PROJECT_NAME@");
+    // clang-format on
+}
+
+auto OTWrap::Title() noexcept -> QString
+{
+    // clang-format off
+    return QString::fromLocal8Bit(u8"@METIER_APPSTREAM_NAME@");
+    // clang-format on
+}
+
 auto OTWrap::versionString(int suffix) -> QString
 {
     // clang-format off

@@ -46,6 +46,9 @@ class OTWrap final : public QObject
     Q_PROPERTY(int longestBlockchainName READ longestBlockchainName)
     Q_PROPERTY(int longestSeedWord READ longestSeedWord)
     Q_PROPERTY(QObject* identityManager READ identityManagerQML CONSTANT)
+    Q_PROPERTY(QString appDomain READ Domain CONSTANT)
+    Q_PROPERTY(QString appName READ Name CONSTANT)
+    Q_PROPERTY(QString appTitle READ Title CONSTANT)
 
 signals:
     void chainsChanged(int enabledCount);
@@ -68,6 +71,9 @@ public:
     using BlockchainList = QVector<int>;
 
     static auto Cleanup() noexcept -> void;
+    static auto Domain() noexcept -> QString;
+    static auto Name() noexcept -> QString;
+    static auto Title() noexcept -> QString;
 
     QAbstractItemModel* blockchainChooserModel(const bool testnet);
     QAbstractItemModel* blockchainStatisticsModel();

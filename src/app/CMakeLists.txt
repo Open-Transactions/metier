@@ -19,6 +19,11 @@ if(METIER_QML_INTERFACE)
   set(moc-headers "qml.hpp")
   qt_wrap_cpp(moc-sources "${moc-headers}")
 else()
+  list(
+    APPEND
+    cxx-sources
+    "no-qml.cpp"
+  )
   set(moc-headers "")
   set(moc-sources "")
 endif()
@@ -39,8 +44,6 @@ target_link_libraries(
     Qt::Widgets
     opentxs
 )
-target_compile_definitions(metier-app PRIVATE METIER_APP_NAME="${PROJECT_NAME}")
-
 if(NOT METIER_BUNDLED_OPENTXS)
   target_include_directories(
     metier-app SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
@@ -49,7 +52,4 @@ endif()
 
 if(METIER_QML_INTERFACE)
   target_link_libraries(metier-app PRIVATE Qt::Qml Qt::Quick)
-  target_compile_definitions(metier-app PRIVATE METIER_QML_INTERFACE=1)
-else()
-  target_compile_definitions(metier-app PRIVATE METIER_QML_INTERFACE=0)
 endif()

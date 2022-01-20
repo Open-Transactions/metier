@@ -36,7 +36,7 @@ MainWindow::MainWindow(QObject* parent, OTWrap& ot) noexcept
 {
     moveToThread(parent->thread());
     qRegisterMetaType<QVector<int>>();
-    setWindowTitle(QString::fromLocal8Bit(METIER_APPSTREAM_NAME));
+    setWindowTitle(ot.Title());
     auto* quit = imp_.ui_->action_file_quit;
     auto* bc = imp_.ui_->action_settings_blockchain;
     auto* words = imp_.ui_->action_settings_recovery_phrase;

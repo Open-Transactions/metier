@@ -23,6 +23,11 @@ struct App::Imp {
     std::promise<void> init_promise_{};
     std::future<void> init_future_{init_promise_.get_future()};
 
+    static auto choose_interface(
+        App& parent,
+        int& argc,
+        char** argv,
+        bool advanced) noexcept -> std::unique_ptr<Imp>;
     static auto factory(App& parent, int& argc, char** argv) noexcept
         -> std::unique_ptr<Imp>;
     static auto factory_qml(App& parent, int& argc, char** argv) noexcept
