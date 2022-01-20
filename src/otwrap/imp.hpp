@@ -228,6 +228,12 @@ public:
             rpc_socket_->Send(std::move(out));
         }
     }
+    auto seedManager() const noexcept -> ot::ui::SeedTreeQt*
+    {
+        static auto* model = api_.UI().SeedTreeQt();
+
+        return model;
+    }
     auto validateBlockchains() const noexcept -> bool
     {
         ready().get();

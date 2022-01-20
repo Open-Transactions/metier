@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <opentxs/blockchain/BlockchainType.hpp>
+#include <opentxs/blockchain/Types.hpp>
 #include <vector>
 
 namespace metier
@@ -13,7 +13,7 @@ namespace metier
 extern const char* introduction_notary_contract_;
 extern const char* messaging_notary_contract_;
 
-auto SeedEndpoints() noexcept -> const std::vector<char*>&;
+auto SeedEndpoints() noexcept -> const std::vector<const char*>&;
 auto DefaultBlockchains() noexcept
     -> const std::vector<opentxs::blockchain::Type>&;
 }  // namespace metier
