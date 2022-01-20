@@ -67,9 +67,6 @@ target_link_libraries(
     opentxs
     protobuf::libprotobuf-lite
 )
-target_compile_definitions(
-  metier-widgets PRIVATE -DMETIER_APPSTREAM_NAME="${METIER_APPSTREAM_NAME}"
-)
 
 if(NOT METIER_BUNDLED_OPENTXS)
   target_include_directories(

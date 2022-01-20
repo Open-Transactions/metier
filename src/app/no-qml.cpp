@@ -3,13 +3,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#pragma once
-
-#include <vector>
+#include "app/imp.hpp"
 
 namespace metier
 {
-extern const char* introduction_notary_contract_;
-extern const char* messaging_notary_contract_;
-static std::vector<char*> seed_server_endpoints_;
+auto App::Imp::choose_interface(
+    App& parent,
+    int& argc,
+    char** argv,
+    bool) noexcept -> std::unique_ptr<Imp>
+{
+    return factory_widgets(parent, argc, argv);
+}
 }  // namespace metier

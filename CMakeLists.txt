@@ -153,8 +153,8 @@ find_package(
 find_package(
   QT
   NAMES
-    Qt6
-    Qt5
+  Qt6
+  Qt5
   COMPONENTS
     Core
     Gui
@@ -209,7 +209,11 @@ if(METIER_BUNDLED_OPENTXS)
   find_package(lmdb QUIET)
   find_package(
     Qt${QT_VERSION_MAJOR}
-    COMPONENTS Core Gui Qml Widgets
+    COMPONENTS
+      Core
+      Gui
+      Qml
+      Widgets
     QUIET
   )
 else()

@@ -34,8 +34,8 @@ configure_file(
 set(cxx-sources
     "${CMAKE_CURRENT_BINARY_DIR}/otwrap/version.cpp"
     "otwrap/imp.hpp"
-    "otwrap/notary.cpp"
-    "otwrap/notary.hpp"
+    "otwrap/custom.cpp"
+    "otwrap/custom.hpp"
     "otwrap/passwordcallback.cpp"
     "otwrap/passwordcallback.hpp"
     "main.cpp"
@@ -123,18 +123,7 @@ if(METIER_QML_INTERFACE)
   qt_import_qml_plugins("${PROJECT_NAME}")
 endif()
 
-target_compile_definitions(
-  "${PROJECT_NAME}" PRIVATE METIER_APP_DOMAIN="${METIER_APP_DOMAIN}"
-                            METIER_APP_NAME="${PROJECT_NAME}"
-)
 target_compile_definitions(metier-rpc PRIVATE METIER_APP_NAME="${PROJECT_NAME}")
-
-if(METIER_USE_DEFAULT_BLOCKCHAIN)
-  target_compile_definitions(
-    "${PROJECT_NAME}"
-    PRIVATE METIER_DEFAULT_BLOCKCHAIN=${METIER_DEFAULT_BLOCKCHAIN}
-  )
-endif()
 
 if(APPLE)
   install(TARGETS "${PROJECT_NAME}" BUNDLE DESTINATION . COMPONENT APP-BUNDLE)
