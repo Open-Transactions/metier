@@ -13,7 +13,6 @@
 #include <set>
 #include <tuple>
 
-#include "models/accountlist.hpp"
 #include "otwrap.hpp"
 #include "ui_mainwindow.h"
 #include "util/resizer.hpp"
@@ -31,6 +30,7 @@ namespace metier::widget
 struct MainWindow::Imp {
     MainWindow& parent_;
     OTWrap& ot_;
+    opentxs::ui::IdentityManagerQt* identity_manager_;
     std::unique_ptr<Ui::MainWindow> ui_;
     std::unique_ptr<widget::BlockchainChooser> blockchains_;
     std::unique_ptr<widget::Licenses> licenses_;
@@ -42,7 +42,7 @@ struct MainWindow::Imp {
     {
         {
             auto& view = *ui_->accountList;
-            view.setModel(ot_.accountListModel());
+            view.setModel(identity_manager_->getAccountList());
             auto* selection = view.selectionModel();
             connect(
                 selection,
@@ -53,7 +53,7 @@ struct MainWindow::Imp {
 
         {
             auto& view = *ui_->contactListView;
-            view.setModel(ot_.contactListModel());
+            view.setModel(identity_manager_->getContactList());
             auto* selection = view.selectionModel();
             connect(
                 selection,
@@ -63,7 +63,7 @@ struct MainWindow::Imp {
         }
 
         using Profile = opentxs::ui::ProfileQt;
-        auto profile = ot_.profileModel();
+        auto* profile = identity_manager_->getProfile();
         connect(
             profile,
             &Profile::displayNameChanged,
@@ -110,6 +110,7 @@ struct MainWindow::Imp {
     Imp(MainWindow* parent, OTWrap& ot) noexcept
         : parent_(*parent)
         , ot_(ot)
+        , identity_manager_(ot_.identityManager())
         , ui_(std::make_unique<Ui::MainWindow>())
         , blockchains_(std::make_unique<widget::BlockchainChooser>(parent, ot_))
         , licenses_(std::make_unique<widget::Licenses>(parent))
@@ -176,8 +177,9 @@ private:
     }
     auto register_progress(const ot::blockchain::Type chain) noexcept -> void
     {
-        using Model = OTWrap::AccountActivity;
-        auto* model = ot_.accountActivityModel(static_cast<int>(chain));
+        const auto accountID =
+            ot_.blockchainTypeToAccountID(static_cast<int>(chain));
+        auto* model = identity_manager_->getAccountActivity(accountID);
 
         assert(nullptr != model);
 
@@ -188,6 +190,7 @@ private:
             registered_chains_.emplace(ptr);
         }
 
+        using Model = ot::ui::AccountActivityQt;
         connect(model, &Model::syncProgressUpdated, [=](int value, int max) {
             receive_progress_update(chain, value, max);
         });

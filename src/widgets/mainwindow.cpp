@@ -151,14 +151,14 @@ auto MainWindow::showAddContact() -> void { imp_.showAddContact(); }
 
 auto MainWindow::showAccountActivity(int chain) -> void
 {
-    auto& accountActivity = *imp_.ui_->accountActivity;
-    accountActivity.setModel(imp_.ot_.accountActivityModel(chain));
+    showAccountActivity(imp_.ot_.blockchainTypeToAccountID(chain));
 }
 
 auto MainWindow::showAccountActivity(QString account) -> void
 {
     auto& accountActivity = *imp_.ui_->accountActivity;
-    accountActivity.setModel(imp_.ot_.accountActivityModel(account));
+    auto* model = imp_.identity_manager_->getAccountActivity(account);
+    accountActivity.setModel(model);
 }
 
 auto MainWindow::showActivityThread(QString contact) -> void
@@ -176,7 +176,7 @@ auto MainWindow::showActivityThread(QString contact) -> void
         dynamic_cast<Model*>(model)->setDraft(edit.toPlainText());
     }
 
-    auto* model = imp_.ot_.activityThreadModel(contact);
+    auto* model = imp_.identity_manager_->getActivityThread(contact);
 
     if (nullptr == model) {
         clearActivityThread();

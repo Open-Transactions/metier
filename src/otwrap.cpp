@@ -30,70 +30,18 @@ OTWrap::OTWrap(QGuiApplication& parent, App& app, int& argc, char** argv)
 {
 }
 
-auto OTWrap::accountActivityModel(const QString& id) -> AccountActivity*
+auto OTWrap::accountIDtoBlockchainType(const QString& id) -> int
 {
-    return imp_.accountActivityModel(
-        imp_.api_.Factory().Identifier(id.toStdString()));
-}
+    const auto accountID = imp_.api_.Factory().Identifier(id.toStdString());
+    const auto [chain, owner] =
+        imp_.api_.Crypto().Blockchain().LookupAccount(accountID);
 
-auto OTWrap::accountActivityModelQML(const QString& id) -> QObject*
-{
-    return const_cast<AccountActivity*>(accountActivityModel(id));
-}
-
-auto OTWrap::accountActivityModel(const int chain) -> AccountActivity*
-{
-    return imp_.accountActivityModel(chain);
-}
-
-auto OTWrap::accountListModel() -> model::AccountList*
-{
-    assert(imp_.account_list_);
-
-    return imp_.account_list_.get();
-}
-
-auto OTWrap::accountListModelQML() -> QObject*
-{
-    return const_cast<model::AccountList*>(accountListModel());
-}
-
-auto OTWrap::accountStatusModel(const int chain)
-    -> opentxs::ui::BlockchainAccountStatusQt*
-{
-    return imp_.accountStatusModel(chain);
-}
-
-auto OTWrap::accountStatusModel(const QString& id)
-    -> opentxs::ui::BlockchainAccountStatusQt*
-{
-    return accountStatusModel(convertBlockchainAccountID(id));
-}
-
-auto OTWrap::accountStatusModelQML(const int chain) -> QObject*
-{
-    return accountStatusModel(chain);
-}
-
-auto OTWrap::accountStatusModelQML(const QString& id) -> QObject*
-{
-    return accountStatusModel(id);
-}
-
-auto OTWrap::activityThreadModel(const QString& id) -> ActivityThread*
-{
-    return imp_.activityThreadModel(
-        imp_.api_.Factory().Identifier(id.toStdString()));
-}
-
-auto OTWrap::activityThreadModelQML(const QString& id) -> QObject*
-{
-    return const_cast<ActivityThread*>(activityThreadModel(id));
+    return static_cast<int>(chain);
 }
 
 auto OTWrap::addContact(QString label, QString id) -> QString
 {
-    return contactListModel()->addContact(label, id);
+    return imp_.identityManager()->getContactList()->addContact(label, id);
 }
 
 auto OTWrap::blockchainChooserModel(const bool testnet) -> QAbstractItemModel*
@@ -120,6 +68,11 @@ auto OTWrap::blockchainStatisticsModel() -> QAbstractItemModel*
 auto OTWrap::blockchainStatisticsModelQML() -> QObject*
 {
     return blockchainStatisticsModel();
+}
+
+auto OTWrap::blockchainTypeToAccountID(int type) -> QString
+{
+    return imp_.blockchainTypeToAccountID(type);
 }
 
 auto OTWrap::chainIsDisabled(int chain) -> void
@@ -186,25 +139,6 @@ auto OTWrap::checkAccounts() -> void { imp_.validateBlockchains(); }
 
 auto OTWrap::Cleanup() noexcept -> void { ot::Cleanup(); }
 
-auto OTWrap::contactListModel() -> ContactList*
-{
-    return imp_.contactListModel();
-}
-
-auto OTWrap::contactListModelQML() -> QObject*
-{
-    return const_cast<ContactList*>(contactListModel());
-}
-
-auto OTWrap::convertBlockchainAccountID(const QString& id) -> int
-{
-    const auto accountID = imp_.api_.Factory().Identifier(id.toStdString());
-    const auto [chain, owner] =
-        imp_.api_.Crypto().Blockchain().LookupAccount(accountID);
-
-    return static_cast<int>(chain);
-}
-
 auto OTWrap::createNewSeed(const int type, const int lang, const int strength)
     -> QStringList
 {
@@ -240,6 +174,13 @@ auto OTWrap::getRecoveryWords() -> QStringList
     return imp_.getRecoveryWords();
 }
 
+auto OTWrap::identityManager() noexcept -> opentxs::ui::IdentityManagerQt*
+{
+    return imp_.identityManager();
+}
+
+auto OTWrap::identityManagerQML() -> QObject* { return identityManager(); }
+
 auto OTWrap::importSeed(int type, int lang, QString words, QString password)
     -> void
 {
@@ -268,13 +209,6 @@ auto OTWrap::openSystemBrowserLink(QString url_link) -> void
 {
     QDesktopServices::openUrl(QUrl(url_link, QUrl::StrictMode));
 }
-
-auto OTWrap::profileModel() -> opentxs::ui::ProfileQt*
-{
-    return imp_.profileModel();
-}
-
-auto OTWrap::profileModelQML() -> QObject* { return profileModel(); }
 
 auto OTWrap::seedLanguageModel(const int type) -> model::SeedLanguage*
 {
