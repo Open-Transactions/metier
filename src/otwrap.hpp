@@ -19,9 +19,10 @@ namespace opentxs
 {
 namespace ui
 {
-class IdentityManagerQt;
-class SeedValidator;
 class IdentityManager;
+class IdentityManagerQt;
+class SeedTreeQt;
+class SeedValidator;
 }  // namespace ui
 }  // namespace opentxs
 
@@ -46,6 +47,7 @@ class OTWrap final : public QObject
     Q_PROPERTY(int longestBlockchainName READ longestBlockchainName)
     Q_PROPERTY(int longestSeedWord READ longestSeedWord)
     Q_PROPERTY(QObject* identityManager READ identityManagerQML CONSTANT)
+    Q_PROPERTY(QObject* seedManager READ seedManagerQML CONSTANT)
     Q_PROPERTY(QString appDomain READ Domain CONSTANT)
     Q_PROPERTY(QString appName READ Name CONSTANT)
     Q_PROPERTY(QString appTitle READ Title CONSTANT)
@@ -75,20 +77,21 @@ public:
     static auto Name() noexcept -> QString;
     static auto Title() noexcept -> QString;
 
-    QAbstractItemModel* blockchainChooserModel(const bool testnet);
-    QAbstractItemModel* blockchainStatisticsModel();
+    auto blockchainChooserModel(const bool testnet) -> QAbstractItemModel*;
+    auto blockchainStatisticsModel() -> QAbstractItemModel*;
     auto identityManager() noexcept -> opentxs::ui::IdentityManagerQt*;
-    model::SeedLanguage* seedLanguageModel(const int type);
-    model::SeedSize* seedSizeModel(const int type);
-    model::SeedType* seedTypeModel();
-    const opentxs::ui::SeedValidator* seedWordValidator(
-        const int type,
-        const int lang);
+    auto seedLanguageModel(const int type) -> model::SeedLanguage*;
+    auto seedManager() noexcept -> opentxs::ui::SeedTreeQt*;
+    auto seedSizeModel(const int type) -> model::SeedSize*;
+    auto seedTypeModel() -> model::SeedType*;
+    auto seedWordValidator(const int type, const int lang)
+        -> const opentxs::ui::SeedValidator*;
 
     Q_INVOKABLE QObject* blockchainChooserModelQML(bool testnet);
     Q_INVOKABLE QObject* blockchainStatisticsModelQML();
     Q_INVOKABLE QObject* identityManagerQML();
     Q_INVOKABLE QObject* seedLanguageModelQML(const int type);
+    Q_INVOKABLE QObject* seedManagerQML();
     Q_INVOKABLE QObject* seedSizeModelQML(const int type);
     Q_INVOKABLE QObject* seedTypeModelQML();
     Q_INVOKABLE QObject* seedWordValidatorQML(const int type, const int lang);

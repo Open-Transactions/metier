@@ -18,6 +18,7 @@ qt_wrap_ui(
   "qrtoolbutton.ui"
   "receivingaddress.ui"
   "recoverwallet.ui"
+  "seedmanager.ui"
   "showseed.ui"
 )
 

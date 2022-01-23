@@ -23,6 +23,7 @@
 #include "widgets/blockchainchooser.hpp"
 #include "widgets/licenses.hpp"
 #include "widgets/mainwindow/chaintoolboxmanager.hpp"
+#include "widgets/seedmanager.hpp"
 #include "widgets/showseed.hpp"
 
 namespace metier::widget
@@ -40,6 +41,7 @@ MainWindow::MainWindow(QObject* parent, OTWrap& ot) noexcept
     auto* quit = imp_.ui_->action_file_quit;
     auto* bc = imp_.ui_->action_settings_blockchain;
     auto* words = imp_.ui_->action_settings_recovery_phrase;
+    auto* seeds = imp_.ui_->action_settings_seed_manager;
     auto* bcdone = imp_.blockchains_->Ok();
     auto* license = imp_.ui_->action_help_opensource;
     auto* toolbox = imp_.ui_->moneyToolbox;
@@ -50,6 +52,7 @@ MainWindow::MainWindow(QObject* parent, OTWrap& ot) noexcept
     connect(quit, &QAction::triggered, this, &MainWindow::exit);
     connect(bc, &QAction::triggered, this, &MainWindow::showBlockchainChooser);
     connect(words, &QAction::triggered, this, &MainWindow::showRecoveryWords);
+    connect(seeds, &QAction::triggered, this, &MainWindow::showSeedManager);
     connect(bcdone, &QPushButton::clicked, &ot, &OTWrap::checkAccounts);
     connect(license, &QAction::triggered, this, &MainWindow::showLicenseViewer);
     connect(toolbox, &QToolBox::currentChanged, this, &MainWindow::changeChain);
@@ -212,6 +215,13 @@ auto MainWindow::showLicenseViewer() -> void
 auto MainWindow::showRecoveryWords() -> void
 {
     auto dialog = std::make_unique<ShowSeed>(this, imp_.ot_);
+    auto postcondition = ScopeGuard{[&]() { dialog.release(); }};
+    util::Focuser(dialog.get()).show();
+}
+
+auto MainWindow::showSeedManager() -> void
+{
+    auto dialog = std::make_unique<SeedManager>(this, imp_.ot_);
     auto postcondition = ScopeGuard{[&]() { dialog.release(); }};
     util::Focuser(dialog.get()).show();
 }

@@ -18,6 +18,7 @@ set(cxx-sources
     "qrtoolbutton.cpp"
     "receivingaddress.cpp"
     "recoverwallet.cpp"
+    "seedmanager.cpp"
     "showseed.cpp"
 )
 set(cxx-headers
@@ -44,6 +45,7 @@ set(moc-headers
     "qrtoolbutton.hpp"
     "receivingaddress.hpp"
     "recoverwallet.hpp"
+    "seedmanager.hpp"
     "showseed.hpp"
 )
 qt_wrap_cpp(moc-sources "${moc-headers}")

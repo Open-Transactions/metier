@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>seedManager</class>
+ <widget class="QDialog" name="seedManager">
+  <property name="windowTitle">
+   <string>Seed Manager</string>
+  </property>
+  <layout class="QVBoxLayout" name="seedManagerLayout">
+   <item>
+    <widget class="QTreeView" name="seedView">
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttons">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

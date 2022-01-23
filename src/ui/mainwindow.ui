@@ -327,6 +327,7 @@
     </property>
     <addaction name="action_settings_blockchain"/>
     <addaction name="action_settings_recovery_phrase"/>
+    <addaction name="action_settings_seed_manager"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -358,6 +359,11 @@
   <action name="action_settings_recovery_phrase">
    <property name="text">
     <string>Recovery Phrase</string>
+   </property>
+  </action>
+  <action name="action_settings_seed_manager">
+   <property name="text">
+    <string>Seed Manager</string>
    </property>
   </action>
  </widget>

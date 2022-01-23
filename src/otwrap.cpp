@@ -220,6 +220,13 @@ auto OTWrap::seedLanguageModelQML(const int type) -> QObject*
     return seedLanguageModel(type);
 }
 
+auto OTWrap::seedManager() noexcept -> opentxs::ui::SeedTreeQt*
+{
+    return imp_.seedManager();
+}
+
+auto OTWrap::seedManagerQML() -> QObject* { return seedManager(); }
+
 auto OTWrap::seedSizeModel(const int type) -> model::SeedSize*
 {
     return imp_.seedSizeModel(type);

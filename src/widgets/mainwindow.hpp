@@ -52,6 +52,7 @@ private slots:
     void showBlockchainStatistics();
     void showLicenseViewer();
     void showRecoveryWords();
+    void showSeedManager();
     void changeChain();
     void updateToolbox();
     void updateName(QString value);
