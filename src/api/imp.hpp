@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "otwrap.hpp"  // IWYU pragma: associated
+#include "api/api.hpp"  // IWYU pragma: associated
 
 #include <opentxs/opentxs.hpp>
 #include <QDebug>
@@ -21,11 +21,12 @@
 #include <set>
 #include <string>
 
+#include "api/custom.hpp"
+#include "api/passwordcallback.hpp"
+#include "models/blockchainchooser.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "otwrap/custom.hpp"
-#include "otwrap/passwordcallback.hpp"
 #include "rpc/rpc.hpp"
 #include "util/claim.hpp"
 #include "util/convertblockchain.hpp"
@@ -43,8 +44,8 @@ static const auto ot_args_ = ot::Options{};
 static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     -> const ot::Options&
 {
-    parent.setOrganizationDomain(OTWrap::Domain());
-    parent.setApplicationName(OTWrap::Name());
+    parent.setOrganizationDomain(Api::Domain());
+    parent.setApplicationName(Api::Name());
     auto path =
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
@@ -89,12 +90,14 @@ static auto ready(bool complete = false) noexcept -> std::shared_future<void>
 
 namespace zmq = opentxs::network::zeromq;
 
-struct OTWrap::Imp {
+struct Api::Imp {
 private:
-    OTWrap& parent_;
+    Api& parent_;
     QGuiApplication& qt_parent_;
 
 public:
+    enum class State { init, have_seed, have_nym, run };
+
     struct EnabledChains {
         using Vector = std::set<ot::blockchain::Type>;
 
@@ -164,6 +167,8 @@ public:
     const SeedSizeMap seed_size_;
     mutable std::mutex lock_;
     mutable std::atomic_bool have_nym_;
+    mutable std::atomic_bool wait_for_seed_backup_;
+    mutable std::atomic<State> state_;
     EnabledChains enabled_chains_;
     std::unique_ptr<model::SeedType> seed_type_;
     std::unique_ptr<model::BlockchainChooser> mainnet_model_;
@@ -190,8 +195,11 @@ public:
     auto enableDefaultChain() const noexcept -> bool
     {
         auto output{true};
+        const auto chains = DefaultBlockchains();
 
-        for (const auto chain : DefaultBlockchains()) {
+        if (0u == chains.size()) { return false; }
+
+        for (const auto chain : chains) {
             output &= api_.Network().Blockchain().Enable(chain);
         }
 
@@ -208,12 +216,6 @@ public:
         ready().get();
 
         return 0 == api_.Wallet().LocalNymCount();
-    }
-    auto needSeed() const noexcept
-    {
-        ready().get();
-
-        return api_.Storage().SeedList().empty();
     }
     auto rpc(zmq::Message&& in) const noexcept -> void
     {
@@ -407,6 +409,7 @@ public:
         const int strength) noexcept -> QStringList
     {
         ready().get();
+        wait_for_seed_backup_ = true;
         ot::Lock lock(lock_);
         auto success{false};
         auto& id = const_cast<std::string&>(seed_id_);
@@ -416,7 +419,7 @@ public:
         const auto& seeds = api_.Crypto().Seed();
 
         assert(id.empty());
-        assert(seeds.DefaultSeed().empty());
+        assert(0 == seeds.DefaultSeed().second);
 
         const auto invalid = [](const int in) -> auto
         {
@@ -479,7 +482,7 @@ public:
         const auto& seeds = api_.Crypto().Seed();
 
         assert(id.empty());
-        assert(seeds.DefaultSeed().empty());
+        assert(0u == seeds.DefaultSeed().second);
 
         auto reason =
             api_.Factory().PasswordPrompt("Import a Metier wallet seed");
@@ -556,7 +559,7 @@ public:
         return static_cast<int>(output);
     }
 
-    Imp(QGuiApplication& parent, App& app, OTWrap& me, int& argc, char** argv)
+    Imp(QGuiApplication& parent, App& app, Api& me, int& argc, char** argv)
         : parent_(me)
         , qt_parent_(parent)
         , callback_(app)
@@ -671,6 +674,8 @@ public:
         }())
         , lock_()
         , have_nym_(false)
+        , wait_for_seed_backup_(false)
+        , state_(State::init)
         , enabled_chains_([&] {
             auto* full =
                 api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::All);
@@ -684,15 +689,10 @@ public:
             assert(nullptr != test);
 
             using Model = ot::ui::BlockchainSelectionQt;
+            connect(full, &Model::enabledChanged, &parent_, &Api::checkChains);
+            connect(full, &Model::chainEnabled, &parent_, &Api::chainIsEnabled);
             connect(
-                full, &Model::enabledChanged, &parent_, &OTWrap::checkChains);
-            connect(
-                full, &Model::chainEnabled, &parent_, &OTWrap::chainIsEnabled);
-            connect(
-                full,
-                &Model::chainDisabled,
-                &parent_,
-                &OTWrap::chainIsDisabled);
+                full, &Model::chainDisabled, &parent_, &Api::chainIsDisabled);
 
             return api_.Network().Blockchain().EnabledChains();
         }())

@@ -14,10 +14,10 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+#include "api/api.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "otwrap.hpp"
 #include "ui_newseed.h"
 #include "util/resizer.hpp"
 #include "util/scopeguard.hpp"
@@ -25,14 +25,14 @@
 namespace metier::widget
 {
 struct NewSeed::Imp {
-    OTWrap& ot_;
+    Api& ot_;
     QDialog* parent_;
     std::unique_ptr<Ui::NewSeed> ui_;
 
     auto finish() -> void
     {
-        ot_.checkStartupConditions();
         parent_->hide();
+        ot_.seedBackupFinished();
     }
     auto generateSeed() -> void
     {
@@ -125,7 +125,7 @@ struct NewSeed::Imp {
         reflowDialog(checked ? 6 : 4);
     }
 
-    Imp(QDialog* parent, OTWrap& ot) noexcept
+    Imp(QDialog* parent, Api& ot) noexcept
         : ot_(ot)
         , parent_(parent)
         , ui_(std::make_unique<Ui::NewSeed>())

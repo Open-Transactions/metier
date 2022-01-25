@@ -11,7 +11,7 @@
 #include <QTableView>
 #include <iostream>
 
-#include "otwrap.hpp"
+#include "api/api.hpp"
 #include "ui_blockchainchooser.h"
 #include "util/resizer.hpp"
 
@@ -19,7 +19,7 @@ constexpr auto enabled_column_width_{10};
 
 namespace metier::widget
 {
-BlockchainChooser::BlockchainChooser(QObject* parent, OTWrap& ot)
+BlockchainChooser::BlockchainChooser(QObject* parent, Api& ot)
     : QDialog(nullptr)
     , ot_(ot)
     , ui_(std::make_unique<Ui::BlockchainChooser>())
@@ -52,8 +52,8 @@ BlockchainChooser::BlockchainChooser(QObject* parent, OTWrap& ot)
     }
 
     auto* ok = ui_->buttons->button(QDialogButtonBox::Ok);
-    connect(&ot_, &OTWrap::chainsChanged, this, &BlockchainChooser::check);
-    connect(&ot_, &OTWrap::chainsChanged, this, &BlockchainChooser::check);
+    connect(&ot_, &Api::chainsChanged, this, &BlockchainChooser::check);
+    connect(&ot_, &Api::chainsChanged, this, &BlockchainChooser::check);
     connect(ok, &QPushButton::clicked, this, &BlockchainChooser::hide);
     init();
 }

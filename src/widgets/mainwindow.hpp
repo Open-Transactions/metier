@@ -10,12 +10,13 @@
 #include <QString>
 #include <memory>
 
+class QCloseEvent;
 class QItemSelection;
 class QWidget;
 
 namespace metier
 {
-class OTWrap;
+class Api;
 }
 
 namespace metier::widget
@@ -59,7 +60,9 @@ private slots:
     void updatePaymentCode(QString value);
 
 public:
-    MainWindow(QObject* parent, OTWrap& ot) noexcept;
+    auto closeEvent(QCloseEvent* event) -> void final;
+
+    MainWindow(QObject* parent, Api& ot) noexcept;
 
     ~MainWindow() final;
 

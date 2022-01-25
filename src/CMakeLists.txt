@@ -4,6 +4,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(metier-common PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(WIN32)
   set(APP_ICON_RESOURCE "${${PROJECT_NAME}_SOURCE_DIR}/package/windows/app.rc")
@@ -17,64 +18,32 @@ endif()
 
 add_library(metier-rpc OBJECT "")
 
+add_subdirectory(api)
 add_subdirectory(app)
 add_subdirectory(cli)
 add_subdirectory(models)
 add_subdirectory(rpc)
-add_subdirectory(ui)
+add_subdirectory(skin)
 add_subdirectory(util)
 add_subdirectory(widgets)
 
-configure_file(
-  "otwrap/version.cpp.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/otwrap/version.cpp"
-  @ONLY
+target_sources(metier-common PRIVATE "main.cpp")
+set_target_properties(
+  metier-common
+  PROPERTIES
+    AUTOMOC ON
+    AUTOUIC ON
+    AUTORCC ON
+    AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/ui"
 )
-
-set(cxx-sources
-    "${CMAKE_CURRENT_BINARY_DIR}/otwrap/version.cpp"
-    "otwrap/imp.hpp"
-    "otwrap/custom.cpp"
-    "otwrap/custom.hpp"
-    "otwrap/passwordcallback.cpp"
-    "otwrap/passwordcallback.hpp"
-    "main.cpp"
-    "otwrap.cpp"
-)
-set(cxx-headers "otwrap/imp.hpp" "otwrap/passwordcallback.hpp")
-set(moc-headers "app.hpp" "otwrap.hpp")
-qt_wrap_cpp(moc-sources "${moc-headers}")
 set(object-deps
-    $<TARGET_OBJECTS:metier-app>
-    $<TARGET_OBJECTS:metier-license>
-    $<TARGET_OBJECTS:metier-models>
+    $<TARGET_OBJECTS:metier-common>
     $<TARGET_OBJECTS:metier-rpc>
-    $<TARGET_OBJECTS:metier-util>
-    $<TARGET_OBJECTS:metier-widgets>
     $<TARGET_OBJECTS:qr-code-generator>
 )
 
-set(METIER_RCC_SOURCES "skin/default/qwidget.qrc")
-
-if(METIER_QML_INTERFACE)
-  list(
-    APPEND
-    METIER_RCC_SOURCES
-    "skin/qml/resources.qrc"
-  )
-endif()
-
-qt_add_resources(rcc-sources "${METIER_RCC_SOURCES}")
-
 add_executable(
-  "${PROJECT_NAME}" MACOSX_BUNDLE
-  "${object-deps}"
-  "${cxx-sources}"
-  "${cxx-headers}"
-  "${moc-sources}"
-  "${moc-headers}"
-  "${rcc-sources}"
-  "${APP_ICON_RESOURCE}"
+  "${PROJECT_NAME}" MACOSX_BUNDLE "${object-deps}" "${APP_ICON_RESOURCE}"
 )
 
 target_include_directories(
@@ -122,8 +91,6 @@ if(METIER_QML_INTERFACE)
 
   qt_import_qml_plugins("${PROJECT_NAME}")
 endif()
-
-target_compile_definitions(metier-rpc PRIVATE METIER_APP_NAME="${PROJECT_NAME}")
 
 if(APPLE)
   install(TARGETS "${PROJECT_NAME}" BUNDLE DESTINATION . COMPONENT APP-BUNDLE)

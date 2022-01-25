@@ -15,10 +15,10 @@
 #include <QPushButton>
 #include <sstream>
 
+#include "api/api.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "otwrap.hpp"
 #include "ui_showseed.h"
 #include "util/resizer.hpp"
 #include "util/scopeguard.hpp"
@@ -26,7 +26,7 @@
 namespace metier::widget
 {
 struct ShowSeed::Imp {
-    OTWrap& ot_;
+    Api& ot_;
     QDialog* parent_;
     std::unique_ptr<Ui::ShowSeed> ui_;
 
@@ -36,7 +36,7 @@ struct ShowSeed::Imp {
             *parent_, 5 * ot_.longestSeedWord(), lines, {3, 2});
     }
 
-    Imp(QDialog* parent, OTWrap& ot) noexcept
+    Imp(QDialog* parent, Api& ot) noexcept
         : ot_(ot)
         , parent_(parent)
         , ui_(std::make_unique<Ui::ShowSeed>())

@@ -3,8 +3,11 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-set(cxx-sources "focuser.cpp" "resizer.cpp")
-set(cxx-headers
+target_sources(
+  metier-common
+  PRIVATE
+    "focuser.cpp"
+    "resizer.cpp"
     "claim.hpp"
     "convertblockchain.hpp"
     "focuser.hpp"
@@ -13,24 +16,13 @@ set(cxx-headers
 )
 
 if(METIER_QML_INTERFACE)
-  list(
-    APPEND
-    cxx-sources
-    "claim_qml.cpp"
-  )
+  target_sources(metier-common PRIVATE "claim_qml.cpp")
 else()
-  list(
-    APPEND
-    cxx-sources
-    "claim_legacy.cpp"
-  )
+  target_sources(metier-common PRIVATE "claim_legacy.cpp")
 endif()
 
-add_library(metier-util OBJECT "${cxx-sources}" "${cxx-headers}")
-target_link_libraries(metier-util PRIVATE Qt::Widgets)
+target_link_libraries(metier-common PRIVATE Qt::Widgets)
 
 if(METIER_QML_INTERFACE)
-  target_link_libraries(metier-util PRIVATE Qt::Qml)
-else()
-
+  target_link_libraries(metier-common PRIVATE Qt::Qml)
 endif()

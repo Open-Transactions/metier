@@ -9,13 +9,13 @@
 #include <QPushButton>
 #include <QToolButton>
 
-#include "otwrap.hpp"
+#include "api/api.hpp"
 #include "ui_addcontact.h"
 #include "util/resizer.hpp"
 
 namespace metier::widget
 {
-AddContact::AddContact(QObject* parent, OTWrap& ot)
+AddContact::AddContact(QObject* parent, Api& ot)
     : QDialog(nullptr)
     , ui_(std::make_unique<Ui::AddContact>())
     , ot_(ot)

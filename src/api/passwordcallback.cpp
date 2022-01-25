@@ -3,12 +3,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "otwrap/passwordcallback.hpp"  // IWYU pragma: associated
+#include "api/passwordcallback.hpp"  // IWYU pragma: associated
 
 #include <opentxs/opentxs.hpp>
 #include <QString>
 
-#include "app.hpp"
+#include "app/app.hpp"
 #include "util/scopeguard.hpp"
 
 namespace metier

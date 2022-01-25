@@ -5,8 +5,8 @@
 
 #include <boost/program_options.hpp>
 
+#include "api/api.hpp"
 #include "app/imp.hpp"
-#include "otwrap.hpp"
 
 namespace po = boost::program_options;
 
@@ -18,7 +18,7 @@ auto App::Imp::factory(App& parent, int& argc, char** argv) noexcept
     static constexpr auto advanced{"advanced"};
     auto use_advanced{false};
     const auto options = [] {
-        const auto text = OTWrap::Name().toStdString() + " options";
+        const auto text = Api::Name().toStdString() + " options";
         auto out = po::options_description{text};
         out.add_options()(
             advanced,

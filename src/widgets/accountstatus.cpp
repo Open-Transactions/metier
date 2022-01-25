@@ -8,7 +8,7 @@
 #include <opentxs/opentxs.hpp>
 #include <QPushButton>
 
-#include "otwrap.hpp"
+#include "api/api.hpp"
 #include "ui_accountstatus.h"
 #include "util/resizer.hpp"
 
@@ -18,7 +18,7 @@ struct AccountStatus::Imp {
     QDialog* parent_;
     std::unique_ptr<Ui::accountStatus> ui_;
 
-    Imp(QDialog* parent, OTWrap& ot, int chain) noexcept
+    Imp(QDialog* parent, Api& ot, int chain) noexcept
         : parent_(parent)
         , ui_(std::make_unique<Ui::accountStatus>())
     {
@@ -40,7 +40,7 @@ struct AccountStatus::Imp {
     auto operator=(Imp&&) -> Imp& = delete;
 };
 
-AccountStatus::AccountStatus(QWidget* parent, OTWrap& ot, int chain) noexcept
+AccountStatus::AccountStatus(QWidget* parent, Api& ot, int chain) noexcept
     : QDialog(parent)
     , imp_p_(std::make_unique<Imp>(this, ot, chain))
     , imp_(*imp_p_)

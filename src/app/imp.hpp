@@ -11,7 +11,7 @@
 
 namespace metier
 {
-class OTWrap;
+class Api;
 }
 
 namespace metier
@@ -44,7 +44,7 @@ struct App::Imp {
     virtual auto getPassword(QString prompt, QString key) -> QString = 0;
     virtual auto init(int& argc, char** argv) noexcept -> void = 0;
     virtual auto run() -> int = 0;
-    virtual auto otwrap() noexcept -> OTWrap* = 0;
+    virtual auto otwrap() noexcept -> Api* = 0;
 
     virtual ~Imp() = default;
 

@@ -12,7 +12,7 @@
 
 namespace metier
 {
-class OTWrap;
+class Api;
 }  // namespace metier
 
 namespace Ui
@@ -27,7 +27,7 @@ class AccountStatus final : public QDialog
     Q_OBJECT
 
 public:
-    AccountStatus(QWidget* parent, OTWrap& ot, int chain) noexcept;
+    AccountStatus(QWidget* parent, Api& ot, int chain) noexcept;
 
     ~AccountStatus() final;
 

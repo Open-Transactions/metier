@@ -9,13 +9,15 @@
 
 namespace metier::widget
 {
-RecoverWallet::RecoverWallet(QObject* parent, OTWrap& ot) noexcept
+RecoverWallet::RecoverWallet(QObject* parent, Api& ot) noexcept
     : QDialog(nullptr)
     , imp_p_(std::make_unique<Imp>(this, ot))
     , imp_(*imp_p_)
 {
     moveToThread(parent->thread());
 }
+
+auto RecoverWallet::cancel() -> void { imp_.cancel(); }
 
 RecoverWallet::~RecoverWallet() = default;
 }  // namespace metier::widget

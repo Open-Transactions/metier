@@ -5,12 +5,12 @@
 
 #include "imp.hpp"  // IWYU pragma: associated
 
-#include <otwrap.hpp>
 #include <QApplication>
 #include <QEventLoop>
 #include <QIcon>
 #include <QPushButton>
 
+#include "api/api.hpp"
 #include "util/focuser.hpp"
 #include "util/scopeguard.hpp"
 #include "widgets/blockchainchooser.hpp"
@@ -36,7 +36,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
     PasswordData password_;
     const QIcon icon_;
     std::atomic_bool first_run_complete_;
-    std::unique_ptr<OTWrap> ot_;
+    std::unique_ptr<Api> ot_;
     std::unique_ptr<widget::FirstRun> first_run_;
     std::unique_ptr<widget::NewSeed> new_seed_;
     std::unique_ptr<widget::RecoverWallet> recover_wallet_;
@@ -108,7 +108,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
 
     auto init(int& argc, char** argv) noexcept -> void final
     {
-        ot_ = std::make_unique<OTWrap>(*this, parent_, argc, argv);
+        ot_ = std::make_unique<Api>(*this, parent_, argc, argv);
         first_run_ = std::make_unique<widget::FirstRun>(this);
         new_seed_ = std::make_unique<widget::NewSeed>(this, *ot_);
         recover_wallet_ = std::make_unique<widget::RecoverWallet>(this, *ot_);
@@ -129,7 +129,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
             &widget::FirstRun::wantOld,
             this,
             &LegacyApp::displayRecovery);
-        connect(alias, &widget::ProfileAlias::gotAlias, ot, &OTWrap::createNym);
+        connect(alias, &widget::ProfileAlias::gotAlias, ot, &Api::createNym);
         connect(ok, &QPushButton::clicked, &parent_, &App::startup);
     }
 
@@ -140,7 +140,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
         return exec();
     }
 
-    auto otwrap() noexcept -> OTWrap* final { return ot_.get(); }
+    auto otwrap() noexcept -> Api* final { return ot_.get(); }
 
     LegacyApp(App& parent, int& argc, char** argv) noexcept
         : QApplication(argc, argv)
