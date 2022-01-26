@@ -109,19 +109,19 @@ auto Api::checkStartupConditions() -> void
                     }
                 }
             } else if (1 > model->enabledCount()) {
-                emit needBlockchain();
+                emit privateNeedBlockchain({});
             } else {
                 if (false == imp_.validateBlockchains()) {
                     qFatal("Unable to initialize blockchains");
                 }
 
                 imp_.state_.store(Imp::State::run);
-                emit readyForMainWindow();
+                emit privateReadyForMainWindow({});
             }
         } break;
         case Imp::State::run:
         default: {
-            emit readyForMainWindow();
+            emit privateReadyForMainWindow({});
         }
     }
 }
@@ -149,7 +149,7 @@ auto Api::doNeedNym() -> void
 
             if (nym->empty()) {
                 if (false == imp_.wait_for_seed_backup_) {
-                    emit needProfileName();
+                    emit privateNeedProfileName({});
                 }
             } else {
                 if (false == imp_.validateNym()) {
@@ -174,7 +174,7 @@ auto Api::doNeedSeed() -> void
             const auto [seed, count] = imp_.api_.Crypto().Seed().DefaultSeed();
 
             if (seed.empty() && (0u == count)) {
-                emit needSeed();
+                emit privateNeedSeed({});
             } else {
                 if (false == imp_.validateSeed()) {
                     qFatal("Unable to initialize wallet seed");

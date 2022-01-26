@@ -156,6 +156,7 @@ struct LegacyApp final : public App::Imp, public QApplication {
         , blockchains_()
         , main_window_()
     {
+        QGuiApplication::setQuitOnLastWindowClosed(false);
     }
 
     ~LegacyApp() final = default;

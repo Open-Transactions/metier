@@ -18,11 +18,11 @@
 
 #include "api/api.hpp"
 #include "app/size.hpp"
+#include "app/startup.hpp"
 #include "models/blockchainchooser.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "qml.hpp"
 #include "util/claim.hpp"
 
 namespace metier
@@ -37,7 +37,7 @@ public:
     App& parent_;
     std::unique_ptr<Api> ot_;
     QQuickView qml_;
-    QmlInterface interface_;
+    Startup startup_;
     std::atomic<bool> model_init_;
     std::shared_future<void> models_set_;
 
@@ -55,7 +55,7 @@ public:
         // Call otwrap.checkStartupConditions() once the user
         // has selected at least one blockchain and is ready to move on.
         models_set_.get();
-        interface_.doDisplayBlockchainChooser();
+        startup_.doDisplayBlockchainChooser();
     }
 
     auto displayFirstRun() -> void final
@@ -69,7 +69,7 @@ public:
         //
         // If the user wants to import an existing seed, collect his input then
         // call otwrap.importSeed()
-        interface_.doDisplayFirstRun();
+        startup_.doDisplayFirstRun();
     }
 
     auto displayMainWindow() -> void final
@@ -77,7 +77,7 @@ public:
         // NOTE once the app.displayMainWindow signal is received the startup
         // process is complete. Display the main screen.
         models_set_.get();
-        interface_.doDisplayMainWindow();
+        startup_.doDisplayMainWindow();
     }
 
     auto displayNamePrompt() -> void final
@@ -85,7 +85,7 @@ public:
         // NOTE when the app.displayNamePrompt signal is received the user must
         // provide a profile name. Call otwrap.createNym() with the name the
         // user provides
-        interface_.doDisplayNamePrompt();
+        startup_.doDisplayNamePrompt();
     }
 
     auto displayPasswordPrompt(QString, bool) -> void final
@@ -133,6 +133,7 @@ public:
         qml_.setResizeMode(QQuickView::SizeRootObjectToView);
         const auto dSize = qml_default_size();
         const auto mSize = qml_minimum_size();
+        const auto xSize = qml_maximum_size();
 
         if ((0 != dSize.first) && (0 != dSize.second)) {
             qml_.resize(dSize.first, dSize.second);
@@ -140,6 +141,10 @@ public:
 
         if ((0 != mSize.first) && (0 != mSize.second)) {
             qml_.setMinimumSize(QSize{mSize.first, mSize.second});
+        }
+
+        if ((0 != xSize.first) && (0 != xSize.second)) {
+            qml_.setMaximumSize(QSize{xSize.first, xSize.second});
         }
 
         qml_.show();
@@ -160,12 +165,12 @@ public:
         , parent_(parent)
         , ot_()
         , qml_()
-        , interface_()
+        , startup_()
         , model_init_(false)
         , models_set_(model_promise_.get_future())
     {
         {
-            auto* app = &interface_;
+            auto* app = &startup_;
             Ownership::Claim(app);
             qml_.rootContext()->setContextProperty("startup", app);
         }
@@ -191,19 +196,6 @@ auto App::Imp::factory_qml(App& parent, int& argc, char** argv) noexcept
 {
     return std::make_unique<QmlApp>(parent, argc, argv);
 }
-
-auto QmlInterface::doDisplayBlockchainChooser() -> void
-{
-    emit displayBlockchainChooser();
-}
-
-auto QmlInterface::doDisplayFirstRun() -> void { emit displayFirstRun(); }
-
-auto QmlInterface::doDisplayMainWindow() -> void { emit displayMainWindow(); }
-
-auto QmlInterface::doDisplayNamePrompt() -> void { emit displayNamePrompt(); }
-
-QmlInterface::~QmlInterface() = default;
 }  // namespace metier
 
 namespace metier

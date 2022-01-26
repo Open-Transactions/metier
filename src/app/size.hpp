@@ -8,5 +8,6 @@
 namespace metier
 {
 auto qml_default_size() noexcept -> std::pair<int, int>;
+auto qml_maximum_size() noexcept -> std::pair<int, int>;
 auto qml_minimum_size() noexcept -> std::pair<int, int>;
 }  // namespace metier

@@ -9,7 +9,7 @@
 
 namespace metier
 {
-class QmlInterface final : public QObject
+class Startup final : public QObject
 {
     Q_OBJECT
 
@@ -25,6 +25,6 @@ public:
     auto doDisplayMainWindow() -> void;
     auto doDisplayNamePrompt() -> void;
 
-    ~QmlInterface() final;
+    ~Startup() final;
 };
 }  // namespace metier
