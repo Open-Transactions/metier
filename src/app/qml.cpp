@@ -121,7 +121,7 @@ public:
                 this,
                 &QmlApp::nymReady);
             Ownership::Claim(ot);
-            qml_.rootContext()->setContextProperty("otwrap", ot);
+            qml_.rootContext()->setContextProperty("api", ot);
         }
 
         qml_.connect(
