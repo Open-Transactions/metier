@@ -55,16 +55,14 @@ class Api final : public QObject
 
 signals:
     void chainsChanged(int enabledCount);
-    void needBlockchain();
-    void needProfileName();
-    void needSeed();
-    void readyForMainWindow();
+
+    void privateNeedBlockchain(QPrivateSignal);
+    void privateNeedProfileName(QPrivateSignal);
+    void privateNeedSeed(QPrivateSignal);
+    void privateReadyForMainWindow(QPrivateSignal);
 
 public slots:
-    void chainIsDisabled(int chain);
-    void chainIsEnabled(int chain);
     void checkAccounts();
-    void checkChains(int chain);
     void checkStartupConditions();
     void createNym(QString alias);
     void importSeed(int type, int lang, QString words, QString password);
@@ -72,6 +70,9 @@ public slots:
     void seedBackupFinished();
 
 private slots:
+    void chainIsDisabled(int chain);
+    void chainIsEnabled(int chain);
+    void checkChains(int chain);
     void doNeedNym();
     void doNeedSeed();
 

@@ -8,8 +8,9 @@ if(METIER_QML_INTERFACE)
     metier-common
     PRIVATE
       "qml.cpp"
-      "qml.hpp"
       "size.hpp"
+      "startup.cpp"
+      "startup.hpp"
   )
   target_link_libraries(metier-common PRIVATE Qt::Qml Qt::Quick)
 else()

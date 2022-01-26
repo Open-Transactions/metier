@@ -21,14 +21,14 @@ App::App(int& argc, char** argv) noexcept
     : imp_p_(Imp::factory(*this, argc, argv))
     , imp_(*imp_p_)
 {
-    QGuiApplication::setQuitOnLastWindowClosed(false);
     connect(this, &App::passwordPrompt, this, &App::displayPasswordPrompt);
     imp_.init(argc, argv);
     auto* ot = imp_.otwrap();
-    connect(ot, &Api::needSeed, this, &App::displayFirstRun);
-    connect(ot, &Api::needProfileName, this, &App::displayNamePrompt);
-    connect(ot, &Api::needBlockchain, this, &App::displayBlockchainChooser);
-    connect(ot, &Api::readyForMainWindow, this, &App::displayMainWindow);
+    connect(ot, &Api::privateNeedSeed, this, &App::displayFirstRun);
+    connect(ot, &Api::privateNeedProfileName, this, &App::displayNamePrompt);
+    connect(
+        ot, &Api::privateNeedBlockchain, this, &App::displayBlockchainChooser);
+    connect(ot, &Api::privateReadyForMainWindow, this, &App::displayMainWindow);
     connect(this, &App::startup, ot, &Api::checkStartupConditions);
     emit startup();
 }

@@ -53,7 +53,8 @@ MainWindow::MainWindow(QObject* parent, Api& ot) noexcept
         &IdentityManager::activeNymChanged,
         this,
         &MainWindow::initModels);
-    connect(&ot, &Api::readyForMainWindow, this, &MainWindow::updateToolbox);
+    connect(
+        &ot, &Api::privateReadyForMainWindow, this, &MainWindow::updateToolbox);
     connect(&ot, &Api::chainsChanged, this, &MainWindow::updateToolbox);
     connect(quit, &QAction::triggered, this, &MainWindow::exit);
     connect(bc, &QAction::triggered, this, &MainWindow::showBlockchainChooser);
