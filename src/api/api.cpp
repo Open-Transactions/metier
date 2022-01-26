@@ -108,6 +108,9 @@ auto Api::checkStartupConditions() -> void
                         qFatal("Timeout waiting for enabled blockchain");
                     }
                 }
+
+                imp_.state_.store(Imp::State::run);
+                emit privateReadyForMainWindow({});
             } else if (1 > model->enabledCount()) {
                 emit privateNeedBlockchain({});
             } else {
