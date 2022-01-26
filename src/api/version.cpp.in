@@ -3,7 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "otwrap.hpp"  // IWYU pragma: associated
+#include "api/api.hpp"  // IWYU pragma: associated
 
 #include <QString>
 #include <sstream>
@@ -11,28 +11,28 @@
 
 namespace metier
 {
-auto OTWrap::Domain() noexcept -> QString
+auto Api::Domain() noexcept -> QString
 {
     // clang-format off
     return QString::fromLocal8Bit(u8"@METIER_APP_DOMAIN@");
     // clang-format on
 }
 
-auto OTWrap::Name() noexcept -> QString
+auto Api::Name() noexcept -> QString
 {
     // clang-format off
     return QString::fromLocal8Bit(u8"@PROJECT_NAME@");
     // clang-format on
 }
 
-auto OTWrap::Title() noexcept -> QString
+auto Api::Title() noexcept -> QString
 {
     // clang-format off
     return QString::fromLocal8Bit(u8"@METIER_APPSTREAM_NAME@");
     // clang-format on
 }
 
-auto OTWrap::versionString(int suffix) -> QString
+auto Api::versionString(int suffix) -> QString
 {
     // clang-format off
     static constexpr auto name_{u8"@METIER_APPSTREAM_NAME@"};

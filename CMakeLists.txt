@@ -18,8 +18,8 @@ set(METIER_CLI_COMMAND "metierctl")
 set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 22)
-set(METIER_VERSION_MINOR 0)
-set(METIER_VERSION_PATCH 2)
+set(METIER_VERSION_MINOR 1)
+set(METIER_VERSION_PATCH 0)
 
 execute_process(
   COMMAND
@@ -121,17 +121,6 @@ endif()
 # Print system information and build options
 
 print_build_details(METIER_PEDANTIC_BUILD METIER_BUILD_TESTS)
-
-if("${METIER_DEFAULT_BLOCKCHAIN}"
-   STREQUAL
-   ""
-)
-  set(METIER_USE_DEFAULT_BLOCKCHAIN OFF)
-  message(STATUS "Default blockchain:       none")
-else()
-  set(METIER_USE_DEFAULT_BLOCKCHAIN ON)
-  message(STATUS "Default blockchain:       ${METIER_DEFAULT_BLOCKCHAIN}")
-endif()
 
 if(METIER_QML_INTERFACE)
   message(STATUS "Interface type:           Qml")
@@ -262,6 +251,7 @@ add_definitions("${QT_DEFINITIONS}")
 # -----------------------------------------------------------------------------
 # Build source
 
+add_library(metier-common OBJECT "")
 add_subdirectory(deps)
 add_subdirectory(licenses)
 add_subdirectory(src)

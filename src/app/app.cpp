@@ -5,11 +5,12 @@
 
 #include "app.hpp"  // IWYU pragma: associated
 
-#include <otwrap.hpp>
+#include <QGuiApplication>
 #include <QThread>
 #include <iostream>
 #include <mutex>
 
+#include "api/api.hpp"
 #include "app/imp.hpp"
 
 namespace metier
@@ -20,14 +21,15 @@ App::App(int& argc, char** argv) noexcept
     : imp_p_(Imp::factory(*this, argc, argv))
     , imp_(*imp_p_)
 {
+    QGuiApplication::setQuitOnLastWindowClosed(false);
     connect(this, &App::passwordPrompt, this, &App::displayPasswordPrompt);
     imp_.init(argc, argv);
     auto* ot = imp_.otwrap();
-    connect(ot, &OTWrap::needSeed, this, &App::displayFirstRun);
-    connect(ot, &OTWrap::needProfileName, this, &App::displayNamePrompt);
-    connect(ot, &OTWrap::needBlockchain, this, &App::displayBlockchainChooser);
-    connect(ot, &OTWrap::readyForMainWindow, this, &App::displayMainWindow);
-    connect(this, &App::startup, ot, &OTWrap::checkStartupConditions);
+    connect(ot, &Api::needSeed, this, &App::displayFirstRun);
+    connect(ot, &Api::needProfileName, this, &App::displayNamePrompt);
+    connect(ot, &Api::needBlockchain, this, &App::displayBlockchainChooser);
+    connect(ot, &Api::readyForMainWindow, this, &App::displayMainWindow);
+    connect(this, &App::startup, ot, &Api::checkStartupConditions);
     emit startup();
 }
 
@@ -94,6 +96,6 @@ auto App::Get(int& argc, char** argv) noexcept -> App*
 App::~App()
 {
     imp_p_.reset();
-    OTWrap::Cleanup();
+    Api::Cleanup();
 }
 }  // namespace metier

@@ -12,7 +12,7 @@
 
 namespace metier
 {
-class OTWrap;
+class Api;
 }  // namespace metier
 
 namespace Ui
@@ -27,7 +27,7 @@ class SeedManager final : public QDialog
     Q_OBJECT
 
 public:
-    SeedManager(QWidget* parent, OTWrap& ot) noexcept;
+    SeedManager(QWidget* parent, Api& ot) noexcept;
 
     ~SeedManager() final;
 

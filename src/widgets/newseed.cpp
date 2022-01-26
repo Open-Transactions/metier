@@ -9,7 +9,7 @@
 
 namespace metier::widget
 {
-NewSeed::NewSeed(QObject* parent, OTWrap& ot) noexcept
+NewSeed::NewSeed(QObject* parent, Api& ot) noexcept
     : QDialog(nullptr)
     , imp_p_(std::make_unique<Imp>(this, ot))
     , imp_(*imp_p_)

@@ -12,7 +12,7 @@
 
 namespace metier
 {
-class OTWrap;
+class Api;
 }  // namespace metier
 
 namespace Ui
@@ -33,13 +33,13 @@ private slots:
     void addContactPrivate();
 
 public:
-    AddContact(QObject* parent, OTWrap& ot);
+    AddContact(QObject* parent, Api& ot);
 
     ~AddContact() final;
 
 private:
     std::unique_ptr<Ui::AddContact> ui_;
-    OTWrap& ot_;
+    Api& ot_;
 
     AddContact(const AddContact&) = delete;
     AddContact(AddContact&&) = delete;

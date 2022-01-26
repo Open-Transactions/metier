@@ -30,6 +30,7 @@ namespace metier
 {
 namespace model
 {
+class BlockchainChooser;
 class SeedLanguage;
 class SeedSize;
 class SeedType;
@@ -40,7 +41,7 @@ class App;
 
 namespace metier
 {
-class OTWrap final : public QObject
+class Api final : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int enabledCurrencyCount READ enabledCurrencyCount)
@@ -57,7 +58,6 @@ signals:
     void needBlockchain();
     void needProfileName();
     void needSeed();
-    void nymReady();
     void readyForMainWindow();
 
 public slots:
@@ -68,6 +68,12 @@ public slots:
     void checkStartupConditions();
     void createNym(QString alias);
     void importSeed(int type, int lang, QString words, QString password);
+    void quit();
+    void seedBackupFinished();
+
+private slots:
+    void doNeedNym();
+    void doNeedSeed();
 
 public:
     using BlockchainList = QVector<int>;
@@ -112,9 +118,9 @@ public:
     BlockchainList validBlockchains();
     Q_INVOKABLE QString versionString(int suffix = 0);
 
-    explicit OTWrap(QGuiApplication& parent, App& app, int& argc, char** argv);
+    explicit Api(QGuiApplication& parent, App& app, int& argc, char** argv);
 
-    ~OTWrap() final;
+    ~Api() final;
 
 private:
     struct Imp;
@@ -122,6 +128,6 @@ private:
     std::unique_ptr<Imp> imp_p_;
     Imp& imp_;
 
-    OTWrap() = delete;
+    Api() = delete;
 };
 }  // namespace metier

@@ -3,38 +3,33 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-if(METIER_QML_INTERFACE)
-  target_sources(
-    metier-common
-    PRIVATE
-      "qml.cpp"
-      "qml.hpp"
-      "size.hpp"
-  )
-  target_link_libraries(metier-common PRIVATE Qt::Qml Qt::Quick)
-else()
-  target_sources(metier-common PRIVATE "no-qml.cpp")
-endif()
+configure_file(
+  "version.cpp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/version.cpp"
+  @ONLY
+)
 
 target_sources(
   metier-common
   PRIVATE
-    "app.cpp"
-    "app.hpp"
-    "factory.cpp"
+    "${CMAKE_CURRENT_BINARY_DIR}/version.cpp"
+    "api.cpp"
+    "api.hpp"
+    "custom.cpp"
+    "custom.hpp"
     "imp.hpp"
-    "legacy.cpp"
+    "passwordcallback.cpp"
+    "passwordcallback.hpp"
 )
-
 target_link_libraries(
   metier-common
   PUBLIC
-    Boost::headers
     Qt::Core
     Qt::Gui
-    Qt::Widgets
     opentxs
+    qr-code-generator
 )
+
 if(NOT METIER_BUNDLED_OPENTXS)
   target_include_directories(
     metier-common SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"

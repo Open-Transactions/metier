@@ -8,7 +8,7 @@
 #include <opentxs/opentxs.hpp>
 #include <QPushButton>
 
-#include "otwrap.hpp"
+#include "api/api.hpp"
 #include "ui_seedmanager.h"
 #include "util/resizer.hpp"
 
@@ -18,7 +18,7 @@ struct SeedManager::Imp {
     QDialog* parent_;
     std::unique_ptr<Ui::seedManager> ui_;
 
-    Imp(QDialog* parent, OTWrap& ot) noexcept
+    Imp(QDialog* parent, Api& ot) noexcept
         : parent_(parent)
         , ui_(std::make_unique<Ui::seedManager>())
     {
@@ -38,7 +38,7 @@ struct SeedManager::Imp {
     auto operator=(Imp&&) -> Imp& = delete;
 };
 
-SeedManager::SeedManager(QWidget* parent, OTWrap& ot) noexcept
+SeedManager::SeedManager(QWidget* parent, Api& ot) noexcept
     : QDialog(parent)
     , imp_p_(std::make_unique<Imp>(this, ot))
     , imp_(*imp_p_)

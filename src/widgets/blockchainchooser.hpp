@@ -14,7 +14,7 @@ class QWidget;
 
 namespace metier
 {
-class OTWrap;
+class Api;
 }  // namespace metier
 
 namespace Ui
@@ -33,12 +33,12 @@ class BlockchainChooser final : public QDialog
 public:
     auto Ok() noexcept -> QPushButton*;
 
-    BlockchainChooser(QObject* parent, OTWrap& ot);
+    BlockchainChooser(QObject* parent, Api& ot);
 
     ~BlockchainChooser() final;
 
 private:
-    OTWrap& ot_;
+    Api& ot_;
     const std::unique_ptr<Ui::BlockchainChooser> ui_;
 
     auto check(int enabledChains) noexcept -> void;

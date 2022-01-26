@@ -3,8 +3,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "imp.hpp"  // IWYU pragma: associated
+#include "app/imp.hpp"  // IWYU pragma: associated
 
+#include <opentxs/interface/qt/IdentityManager.hpp>
 #include <opentxs/interface/qt/SeedValidator.hpp>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -15,11 +16,12 @@
 #include <atomic>
 #include <future>
 
+#include "api/api.hpp"
+#include "app/size.hpp"
 #include "models/blockchainchooser.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "otwrap.hpp"
 #include "qml.hpp"
 #include "util/claim.hpp"
 
@@ -33,7 +35,7 @@ public:
     static std::unique_ptr<App> singleton_;
 
     App& parent_;
-    std::unique_ptr<OTWrap> ot_;
+    std::unique_ptr<Api> ot_;
     QQuickView qml_;
     QmlInterface interface_;
     std::atomic<bool> model_init_;
@@ -42,11 +44,15 @@ public:
     auto displayBlockchainChooser() -> void final
     {
         // NOTE when the app.displayBlockchainChooser signal is received the
-        // user must enable at least one blockchain Use
-        // otwrap.BlockchainChooserModel to populate a control which allows the
-        // user to enable a blockchain Do not allow the user to proceed until
-        // the otwrap.chainsChanged signal has been received with a value
-        // greater than zero. Call otwrap.checkStartupConditions() once the user
+        // user must enable at least one blockchain.
+        //
+        // Use otwrap.BlockchainChooserModel to populate a control which allows
+        // the user to enable a blockchain.
+        //
+        // Do not allow the user to proceed until the otwrap.chainsChanged
+        // signal has been received with a value greater than zero.
+        //
+        // Call otwrap.checkStartupConditions() once the user
         // has selected at least one blockchain and is ready to move on.
         models_set_.get();
         interface_.doDisplayBlockchainChooser();
@@ -77,7 +83,7 @@ public:
     auto displayNamePrompt() -> void final
     {
         // NOTE when the app.displayNamePrompt signal is received the user must
-        // provide a profile name. call otwrap.createNym() with the name the
+        // provide a profile name. Call otwrap.createNym() with the name the
         // user provides
         interface_.doDisplayNamePrompt();
     }
@@ -103,11 +109,17 @@ public:
 
     auto init(int& argc, char** argv) noexcept -> void final
     {
-        ot_ = std::make_unique<OTWrap>(*this, parent_, argc, argv);
+        ot_ = std::make_unique<Api>(*this, parent_, argc, argv);
 
         {
             auto* ot = ot_.get();
-            ot->connect(ot, &OTWrap::nymReady, this, &QmlApp::nymReady);
+            using IdentityManager = opentxs::ui::IdentityManagerQt;
+            auto* identity = ot->identityManager();
+            ot->connect(
+                identity,
+                &IdentityManager::activeNymChanged,
+                this,
+                &QmlApp::nymReady);
             Ownership::Claim(ot);
             qml_.rootContext()->setContextProperty("otwrap", ot);
         }
@@ -119,6 +131,17 @@ public:
         if (qml_.status() == QQuickView::Error) { abort(); }
 
         qml_.setResizeMode(QQuickView::SizeRootObjectToView);
+        const auto dSize = qml_default_size();
+        const auto mSize = qml_minimum_size();
+
+        if ((0 != dSize.first) && (0 != dSize.second)) {
+            qml_.resize(dSize.first, dSize.second);
+        }
+
+        if ((0 != mSize.first) && (0 != mSize.second)) {
+            qml_.setMinimumSize(QSize{mSize.first, mSize.second});
+        }
+
         qml_.show();
     }
 
@@ -129,7 +152,7 @@ public:
         return exec();
     }
 
-    auto otwrap() noexcept -> OTWrap* final { return ot_.get(); }
+    auto otwrap() noexcept -> Api* final { return ot_.get(); }
 
     QmlApp(App& parent, int& argc, char** argv) noexcept
         : QGuiApplication(argc, argv)
@@ -144,8 +167,10 @@ public:
         {
             auto* app = &interface_;
             Ownership::Claim(app);
-            qml_.rootContext()->setContextProperty("app", app);
+            qml_.rootContext()->setContextProperty("startup", app);
         }
+
+        qml_.rootContext()->setContextProperty("metier", this);
     }
 
     ~QmlApp() final = default;

@@ -12,7 +12,7 @@
 
 namespace metier
 {
-class OTWrap;
+class Api;
 }  // namespace metier
 
 namespace metier::widget
@@ -21,7 +21,7 @@ class ShowSeed final : public QDialog
 {
     Q_OBJECT
 public:
-    ShowSeed(QWidget* parent, OTWrap& ot) noexcept;
+    ShowSeed(QWidget* parent, Api& ot) noexcept;
 
     ~ShowSeed() final;
 

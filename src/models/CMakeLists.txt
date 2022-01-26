@@ -3,40 +3,29 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-set(cxx-sources
-    "licenses.cpp"
-    "seedlang.cpp"
-    "seedsize.cpp"
-    "seedtype.cpp"
-)
-set(cxx-headers "")
-set(moc-headers
+target_sources(
+  metier-common
+  PRIVATE
     "blockchainchooser.hpp"
+    "licenses.cpp"
     "licenses.hpp"
+    "seedlang.cpp"
     "seedlang.hpp"
+    "seedsize.cpp"
     "seedsize.hpp"
+    "seedtype.cpp"
     "seedtype.hpp"
 )
-qt_wrap_cpp(moc-sources "${moc-headers}")
-
-add_library(
-  metier-models OBJECT
-  "${cxx-sources}"
-  "${cxx-headers}"
-  "${moc-sources}"
-  "${moc-headers}"
-)
 target_link_libraries(
-  metier-models
+  metier-common
   PUBLIC
     Qt::Core
     Qt::Gui
-    protobuf::libprotobuf-lite
-  PRIVATE metier-license opentxs
+    opentxs
 )
 
 if(NOT METIER_BUNDLED_OPENTXS)
   target_include_directories(
-    metier-models SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
+    metier-common SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
   )
 endif()

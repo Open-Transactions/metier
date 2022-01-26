@@ -14,7 +14,7 @@
 #include <iostream>
 #include <tuple>
 
-#include "otwrap.hpp"
+#include "api/api.hpp"
 #include "ui_mainwindow.h"
 #include "util/convertblockchain.hpp"
 #include "util/resizer.hpp"
@@ -60,7 +60,7 @@ struct ChainToolboxManager {
         return util::convert(items_.at(position));
     }
 
-    auto reconcile(OTWrap::BlockchainList current) noexcept
+    auto reconcile(Api::BlockchainList current) noexcept
     {
         ot::rLock lock{lock_};
         std::sort(std::begin(current), std::end(current));
@@ -125,7 +125,7 @@ struct ChainToolboxManager {
 
     ChainToolboxManager(
         QMainWindow* parent,
-        OTWrap& ot,
+        Api& ot,
         AccountList& accountList,
         ToolBox& toolbox,
         RegisterProgress progress) noexcept
@@ -145,7 +145,7 @@ private:
     QMainWindow* parent_;
     mutable std::recursive_mutex lock_;
     const RegisterProgress progress_cb_;
-    OTWrap& ot_;
+    Api& ot_;
     opentxs::ui::IdentityManagerQt* identity_manager_;
     AccountList& account_list_;
     ToolBox& toolbox_;

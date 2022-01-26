@@ -20,10 +20,10 @@
 #include <set>
 #include <vector>
 
+#include "api/api.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
-#include "otwrap.hpp"
 #include "ui_recoverwallet.h"
 #include "util/resizer.hpp"
 #include "util/scopeguard.hpp"
@@ -31,8 +31,8 @@
 namespace metier::widget
 {
 struct RecoverWallet::Imp {
-    OTWrap& ot_;
-    QDialog* parent_;
+    Api& ot_;
+    RecoverWallet* parent_;
     mutable std::mutex lock_;
     std::unique_ptr<Ui::RestoreSeed> ui_;
     std::set<QWidget*> labels_;
@@ -53,6 +53,11 @@ struct RecoverWallet::Imp {
     auto getStrength() const noexcept { return get_data(ui_->strength); }
     auto getStyle() const noexcept { return get_data(ui_->type); }
 
+    auto cancel() -> void
+    {
+        parent_->hide();
+        ot_.checkStartupConditions();
+    }
     auto clearWords() -> void
     {
         auto* layout = ui_->wordsLayout;
@@ -222,7 +227,7 @@ struct RecoverWallet::Imp {
         ok->setEnabled(valid);
     }
 
-    Imp(QDialog* parent, OTWrap& ot) noexcept
+    Imp(RecoverWallet* parent, Api& ot) noexcept
         : ot_(ot)
         , parent_(parent)
         , lock_()
@@ -272,10 +277,7 @@ struct RecoverWallet::Imp {
         {
             auto* cancel = ui_->control->button(QDialogButtonBox::Cancel);
             connect(
-                cancel,
-                &QPushButton::clicked,
-                &ot_,
-                &OTWrap::checkStartupConditions);
+                cancel, &QPushButton::clicked, parent_, &RecoverWallet::cancel);
         }
     }
     Imp(const Imp&) = delete;

@@ -13,7 +13,7 @@
 #include <set>
 #include <tuple>
 
-#include "otwrap.hpp"
+#include "api/api.hpp"
 #include "ui_mainwindow.h"
 #include "util/resizer.hpp"
 #include "util/scopeguard.hpp"
@@ -29,7 +29,7 @@ namespace metier::widget
 {
 struct MainWindow::Imp {
     MainWindow& parent_;
-    OTWrap& ot_;
+    Api& ot_;
     opentxs::ui::IdentityManagerQt* identity_manager_;
     std::unique_ptr<Ui::MainWindow> ui_;
     std::unique_ptr<widget::BlockchainChooser> blockchains_;
@@ -107,7 +107,7 @@ struct MainWindow::Imp {
         parent_.setProgressValue(current);
     }
 
-    Imp(MainWindow* parent, OTWrap& ot) noexcept
+    Imp(MainWindow* parent, Api& ot) noexcept
         : parent_(*parent)
         , ot_(ot)
         , identity_manager_(ot_.identityManager())
@@ -158,6 +158,8 @@ struct MainWindow::Imp {
                 &parent_,
                 &MainWindow::showAddContact);
         }
+
+        connect(&parent_, &QObject::destroyed, &ot_, &Api::quit);
     }
 
     Imp() = delete;

@@ -16,8 +16,8 @@
 #include <QToolBox>
 #include <QVariant>
 
+#include "api/api.hpp"
 #include "mainwindow/imp.hpp"
-#include "otwrap.hpp"
 #include "ui_mainwindow.h"
 #include "util/focuser.hpp"
 #include "widgets/blockchainchooser.hpp"
@@ -30,7 +30,7 @@ namespace metier::widget
 {
 using OTModel = opentxs::ui::AccountListQt;
 
-MainWindow::MainWindow(QObject* parent, OTWrap& ot) noexcept
+MainWindow::MainWindow(QObject* parent, Api& ot) noexcept
     : QMainWindow(nullptr)
     , imp_p_(std::make_unique<Imp>(this, ot))
     , imp_(*imp_p_)
@@ -46,14 +46,20 @@ MainWindow::MainWindow(QObject* parent, OTWrap& ot) noexcept
     auto* license = imp_.ui_->action_help_opensource;
     auto* toolbox = imp_.ui_->moneyToolbox;
     auto* prog = imp_.ui_->syncProgress;
-    connect(&ot, &OTWrap::nymReady, this, &MainWindow::initModels);
-    connect(&ot, &OTWrap::readyForMainWindow, this, &MainWindow::updateToolbox);
-    connect(&ot, &OTWrap::chainsChanged, this, &MainWindow::updateToolbox);
+    using IdentityManager = opentxs::ui::IdentityManagerQt;
+    auto* identity = ot.identityManager();
+    connect(
+        identity,
+        &IdentityManager::activeNymChanged,
+        this,
+        &MainWindow::initModels);
+    connect(&ot, &Api::readyForMainWindow, this, &MainWindow::updateToolbox);
+    connect(&ot, &Api::chainsChanged, this, &MainWindow::updateToolbox);
     connect(quit, &QAction::triggered, this, &MainWindow::exit);
     connect(bc, &QAction::triggered, this, &MainWindow::showBlockchainChooser);
     connect(words, &QAction::triggered, this, &MainWindow::showRecoveryWords);
     connect(seeds, &QAction::triggered, this, &MainWindow::showSeedManager);
-    connect(bcdone, &QPushButton::clicked, &ot, &OTWrap::checkAccounts);
+    connect(bcdone, &QPushButton::clicked, &ot, &Api::checkAccounts);
     connect(license, &QAction::triggered, this, &MainWindow::showLicenseViewer);
     connect(toolbox, &QToolBox::currentChanged, this, &MainWindow::changeChain);
     connect(this, &MainWindow::progMaxUpdated, prog, &QProgressBar::setMaximum);
@@ -102,6 +108,12 @@ auto MainWindow::clearActivityThread() -> void
     edit.setEnabled(false);
     send.setEnabled(false);
     edit.setPlainText({});
+}
+
+auto MainWindow::closeEvent(QCloseEvent* event) -> void
+{
+    event->ignore();
+    imp_.ot_.quit();
 }
 
 auto MainWindow::contactListUpdated(
