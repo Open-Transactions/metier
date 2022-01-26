@@ -139,7 +139,7 @@
       "sources": [
         {
           "url": "ssh://git@github.com/matterfi/wallet",
-          "branch": "pkt",
+          "branch": "pkt-release",
           "type": "git",
           "disable-shallow-clone": true
         }
