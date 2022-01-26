@@ -386,7 +386,7 @@ public:
         const auto pNym =
             api_.Wallet().Nym({seed_id_, 0}, reason, alias.toStdString());
 
-        if (!pNym) { return; }
+        if (!pNym) { qFatal("Failed to create nym"); }
 
         const auto& nym = *pNym;
         bool notUsed{false};
@@ -397,8 +397,10 @@ public:
             ot::String::Factory(nym.ID().str()),
             notUsed);
 
-        if (false == config) { return; }
-        if (false == api_.Config().Save()) { return; }
+        if (false == config) { qFatal("Failed to update configuration"); }
+        if (false == api_.Config().Save()) {
+            qFatal("Failed to save config file");
+        }
 
         identityManager()->setActiveNym(QString::fromStdString(nym.ID().str()));
         have_nym_ = true;
