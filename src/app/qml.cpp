@@ -175,6 +175,7 @@ public:
             qml_.rootContext()->setContextProperty("startup", app);
         }
 
+        Ownership::Claim(this);
         qml_.rootContext()->setContextProperty("metier", this);
     }
 
