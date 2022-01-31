@@ -7,7 +7,7 @@
 
 #include <boost/container/flat_map.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/json/src.hpp>
+#include <boost/json.hpp>
 #include <opentxs/opentxs.hpp>
 #include <zmq.h>
 #include <chrono>
