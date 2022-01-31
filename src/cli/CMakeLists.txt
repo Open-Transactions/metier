@@ -25,6 +25,7 @@ target_link_libraries(
 )
 
 if(NOT METIER_BUNDLED_OPENTXS)
+  target_sources("${METIER_CLI_COMMAND}" PRIVATE "json.cpp")
   target_include_directories(
     "${METIER_CLI_COMMAND}" SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
   )
