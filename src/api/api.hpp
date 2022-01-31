@@ -30,7 +30,6 @@ namespace metier
 {
 namespace model
 {
-class BlockchainChooser;
 class SeedLanguage;
 class SeedSize;
 class SeedType;

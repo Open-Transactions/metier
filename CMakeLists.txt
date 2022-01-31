@@ -18,8 +18,8 @@ set(METIER_CLI_COMMAND "metierctl")
 set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 22)
-set(METIER_VERSION_MINOR 1)
-set(METIER_VERSION_PATCH 2)
+set(METIER_VERSION_MINOR 2)
+set(METIER_VERSION_PATCH 0)
 
 execute_process(
   COMMAND
@@ -137,7 +137,10 @@ find_package(
   Boost
   1.75.0
   REQUIRED
-  COMPONENTS date_time program_options
+  COMPONENTS
+    date_time
+    json
+    program_options
 )
 find_package(
   QT
@@ -176,14 +179,16 @@ endif()
 if(METIER_BUNDLED_OPENTXS)
   find_package(
     Boost
-    1.73.0
+    1.75.0
     QUIET
     OPTIONAL_COMPONENTS
-      system
+      container
       filesystem
-      thread
       iostreams
+      json
       stacktrace_basic
+      system
+      thread
   )
 
   find_package(ZLIB QUIET)
@@ -209,14 +214,16 @@ else()
   find_package(opentxs REQUIRED)
   find_package(
     Boost
-    1.73.0
+    1.75.0
     QUIET
     OPTIONAL_COMPONENTS
-      system
+      container
       filesystem
-      thread
       iostreams
+      json
       stacktrace_basic
+      system
+      thread
   )
   find_package(ZLIB QUIET)
   find_package("${METIER_ZMQ_PACKAGE}" QUIET)

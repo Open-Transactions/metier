@@ -13,50 +13,23 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="mainnetLabel">
-     <property name="text">
-      <string>Currencies (disabled until beta release)</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QTableView" name="mainnet">
      <property name="showGrid">
       <bool>false</bool>
      </property>
-     <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
      <attribute name="horizontalHeaderVisible">
       <bool>false</bool>
      </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="testnetLabel">
+    <widget class="QCheckBox" name="checkBox">
      <property name="text">
-      <string>Test currencies</string>
+      <string>Show test currencies</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTableView" name="testnet">
-     <property name="showGrid">
-      <bool>false</bool>
-     </property>
-     <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="horizontalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
     </widget>
    </item>
    <item>

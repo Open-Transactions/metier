@@ -16,7 +16,6 @@
 
 #include "QR-Code-generator/cpp/QrCode.hpp"
 #include "api/imp.hpp"
-#include "models/blockchainchooser.hpp"
 #include "util/convertblockchain.hpp"
 
 namespace qr = qrcodegen;
@@ -53,13 +52,10 @@ auto Api::addContact(QString label, QString id) -> QString
 
 auto Api::blockchainChooserModel(const bool testnet) -> QAbstractItemModel*
 {
-    if (testnet) {
+    const auto type =
+        testnet ? ot::ui::Blockchains::All : ot::ui::Blockchains::Main;
 
-        return imp_.api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Test);
-    } else {
-
-        return imp_.mainnet_model_.get();
-    }
+    return imp_.api_.UI().BlockchainSelectionQt(type);
 }
 
 auto Api::blockchainChooserModelQML(const bool testnet) -> QObject*

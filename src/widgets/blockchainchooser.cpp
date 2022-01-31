@@ -6,6 +6,7 @@
 #include "blockchainchooser.hpp"  // IWYU pragma: associated
 
 #include <opentxs/interface/qt/BlockchainSelection.hpp>
+#include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QTableView>
@@ -26,22 +27,17 @@ BlockchainChooser::BlockchainChooser(QObject* parent, Api& ot)
 {
     moveToThread(parent->thread());
     ui_->setupUi(this);
+    model();
     const auto longestBlockchainName = ot_.longestBlockchainName();
 
     {
-        auto& mainnet = *ui_->mainnet;
-        auto& testnet = *ui_->testnet;
-        auto* mainModel = ot_.blockchainChooserModel(false);
-        auto* testModel = ot_.blockchainChooserModel(true);
-        mainnet.setModel(mainModel);
-        testnet.setModel(testModel);
+        auto& widget = *ui_->mainnet;
         const auto setWidth = [&](auto& table) {
             const auto width =
                 util::line_width(table, longestBlockchainName + 6);
             table.setColumnWidth(0, width);
         };
-        setWidth(mainnet);
-        setWidth(testnet);
+        setWidth(widget);
     }
 
     {
@@ -52,9 +48,11 @@ BlockchainChooser::BlockchainChooser(QObject* parent, Api& ot)
     }
 
     auto* ok = ui_->buttons->button(QDialogButtonBox::Ok);
+    auto* check = ui_->checkBox;
     connect(&ot_, &Api::chainsChanged, this, &BlockchainChooser::check);
     connect(&ot_, &Api::chainsChanged, this, &BlockchainChooser::check);
     connect(ok, &QPushButton::clicked, this, &BlockchainChooser::hide);
+    connect(check, &QCheckBox::stateChanged, this, &BlockchainChooser::model);
     init();
 }
 
@@ -71,6 +69,14 @@ auto BlockchainChooser::init() noexcept -> void
 auto BlockchainChooser::Ok() noexcept -> QPushButton*
 {
     return ui_->buttons->button(QDialogButtonBox::Ok);
+}
+
+auto BlockchainChooser::model() noexcept -> void
+{
+    auto& widget = *ui_->mainnet;
+    auto& check = *ui_->checkBox;
+    auto* model = ot_.blockchainChooserModel(check.isChecked());
+    widget.setModel(model);
 }
 
 BlockchainChooser::~BlockchainChooser() = default;

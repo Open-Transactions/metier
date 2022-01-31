@@ -43,5 +43,6 @@ private:
 
     auto check(int enabledChains) noexcept -> void;
     auto init() noexcept -> void;
+    auto model() noexcept -> void;
 };
 }  // namespace metier::widget
