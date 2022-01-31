@@ -23,7 +23,6 @@
 
 #include "api/custom.hpp"
 #include "api/passwordcallback.hpp"
-#include "models/blockchainchooser.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
@@ -171,7 +170,6 @@ public:
     mutable std::atomic<State> state_;
     EnabledChains enabled_chains_;
     std::unique_ptr<model::SeedType> seed_type_;
-    std::unique_ptr<model::BlockchainChooser> mainnet_model_;
 
     template <typename OutputType, typename InputType>
     static auto transform(const InputType& data) noexcept -> OutputType
@@ -702,12 +700,9 @@ public:
               &parent,
               transform<model::SeedType::Data>(
                   api_.Crypto().Seed().AllowedSeedTypes())))
-        , mainnet_model_(std::make_unique<model::BlockchainChooser>(
-              api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::Main)))
     {
         assert(seed_type_);
 
-        Ownership::Claim(mainnet_model_.get());
         Ownership::Claim(seed_type_.get());
         check_introduction_notary();
         ready(true);

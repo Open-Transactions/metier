@@ -6,7 +6,6 @@
 target_sources(
   metier-common
   PRIVATE
-    "blockchainchooser.hpp"
     "licenses.cpp"
     "licenses.hpp"
     "seedlang.cpp"

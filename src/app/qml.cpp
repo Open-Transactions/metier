@@ -19,7 +19,6 @@
 #include "api/api.hpp"
 #include "app/size.hpp"
 #include "app/startup.hpp"
-#include "models/blockchainchooser.hpp"
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
