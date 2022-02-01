@@ -3,7 +3,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.19.4)
 cmake_policy(
   SET
   CMP0091
@@ -19,7 +19,7 @@ set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 22)
 set(METIER_VERSION_MINOR 2)
-set(METIER_VERSION_PATCH 1)
+set(METIER_VERSION_PATCH 2)
 
 execute_process(
   COMMAND
