@@ -77,6 +77,7 @@ if(METIER_QML_INTERFACE)
     PRIVATE
       Qt::Qml
       Qt::Quick
+      Qt::QuickControls2
       Qt::Svg
   )
 
