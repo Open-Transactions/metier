@@ -16,10 +16,16 @@ set(METIER_APPSTREAM_NAME "Métier")
 set(METIER_APP_DOMAIN "opentransactions.org")
 set(METIER_CLI_COMMAND "metierctl")
 set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
+# Override these in derived wallet
+#set(METIER_VERSION_MAJOR "${${PROJECT_NAME}_VERSION_MAJOR}")
+#set(METIER_VERSION_MINOR "${${PROJECT_NAME}_VERSION_MINOR}")
+#set(METIER_VERSION_PATCH "${${PROJECT_NAME}_VERSION_PATCH}")
+#set(${METIER_PACKAGE_VERSION_TAG} "${${PROJECT_NAME}_GIT_VERSION}")
 
 set(METIER_VERSION_MAJOR 22)
 set(METIER_VERSION_MINOR 2)
 set(METIER_VERSION_PATCH 3)
+set(METIER_PACKAGE_VERSION_TAG "${CMAKE_BUILD_TYPE}")
 
 execute_process(
   COMMAND
@@ -263,3 +269,59 @@ add_subdirectory(deps)
 add_subdirectory(licenses)
 add_subdirectory(src)
 add_subdirectory(package)
+
+# -----------------------------------------------------------------------------
+# Package
+
+include(InstallRequiredSystemLibraries)
+
+set(CPACK_PACKAGE_NAME "${METIER_APPSTREAM_NAME}")
+
+if (WIN32)
+
+  set(CPACK_PACKAGE_EXECUTABLES 
+    "${METIER_APPSTREAM_NAME};${METIER_APPSTREAM_NAME}"
+    "${METIER_CLI_COMMAND};${METIER_APPSTREAM_NAME} ${METIER_CLI_COMMAND}"
+    "..\\\\Uninstall;Uninstall ${METIER_APPSTREAM_NAME}")
+
+  if(NOT CMAKE_BUILD_TYPE MATCHES "Release")
+
+     set(CPACK_NSIS_CREATE_ICONS_EXTRA
+       "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Metier.lnk' '\\\"$INSTDIR\\\\bin\\\\${METIER_APPSTREAM_NAME}.exe\\\"' '--advanced=true'")
+
+     set(CPACK_NSIS_DELETE_ICONS_EXTRA
+       "Delete '$SMPROGRAMS\\\\$START_MENU\\\\Metier.lnk'")
+   endif()
+
+   set(CPACK_NSIS_MENU_LINKS
+     "https://matterfi.com" "MatterFi.com Link"
+     "mailto:support@matterfi.com" "MatterFi Support Link"
+     "https://opentransactions.org" "Open Transactions Link")
+
+     set(CPACK_NSIS_MODIFY_PATH "ON")
+     set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL, "ON")
+
+else()
+  set(CPACK_PACKAGE_EXECUTABLES 
+    "${METIER_APPSTREAM_NAME};${METIER_APPSTREAM_NAME}"
+    "${METIER_CLI_COMMAND};${METIER_APPSTREAM_NAME} ${METIER_CLI_COMMAND}")
+endif()
+
+#set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_VENDOR "matterfi.com")
+set(CPACK_PACKAGE_CONTACT "support@matterfi.com")
+
+
+set(CPACK_PACKAGE_VERSION_MAJOR "${METIER_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${METIER_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${METIER_VERSION_PATCH}")
+
+#set( CPACK_PACKAGE_ICON " ")  
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${METIER_APPSTREAM_NAME} (${PROJECT_NAME}) ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}  ${METIER_PACKAGE_VERSION_TAG}")
+#set(CPACK_PACKAGE_CHECKSUM "" )
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://matterfi.com")
+set(CPACK_THREADS 0)
+include(CPack)
+
