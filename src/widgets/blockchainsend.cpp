@@ -34,6 +34,8 @@ BlockchainSend::BlockchainSend(QWidget* parent, Model* model)
     auto* vAddress = imp_.address_validator_;
     auto* vAmount = imp_.amount_validator_;
     auto* scale = ui.scale;
+    scale->setModel(model->getScaleModel());
+    vAmount->setScale(0);  // TODO
     connect(cancel, &QPushButton::clicked, this, &QWidget::close);
     connect(address, &QLineEdit::textChanged, this, &BlockchainSend::verify);
     connect(amount, &QLineEdit::textChanged, this, &BlockchainSend::verify);

@@ -89,7 +89,8 @@ struct BlockchainSend::Imp {
     auto recalculateAmount(int scale) noexcept
     {
         auto* amount = ui_->amount;
-        amount->setText(amount_validator_->revise(amount->text(), scale));
+        auto text = amount->text();
+        amount->setText(amount_validator_->revise(text, scale));
     }
     auto scaleChanged(int scale) noexcept
     {
@@ -99,7 +100,6 @@ struct BlockchainSend::Imp {
     {
         auto* address = ui_->address;
         auto* amount = ui_->amount;
-        auto* scale = ui_->scale;
         auto* memo = ui_->memo;
         auto failed{false};
 
@@ -109,7 +109,7 @@ struct BlockchainSend::Imp {
                 address->text(),
                 amount->text(),
                 memo->text(),
-                scale->currentIndex());
+                amount_validator_->getScale());
             failed = (0 > key_.value());
         }
 
