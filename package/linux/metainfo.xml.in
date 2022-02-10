@@ -12,11 +12,8 @@
   <url type="bugtracker">https://github.com/Open-Transactions/metier/issues</url>
   <launchable type="desktop-id">@METIER_APPSTREAM_ID@.desktop</launchable>
   <releases>
+    <release version="22.3" date="2022-02-10" />
     <release version="21.5" date="2021-12-15" />
-    <release version="21.4" date="2021-09-30" />
-    <release version="21.3" date="2021-08-05" />
-    <release version="21.2" date="2021-06-29" />
-    <release version="21.1" date="2021-04-07" />
   </releases>
   <provides>
     <binary>@METIER_GUI_OUTPUT_NAME@</binary>
