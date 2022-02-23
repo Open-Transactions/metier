@@ -30,6 +30,7 @@
 #include "util/claim.hpp"
 #include "util/convertblockchain.hpp"
 #include "util/scopeguard.hpp"
+#include "opentxs/util/Container.hpp"
 
 namespace ot = opentxs;
 
@@ -61,16 +62,29 @@ static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
 
     auto& args = const_cast<ot::Options&>(ot_args_);
     args.ParseCommandLine(argc, argv);
-    args.SetHome(absolute.toStdString().c_str());
-    args.SetBlockchainStorageLevel(1);
+    const auto nullVal = opentxs::UnallocatedCString{};
+    if (strcmp(args.Home(), nullVal.c_str()) == 0) {
+        args.SetHome(absolute.toStdString().c_str());
+    }
+    const auto defInt = int{};
+    if (defInt == args.BlockchainStorageLevel()) {
+        args.SetBlockchainStorageLevel(1);
+    }
 
-    for (const auto* endpoint : metier::SeedEndpoints()) {
-        args.AddBlockchainSyncServer(endpoint);
+    if (args.RemoteBlockchainSyncServers().empty()) {
+        for (const auto* endpoint : metier::SeedEndpoints()) {
+            args.AddBlockchainSyncServer(endpoint);
+        }
     }
 
     args.SetQtRootObject(&parent);
-    args.SetIpv4ConnectionMode(ot::Options::ConnectionMode::on);
-    args.SetIpv6ConnectionMode(ot::Options::ConnectionMode::automatic);
+    const auto defConnMode = ot::Options::ConnectionMode{};
+    if (defConnMode == args.Ipv4ConnectionMode()) {
+        args.SetIpv4ConnectionMode(ot::Options::ConnectionMode::on);
+    }
+    if (defConnMode == args.Ipv6ConnectionMode()) {
+        args.SetIpv6ConnectionMode(ot::Options::ConnectionMode::automatic);
+    }
 
     return ot_args_;
 }
