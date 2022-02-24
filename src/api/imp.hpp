@@ -63,28 +63,18 @@ static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     auto& args = const_cast<ot::Options&>(ot_args_);
     args.ParseCommandLine(argc, argv);
     const auto nullVal = opentxs::UnallocatedCString{};
-    if (strcmp(args.Home(), nullVal.c_str()) == 0) {
+    if (args.Home() == nullVal) {
         args.SetHome(absolute.toStdString().c_str());
     }
-    const auto defInt = int{};
-    if (defInt == args.BlockchainStorageLevel()) {
-        args.SetBlockchainStorageLevel(1);
-    }
+    args.SetBlockchainStorageLevel(1);
 
-    if (args.RemoteBlockchainSyncServers().empty()) {
-        for (const auto* endpoint : metier::SeedEndpoints()) {
-            args.AddBlockchainSyncServer(endpoint);
-        }
+    for (const auto* endpoint : metier::SeedEndpoints()) {
+        args.AddBlockchainSyncServer(endpoint);
     }
 
     args.SetQtRootObject(&parent);
-    const auto defConnMode = ot::Options::ConnectionMode{};
-    if (defConnMode == args.Ipv4ConnectionMode()) {
-        args.SetIpv4ConnectionMode(ot::Options::ConnectionMode::on);
-    }
-    if (defConnMode == args.Ipv6ConnectionMode()) {
-        args.SetIpv6ConnectionMode(ot::Options::ConnectionMode::automatic);
-    }
+    args.SetIpv4ConnectionMode(ot::Options::ConnectionMode::on);
+    args.SetIpv6ConnectionMode(ot::Options::ConnectionMode::automatic);
 
     return ot_args_;
 }
