@@ -577,7 +577,7 @@ public:
         , rpc_cb_(zmq::ListenCallback::Factory(
               [this](auto&& in) { rpc(std::move(in)); }))
         , rpc_socket_([this] {
-            using Dir = zmq::socket::Socket::Direction;
+            using Dir = zmq::socket::Direction;
             auto out = ot_.ZMQ().RouterSocket(rpc_cb_, Dir::Bind);
             const auto endpoint = rpc_endpoint();
 
