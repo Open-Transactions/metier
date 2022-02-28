@@ -30,6 +30,7 @@
 #include "util/claim.hpp"
 #include "util/convertblockchain.hpp"
 #include "util/scopeguard.hpp"
+#include "opentxs/util/Container.hpp"
 
 namespace ot = opentxs;
 
@@ -61,7 +62,10 @@ static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
 
     auto& args = const_cast<ot::Options&>(ot_args_);
     args.ParseCommandLine(argc, argv);
-    args.SetHome(absolute.toStdString().c_str());
+    const auto nullVal = opentxs::UnallocatedCString{};
+    if (args.Home() == nullVal) {
+        args.SetHome(absolute.toStdString().c_str());
+    }
     args.SetBlockchainStorageLevel(1);
 
     for (const auto* endpoint : metier::SeedEndpoints()) {
