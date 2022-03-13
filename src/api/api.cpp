@@ -230,7 +230,7 @@ auto Api::longestBlockchainName() -> int
         auto out = std::size_t{0};
 
         for (const auto chain : ot::blockchain::DefinedChains()) {
-            out = std::max(out, ot::blockchain::DisplayString(chain).size());
+            out = std::max(out, print(chain).size());
         }
 
         return out;
