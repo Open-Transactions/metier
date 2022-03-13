@@ -7,12 +7,7 @@
 
 #include "widgets/blockchainsend.hpp"  // IWYU pragma: associated
 
-#include <opentxs/blockchain/SendResult.hpp>
-#include <opentxs/blockchain/Types.hpp>
-#include <opentxs/interface/qt/AccountActivity.hpp>
-#include <opentxs/interface/qt/AmountValidator.hpp>
-#include <opentxs/interface/qt/DestinationValidator.hpp>
-#include <opentxs/interface/qt/DisplayScale.hpp>
+#include <opentxs/opentxs.hpp>
 #include <QApplication>
 #include <QLabel>
 #include <QLineEdit>
@@ -126,9 +121,9 @@ struct BlockchainSend::Imp {
         if (false == key_.has_value()) { return; }
         if (key_.value() != key) { return; }
 
-        using Result = ot::blockchain::SendResult;
+        using Result = ot::blockchain::node::SendResult;
         const auto result = static_cast<Result>(code);
-        auto status = QString{ot::print(result).c_str()};
+        auto status = QString::fromStdString(std::string{print(result)});
 
         if (0 < txid.size()) { status.append(" ").append(txid); }
 
