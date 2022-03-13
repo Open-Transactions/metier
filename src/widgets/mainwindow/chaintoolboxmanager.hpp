@@ -172,8 +172,7 @@ private:
         -> std::pair<std::unique_ptr<QWidget>, std::string>
     {
         auto output = std::make_pair<std::unique_ptr<QWidget>, std::string>(
-            std::make_unique<QWidget>(toolbox_),
-            ot::blockchain::DisplayString(chain));
+            std::make_unique<QWidget>(toolbox_), std::string{print(chain)});
         auto& [widget, description] = output;
         auto layout = std::make_unique<QGridLayout>(widget.get());
         auto view = std::make_unique<QTableView>(widget.get());

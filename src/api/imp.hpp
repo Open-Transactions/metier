@@ -26,11 +26,11 @@
 #include "models/seedlang.hpp"
 #include "models/seedsize.hpp"
 #include "models/seedtype.hpp"
+#include "opentxs/util/Container.hpp"
 #include "rpc/rpc.hpp"
 #include "util/claim.hpp"
 #include "util/convertblockchain.hpp"
 #include "util/scopeguard.hpp"
-#include "opentxs/util/Container.hpp"
 
 namespace ot = opentxs;
 
@@ -828,9 +828,9 @@ private:
         }();
 
         for (const auto& type : need) {
-            const auto prompt = std::string{"Creating a new "} +
-                                ot::blockchain::DisplayString(chain) +
-                                " account";
+            const auto prompt = std::string{"Creating a new "}
+                                    .append(print(chain))
+                                    .append(" account");
             const auto reason = api_.Factory().PasswordPrompt(prompt);
             const auto id = [&] {
                 if ((Chain::PKT == chain) && (Protocol::BIP_84 == type)) {
