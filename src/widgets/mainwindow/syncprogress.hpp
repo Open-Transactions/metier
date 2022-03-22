@@ -18,10 +18,11 @@ namespace metier::widget
 {
 struct SyncProgress {
     using Progress = std::pair<int, int>;
+    using Lock = std::unique_lock<std::mutex>;
 
     auto get(const ot::blockchain::Type chain) const noexcept -> Progress
     {
-        ot::Lock lock{lock_};
+        auto lock = Lock{lock_};
 
         try {
 
@@ -35,7 +36,7 @@ struct SyncProgress {
     auto update(const ot::blockchain::Type chain, const Progress value) noexcept
     {
         try {
-            ot::Lock lock{lock_};
+            auto lock = Lock{lock_};
 
             progress_[chain] = value;
         } catch ([[maybe_unused]] const std::system_error& e) {

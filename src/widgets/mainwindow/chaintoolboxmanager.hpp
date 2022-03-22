@@ -35,10 +35,11 @@ struct ChainToolboxManager {
     using AccountList = QListView*;
     using ToolBox = QToolBox*;
     using RegisterProgress = std::function<void(const ot::blockchain::Type)>;
+    using rLock = std::unique_lock<std::recursive_mutex>;
 
     auto currentChain() const noexcept
     {
-        ot::rLock lock{lock_};
+        auto lock = rLock{lock_};
         const auto index = toolbox_->currentIndex();
 
         if (0 > index) { return ot::blockchain::Type::Unknown; }
@@ -62,7 +63,7 @@ struct ChainToolboxManager {
 
     auto reconcile(Api::BlockchainList current) noexcept
     {
-        ot::rLock lock{lock_};
+        auto lock = rLock{lock_};
         std::sort(std::begin(current), std::end(current));
         auto itemsToDelete = std::deque<int>{};
         auto itemsToInsert = std::deque<int>{};

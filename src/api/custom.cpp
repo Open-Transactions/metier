@@ -5,7 +5,7 @@
 
 #include "api/custom.hpp"  // IWYU pragma: associated
 
-#include <opentxs/blockchain/BlockchainType.hpp>
+#include <opentxs/opentxs.hpp>
 
 namespace metier
 {
