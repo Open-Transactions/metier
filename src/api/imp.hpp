@@ -103,10 +103,11 @@ public:
 
     struct EnabledChains {
         using Vector = std::set<ot::blockchain::Type>;
+        using Lock = std::unique_lock<std::mutex>;
 
         auto count() const noexcept
         {
-            ot::Lock lock(lock_);
+            auto lock = Lock{lock_};
 
             return enabled_.size();
         }
@@ -115,7 +116,7 @@ public:
             auto output = BlockchainList{};
             auto copy = Vector{};
             {
-                ot::Lock lock(lock_);
+                auto lock = Lock{lock_};
                 copy = enabled_;
             }
             std::transform(
@@ -127,17 +128,17 @@ public:
 
         auto add(ot::blockchain::Type chain) noexcept
         {
-            ot::Lock lock(lock_);
+            auto lock = Lock{lock_};
             enabled_.emplace(chain);
         }
         auto remove(ot::blockchain::Type chain) noexcept
         {
-            ot::Lock lock(lock_);
+            auto lock = Lock{lock_};
             enabled_.erase(chain);
         }
         auto set(Vector&& in) noexcept
         {
-            ot::Lock lock(lock_);
+            auto lock = Lock{lock_};
             std::swap(enabled_, in);
         }
 
@@ -155,6 +156,7 @@ public:
         std::map<ot::crypto::SeedStyle, std::unique_ptr<model::SeedLanguage>>;
     using SeedSizeMap =
         std::map<ot::crypto::SeedStyle, std::unique_ptr<model::SeedSize>>;
+    using Lock = std::unique_lock<std::mutex>;
 
     PasswordCallback callback_;
     opentxs::PasswordCaller caller_;
@@ -241,7 +243,7 @@ public:
     auto validateBlockchains() const noexcept -> bool
     {
         ready().get();
-        ot::Lock lock(lock_);
+        auto lock = Lock{lock_};
 
         for (const auto chain : api_.Network().Blockchain().EnabledChains()) {
             if (false == make_accounts(chain)) { return false; }
@@ -254,7 +256,7 @@ public:
     auto validateNym() const noexcept
     {
         ready().get();
-        ot::Lock lock(lock_);
+        auto lock = Lock{lock_};
         auto nymID = api_.Factory().NymID();
         auto postcondition = ScopeGuard{[&] {
             if (nymID->empty()) { return; }
@@ -309,7 +311,7 @@ public:
     auto validateSeed() const noexcept
     {
         ready().get();
-        ot::Lock lock(lock_);
+        auto lock = Lock{lock_};
 
         if (false == seed_id_.empty()) { return true; }
 
@@ -379,7 +381,7 @@ public:
     auto createNym(QString alias) noexcept -> void
     {
         ready().get();
-        ot::Lock lock(lock_);
+        auto lock = Lock{lock_};
         const auto reason =
             api_.Factory().PasswordPrompt("Generate a new Metier identity");
 
@@ -414,7 +416,7 @@ public:
     {
         ready().get();
         wait_for_seed_backup_ = true;
-        ot::Lock lock(lock_);
+        auto lock = Lock{lock_};
         auto success{false};
         auto& id = const_cast<std::string&>(seed_id_);
         auto postcondition = ScopeGuard{[&]() {
@@ -462,7 +464,7 @@ public:
     auto getRecoveryWords() -> QStringList
     {
         ready().get();
-        ot::Lock lock(lock_);
+        auto lock = Lock{lock_};
         const auto& seeds = api_.Crypto().Seed();
         const auto reason =
             api_.Factory().PasswordPrompt("Loading recovery words for backup");
@@ -477,7 +479,7 @@ public:
         const QString& password) -> void
     {
         ready().get();
-        ot::Lock lock(lock_);
+        auto lock = Lock{lock_};
         auto success{false};
         auto& id = const_cast<std::string&>(seed_id_);
         auto postcondition = ScopeGuard{[&]() {

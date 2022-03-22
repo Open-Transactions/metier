@@ -5,7 +5,7 @@
 
 #include "blockchainchooser.hpp"  // IWYU pragma: associated
 
-#include <opentxs/interface/qt/BlockchainSelection.hpp>
+#include <opentxs/opentxs.hpp>
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QPushButton>

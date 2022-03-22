@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <opentxs/blockchain/Types.hpp>
+#include <opentxs/opentxs.hpp>
 #include <vector>
 
 namespace metier

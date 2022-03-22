@@ -5,8 +5,7 @@
 
 #include "app/imp.hpp"  // IWYU pragma: associated
 
-#include <opentxs/interface/qt/IdentityManager.hpp>
-#include <opentxs/interface/qt/SeedValidator.hpp>
+#include <opentxs/opentxs.hpp>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
