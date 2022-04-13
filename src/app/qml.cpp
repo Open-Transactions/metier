@@ -6,7 +6,7 @@
 #include "app/imp.hpp"  // IWYU pragma: associated
 
 #include <opentxs/opentxs.hpp>
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickView>
@@ -25,7 +25,7 @@
 
 namespace metier
 {
-struct QmlApp final : public App::Imp, public QGuiApplication {
+struct QmlApp final : public App::Imp, public QApplication {
 private:
     std::promise<void> model_promise_;
 
@@ -158,7 +158,7 @@ public:
     auto otwrap() noexcept -> Api* final { return ot_.get(); }
 
     QmlApp(App& parent, int& argc, char** argv) noexcept
-        : QGuiApplication(argc, argv)
+        : QApplication(argc, argv)
         , model_promise_()
         , parent_(parent)
         , ot_()
