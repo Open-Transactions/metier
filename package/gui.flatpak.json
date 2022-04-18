@@ -1,7 +1,7 @@
 {
   "id": "org.opentransactions.metier",
   "runtime": "org.kde.Platform",
-  "runtime-version": "5.15",
+  "runtime-version": "6.2",
   "sdk": "org.kde.Sdk",
   "command": "metier",
   "modules": [
@@ -10,8 +10,8 @@
       "buildsystem": "simple",
       "sources": [
         {
-          "url": "https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2",
-          "sha256": "f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41",
+          "url": "https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.bz2",
+          "sha256": "475d589d51a7f8b3ba2ba4eda022b170e562ca3b760ee922c146b6c65856ef39",
           "type": "archive"
         }
       ],
@@ -134,6 +134,7 @@
       "buildsystem": "cmake-ninja",
       "builddir": true,
       "config-opts": [
+        "-DCMAKE_UNITY_BUILD=ON"
       ],
       "sources": [
         {
