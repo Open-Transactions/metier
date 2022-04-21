@@ -46,26 +46,27 @@ static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
 {
     parent.setOrganizationDomain(Api::Domain());
     parent.setApplicationName(Api::Name());
-    auto path =
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-
-    if (path.isEmpty()) { qFatal("Invalid app data folder"); }
-
-    auto folder = QDir{path.append("/opentxs/")};
-    const auto absolute = folder.absolutePath();
-
-    if (folder.mkpath(absolute)) {
-        qDebug() << QString("Setting opentxs data folder to: %1").arg(absolute);
-    } else {
-        qFatal("Failed to create opentxs data folder");
-    }
-
     auto& args = const_cast<ot::Options&>(ot_args_);
     args.ParseCommandLine(argc, argv);
-    const auto nullVal = opentxs::UnallocatedCString{};
-    if (args.Home() == nullVal) {
-        args.SetHome(absolute.toStdString().c_str());
+
+    if (args.Home().empty()) {
+        auto path =
+            QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+        if (path.isEmpty()) { qFatal("Invalid app data folder"); }
+
+        auto folder = QDir{path.append("/opentxs/")};
+        const auto absolute = folder.absolutePath();
+
+        if (false == folder.mkpath(absolute)) {
+            qFatal("Failed to create opentxs data folder");
+        }
+
+        args.SetHome(absolute.toStdString());
     }
+
+    qDebug() << QString("Using %1 for opentxs data folder")
+                    .arg(std::string{args.Home()}.c_str());
     args.SetBlockchainStorageLevel(1);
 
     for (const auto* endpoint : metier::SeedEndpoints()) {
@@ -121,7 +122,7 @@ public:
             }
             std::transform(
                 std::begin(copy), std::end(copy), std::back_inserter(output), [
-                ](const auto& in) -> auto { return static_cast<int>(in); });
+                ](const auto& in) -> auto{ return static_cast<int>(in); });
 
             return output;
         }
@@ -183,7 +184,7 @@ public:
         auto output = OutputType{};
         std::transform(
             data.begin(), data.end(), std::back_inserter(output), [
-            ](const auto& in) -> auto {
+            ](const auto& in) -> auto{
                 return std::make_pair(in.second, static_cast<int>(in.first));
             });
         std::sort(output.begin(), output.end());
@@ -572,7 +573,7 @@ public:
         , caller_()
         , ot_(ot::InitContext(
               make_args(parent, argc, argv),
-              [this]() -> auto {
+              [this]() -> auto{
                   caller_.SetCallback(&callback_);
                   return &caller_;
               }()))
@@ -620,7 +621,7 @@ public:
             }
         }())
         , seed_id_()
-        , longest_seed_word_([&]() -> auto {
+        , longest_seed_word_([&]() -> auto{
             const auto& api = api_.Crypto().Seed();
             auto output = int{};
             const auto types = api.AllowedSeedTypes();
