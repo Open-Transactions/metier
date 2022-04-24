@@ -103,7 +103,7 @@ public:
     enum class State { init, have_seed, have_nym, run };
 
     struct EnabledChains {
-        using Vector = std::set<ot::blockchain::Type>;
+        using Vector = opentxs::UnallocatedSet<ot::blockchain::Type>;
         using Lock = std::unique_lock<std::mutex>;
 
         auto count() const noexcept
