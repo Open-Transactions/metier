@@ -222,6 +222,31 @@ public:
 
         return 0 == api_.Wallet().LocalNymCount();
     }
+    auto rescanBlockchain(int chain) -> void
+    {
+        static const auto valid = []{
+            auto output = std::set<int>{};
+            const auto& input = ot::blockchain::SupportedChains();
+            std::transform(
+                input.begin(),
+                input.end(),
+                std::inserter(output, output.end()),
+                [](const auto in) { return util::convert(in); });
+
+            return output;
+        }();
+
+        if (0u == valid.count(chain)) {
+            qInfo() << "Invalid chain";
+        }
+
+        try {
+            const auto type = static_cast<ot::blockchain::Type>(chain);
+            api_.Network().Blockchain().GetChain(type).Wallet().StartRescan();
+        } catch (const std::exception& e) {
+            qInfo() << e.what();
+        }
+    }
     auto rpc(zmq::Message&& in) const noexcept -> void
     {
         const auto body = in.Body();

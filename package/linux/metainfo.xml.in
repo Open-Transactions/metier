@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2021 The Open-Transactions developers -->
+<!-- Copyright 2022 The Open-Transactions developers -->
 <component type="desktop-application">
   <id>@METIER_APPSTREAM_ID@</id>
   <metadata_license>CC0-1.0</metadata_license>
@@ -12,6 +12,7 @@
   <url type="bugtracker">https://github.com/Open-Transactions/metier/issues</url>
   <launchable type="desktop-id">@METIER_APPSTREAM_ID@.desktop</launchable>
   <releases>
+    <release version="22.4" date="2022-05-11" />
     <release version="22.3" date="2022-02-10" />
     <release version="21.5" date="2021-12-15" />
   </releases>
