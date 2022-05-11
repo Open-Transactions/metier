@@ -66,6 +66,7 @@ public slots:
     void createNym(QString alias);
     void importSeed(int type, int lang, QString words, QString password);
     void quit();
+    void rescanBlockchain(int chain);
     void seedBackupFinished();
 
 private slots:

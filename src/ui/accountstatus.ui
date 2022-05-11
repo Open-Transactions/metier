@@ -13,6 +13,13 @@
      </attribute>
     </widget>
    </item>
+   <item alignment="Qt::AlignRight">
+    <widget class="QToolButton" name="rescanButton">
+     <property name="text">
+      <string>Rescan</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QDialogButtonBox" name="buttons">
      <property name="standardButtons">

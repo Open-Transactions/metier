@@ -248,6 +248,8 @@ auto Api::openSystemBrowserLink(QString url_link) -> void
 
 auto Api::quit() -> void { QCoreApplication::exit(); }
 
+auto Api::rescanBlockchain(int chain) -> void { imp_.rescanBlockchain(chain); }
+
 auto Api::seedBackupFinished() -> void
 {
     imp_.wait_for_seed_backup_ = false;

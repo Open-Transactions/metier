@@ -15,11 +15,13 @@
 namespace metier::widget
 {
 struct AccountStatus::Imp {
+    const int chain_;
     QDialog* parent_;
     std::unique_ptr<Ui::accountStatus> ui_;
 
     Imp(QDialog* parent, Api& ot, int chain) noexcept
-        : parent_(parent)
+        : chain_(chain)
+        , parent_(parent)
         , ui_(std::make_unique<Ui::accountStatus>())
     {
         ui_->setupUi(parent_);
@@ -28,7 +30,11 @@ struct AccountStatus::Imp {
             &QPushButton::clicked,
             parent_,
             &QDialog::close);
-        const auto accountID = ot.blockchainTypeToAccountID(chain);
+        connect(
+            ui_->rescanButton,
+            &QPushButton::clicked,
+            [&ot, bc = chain_] { ot.rescanBlockchain(bc); });
+        const auto accountID = ot.blockchainTypeToAccountID(chain_);
         ui_->accountView->setModel(
             ot.identityManager()->getAccountStatus(accountID));
         ui_->accountView->expandAll();
