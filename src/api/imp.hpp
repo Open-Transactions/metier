@@ -39,14 +39,18 @@ namespace metier
 constexpr auto seed_id_key{"seedid"};
 constexpr auto nym_id_key{"nymid"};
 
-static const auto ot_args_ = ot::Options{};
+static auto ot_args() -> const ot::Options&
+{
+    static auto ot_args = ot::Options{};
+    return ot_args;
+}
 
 static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     -> const ot::Options&
 {
     parent.setOrganizationDomain(Api::Domain());
     parent.setApplicationName(Api::Name());
-    auto& args = const_cast<ot::Options&>(ot_args_);
+    auto& args = const_cast<ot::Options&>(ot_args());
     args.ParseCommandLine(argc, argv);
 
     if (args.Home().empty()) {
@@ -77,7 +81,7 @@ static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
     args.SetIpv4ConnectionMode(ot::Options::ConnectionMode::on);
     args.SetIpv6ConnectionMode(ot::Options::ConnectionMode::automatic);
 
-    return ot_args_;
+    return ot_args();
 }
 
 static auto ready(bool complete = false) noexcept -> std::shared_future<void>
@@ -224,7 +228,7 @@ public:
     }
     auto rescanBlockchain(int chain) -> void
     {
-        static const auto valid = []{
+        static const auto valid = [] {
             auto output = std::set<int>{};
             const auto& input = ot::blockchain::SupportedChains();
             std::transform(
@@ -236,9 +240,7 @@ public:
             return output;
         }();
 
-        if (0u == valid.count(chain)) {
-            qInfo() << "Invalid chain";
-        }
+        if (0u == valid.count(chain)) { qInfo() << "Invalid chain"; }
 
         try {
             const auto type = static_cast<ot::blockchain::Type>(chain);
@@ -618,7 +620,7 @@ public:
 
             return out;
         }())
-        , api_(ot_.StartClientSession(ot_args_, 0))
+        , api_(ot_.StartClientSession(ot_args(), 0))
         , introduction_notary_id_([&] {
             try {
                 const auto contract =
