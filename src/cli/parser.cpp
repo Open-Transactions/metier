@@ -45,30 +45,38 @@ auto command_map() noexcept -> const Map&
 }
 
 struct Parser::Imp {
-    static const po::options_description desc_;
-    static const po::positional_options_description pos_;
+    static auto desc() -> const po::options_description&;
+    static auto pos() -> const po::positional_options_description&;
 };
 
-const po::options_description Parser::Imp::desc_{[] {
-    auto out = po::options_description{256};
-    out.add_options()(help_, "Display this message");
-    out.add_options()(command_, po::value<std::string>(), usage_.c_str());
-    out.add_options()(
-        account_id_, po::value<std::string>(), "target account id");
-    out.add_options()(
-        amount_, po::value<std::int64_t>(), "value to send as an integer");
-    out.add_options()(from_, po::value<std::string>(), "source account id");
-    out.add_options()(
-        to_, po::value<std::string>(), "recipient address or payment code");
+auto Parser::Imp::desc() -> const po::options_description&
+{
+    static auto desc = []() {
+        auto out = po::options_description{256};
+        out.add_options()(help_, "Display this message");
+        out.add_options()(command_, po::value<std::string>(), usage_.c_str());
+        out.add_options()(
+            account_id_, po::value<std::string>(), "target account id");
+        out.add_options()(
+            amount_, po::value<std::int64_t>(), "value to send as an integer");
+        out.add_options()(from_, po::value<std::string>(), "source account id");
+        out.add_options()(
+            to_, po::value<std::string>(), "recipient address or payment code");
 
-    return out;
-}()};
-const po::positional_options_description Parser::Imp::pos_{[] {
-    auto out = po::positional_options_description{};
-    out.add(command_, 1);
+        return out;
+    }();
+    return desc;
+}
+auto Parser::Imp::pos() -> const po::positional_options_description&
+{
+    static auto pos = []() {
+        auto out = po::positional_options_description{};
+        out.add(command_, 1);
 
-    return out;
-}()};
+        return out;
+    }();
+    return pos;
+};
 
 Parser::Parser() noexcept
     : imp_(std::make_unique<Imp>())
@@ -79,7 +87,7 @@ auto Parser::help() const noexcept -> std::string
 {
     auto out = std::stringstream{};
     out << "Usage:\n";
-    out << Imp::desc_;
+    out << Imp::desc();
 
     return out.str();
 }
@@ -92,8 +100,8 @@ auto Parser::parse(int argc, char* argv[]) const noexcept -> Options
     try {
         po::store(
             po::command_line_parser(argc, argv)
-                .options(Imp::desc_)
-                .positional(Imp::pos_)
+                .options(Imp::desc())
+                .positional(Imp::pos())
                 .run(),
             vars);
         po::notify(vars);
