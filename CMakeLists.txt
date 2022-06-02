@@ -57,9 +57,8 @@ update_git_submodules()
 # -----------------------------------------------------------------------------
 # Set option defaults
 
-if(CMAKE_BUILD_TYPE
-   STREQUAL
-   "Debug"
+if(CMAKE_BUILD_TYPE STREQUAL "Debug"
+   OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"
 )
   set(METIER_PEDANTIC_DEFAULT ON)
   set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -232,6 +231,10 @@ else()
     1.0.1
     QUIET
   )
+
+  if(WIN32)
+    find_package(pthread QUIET)
+  endif()
 
   find_package(unofficial-secp256k1 QUIET)
   find_package(unofficial-sodium QUIET)
