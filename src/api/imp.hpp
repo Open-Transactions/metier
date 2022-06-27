@@ -71,15 +71,15 @@ static auto make_args(QGuiApplication& parent, int& argc, char** argv) noexcept
 
     qDebug() << QString("Using %1 for opentxs data folder")
                     .arg(std::string{args.Home()}.c_str());
-    args.SetBlockchainStorageLevel(1);
+    args.SetBlockchainProfile(ot::BlockchainProfile::desktop);
 
     for (const auto* endpoint : metier::SeedEndpoints()) {
         args.AddBlockchainSyncServer(endpoint);
     }
 
     args.SetQtRootObject(&parent);
-    args.SetIpv4ConnectionMode(ot::Options::ConnectionMode::on);
-    args.SetIpv6ConnectionMode(ot::Options::ConnectionMode::automatic);
+    args.SetIpv4ConnectionMode(ot::ConnectionMode::on);
+    args.SetIpv6ConnectionMode(ot::ConnectionMode::automatic);
 
     return ot_args();
 }
@@ -107,7 +107,7 @@ public:
     enum class State { init, have_seed, have_nym, run };
 
     struct EnabledChains {
-        using Vector = opentxs::UnallocatedSet<ot::blockchain::Type>;
+        using Vector = opentxs::Set<ot::blockchain::Type>;
         using Lock = std::unique_lock<std::mutex>;
 
         auto count() const noexcept
@@ -812,9 +812,8 @@ private:
 
             return out;
         }();
-        const auto proto = api_.Factory().Data(armored);
 
-        return api_.Wallet().Server(proto->Bytes());
+        return api_.Wallet().Server(api_.Factory().Data(armored).Bytes());
     }
 
     auto make_accounts(const ot::blockchain::Type chain) const noexcept -> bool
