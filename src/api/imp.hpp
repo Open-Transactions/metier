@@ -244,7 +244,13 @@ public:
 
         try {
             const auto type = static_cast<ot::blockchain::Type>(chain);
-            api_.Network().Blockchain().GetChain(type).Wallet().StartRescan();
+            const auto handle = api_.Network().Blockchain().GetChain(type);
+
+            if (false == handle.IsValid()) {
+                throw std::runtime_error{"invalid chain"};
+            }
+
+            handle.get().Wallet().StartRescan();
         } catch (const std::exception& e) {
             qInfo() << e.what();
         }
