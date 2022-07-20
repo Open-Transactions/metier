@@ -169,8 +169,8 @@ public:
     const ot::OTZMQListenCallback rpc_cb_;
     ot::OTZMQRouterSocket rpc_socket_;
     const opentxs::api::session::Client& api_;
-    const ot::OTNotaryID introduction_notary_id_;
-    const ot::OTNotaryID messaging_notary_id_;
+    const ot::identifier::Notary introduction_notary_id_;
+    const ot::identifier::Notary messaging_notary_id_;
     const std::string seed_id_;
     const int longest_seed_word_;
     const SeedLanguageMap seed_language_;
@@ -291,13 +291,13 @@ public:
     {
         ready().get();
         auto lock = Lock{lock_};
-        auto nymID = api_.Factory().NymID();
+        auto nymID = ot::identifier::Nym{};
         auto postcondition = ScopeGuard{[&] {
-            if (nymID->empty()) { return; }
+            if (nymID.empty()) { return; }
 
             {
                 identityManager()->setActiveNym(
-                    QString::fromStdString(nymID->str()));
+                    QString::fromStdString(nymID.asBase58(api_.Crypto())));
                 have_nym_ = true;
             }
         }};
@@ -314,7 +314,7 @@ public:
             notUsed);
 
         if (id->Exists()) {
-            nymID->SetString(id->Get());
+            nymID = api_.Factory().NymIDFromBase58(id->Bytes());
 
             return true;
         }
@@ -323,7 +323,7 @@ public:
 
         if (1 == nymList.size()) {
             const auto& firstID = *nymList.begin();
-            id->Set(firstID->str().c_str());
+            id->Set(firstID.asBase58(api_.Crypto()).c_str());
             const auto config = api_.Config().Set_str(
                 ot::String::Factory(
                     QGuiApplication::applicationName().toStdString()),
@@ -335,7 +335,7 @@ public:
 
             if (false == api_.Config().Save()) { return false; }
 
-            nymID->SetString(id->Get());
+            nymID = firstID;
 
             return true;
         }
@@ -395,14 +395,15 @@ public:
 
         if (active.isEmpty()) { return {}; }
 
-        const auto nymID = api_.Factory().NymID(active.toStdString());
+        const auto nymID = api_.Factory().NymIDFromBase58(active.toStdString());
 
-        if (nymID->empty()) { return {}; }
+        if (nymID.empty()) { return {}; }
 
         const auto& account =
             api_.Crypto().Blockchain().Account(nymID, util::convert(chain));
 
-        return QString::fromStdString(account.AccountID().str());
+        return QString::fromStdString(
+            account.AccountID().asBase58(api_.Crypto()));
     }
     auto chain_is_disabled(int chain) noexcept -> void
     {
@@ -432,7 +433,7 @@ public:
             ot::String::Factory(
                 QGuiApplication::applicationName().toStdString()),
             ot::String::Factory(nym_id_key),
-            ot::String::Factory(nym.ID().str()),
+            ot::String::Factory(nym.ID().asBase58(api_.Crypto())),
             notUsed);
 
         if (false == config) { qFatal("Failed to update configuration"); }
@@ -440,7 +441,8 @@ public:
             qFatal("Failed to save config file");
         }
 
-        identityManager()->setActiveNym(QString::fromStdString(nym.ID().str()));
+        identityManager()->setActiveNym(
+            QString::fromStdString(nym.ID().asBase58(api_.Crypto())));
         have_nym_ = true;
     }
     auto createNewSeed(
@@ -627,30 +629,30 @@ public:
             return out;
         }())
         , api_(ot_.StartClientSession(ot_args(), 0))
-        , introduction_notary_id_([&] {
+        , introduction_notary_id_([&]() -> ot::identifier::Notary {
             try {
                 const auto contract =
                     import_contract(introduction_notary_contract_);
-                auto out = api_.Factory().ServerID();
-                out->Assign(contract->ID()->Bytes());
+                auto out = ot::identifier::Notary{};
+                out.Assign(contract->ID().Bytes());
 
                 return out;
             } catch (...) {
 
-                return api_.Factory().ServerID();
+                return {};
             }
         }())
-        , messaging_notary_id_([&] {
+        , messaging_notary_id_([&]() -> ot::identifier::Notary {
             try {
                 const auto contract =
                     import_contract(messaging_notary_contract_);
-                auto out = api_.Factory().ServerID();
-                out->Assign(contract->ID()->Bytes());
+                auto out = ot::identifier::Notary{};
+                out.Assign(contract->ID().Bytes());
 
                 return out;
             } catch (...) {
 
-                return api_.Factory().ServerID();
+                return {};
             }
         }())
         , seed_id_()
@@ -753,7 +755,7 @@ public:
 private:
     auto check_introduction_notary() const noexcept -> void
     {
-        if (introduction_notary_id_->empty()) { return; }
+        if (introduction_notary_id_.empty()) { return; }
 
         api_.OTX().SetIntroductionServer(
             api_.Wallet().Server(introduction_notary_id_));
@@ -761,14 +763,14 @@ private:
 
     auto check_registration() const noexcept -> bool
     {
-        if (introduction_notary_id_->empty()) { return false; }
-        if (messaging_notary_id_->empty()) { return false; }
+        if (introduction_notary_id_.empty()) { return false; }
+        if (messaging_notary_id_.empty()) { return false; }
 
         const auto active = identityManager()->getActiveNym();
 
         if (active.isEmpty()) { return false; }
 
-        const auto nymID = api_.Factory().NymID(active.toStdString());
+        const auto nymID = api_.Factory().NymIDFromBase58(active.toStdString());
 
         {
             const auto reason = api_.Factory().PasswordPrompt(
@@ -778,7 +780,7 @@ private:
 
             if (notary.empty()) {
                 nym.AddPreferredOTServer(
-                    messaging_notary_id_->str(), true, reason);
+                    messaging_notary_id_.asBase58(api_.Crypto()), true, reason);
             }
         }
 
@@ -826,7 +828,7 @@ private:
     {
         using Chain = ot::blockchain::Type;
         using Protocol = ot::blockchain::crypto::HDProtocol;
-        const auto nymID = api_.Factory().NymID(
+        const auto nymID = api_.Factory().NymIDFromBase58(
             identityManager()->getActiveNym().toStdString());
         const auto want = [&] {
             auto out = std::set<Protocol>{};
@@ -880,7 +882,7 @@ private:
                 }
             }();
 
-            if (id->empty()) { return false; }
+            if (id.empty()) { return false; }
         }
 
         return true;

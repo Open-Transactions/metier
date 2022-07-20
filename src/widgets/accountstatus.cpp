@@ -30,10 +30,9 @@ struct AccountStatus::Imp {
             &QPushButton::clicked,
             parent_,
             &QDialog::close);
-        connect(
-            ui_->rescanButton,
-            &QPushButton::clicked,
-            [&ot, bc = chain_] { ot.rescanBlockchain(bc); });
+        connect(ui_->rescanButton, &QPushButton::clicked, [&ot, bc = chain_] {
+            ot.rescanBlockchain(bc);
+        });
         const auto accountID = ot.blockchainTypeToAccountID(chain_);
         ui_->accountView->setModel(
             ot.identityManager()->getAccountStatus(accountID));

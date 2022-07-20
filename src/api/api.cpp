@@ -38,7 +38,8 @@ Api::Api(QGuiApplication& parent, App& app, int& argc, char** argv)
 
 auto Api::accountIDtoBlockchainType(const QString& id) -> int
 {
-    const auto accountID = imp_.api_.Factory().Identifier(id.toStdString());
+    const auto accountID =
+        imp_.api_.Factory().IdentifierFromBase58(id.toStdString());
     const auto [chain, owner] =
         imp_.api_.Crypto().Blockchain().LookupAccount(accountID);
 
@@ -146,7 +147,7 @@ auto Api::doNeedNym() -> void
         case Imp::State::have_seed: {
             const auto [nym, count] = imp_.api_.Wallet().DefaultNym();
 
-            if (nym->empty()) {
+            if (nym.empty()) {
                 if (false == imp_.wait_for_seed_backup_) {
                     emit privateNeedProfileName({});
                 }
