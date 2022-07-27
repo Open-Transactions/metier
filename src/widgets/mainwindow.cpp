@@ -12,6 +12,7 @@
 #include <QList>
 #include <QListView>
 #include <QPushButton>
+#include <QSettings>
 #include <QTableView>
 #include <QToolBox>
 #include <QVariant>
@@ -38,6 +39,10 @@ MainWindow::MainWindow(QObject* parent, Api& ot) noexcept
     moveToThread(parent->thread());
     qRegisterMetaType<QVector<int>>();
     setWindowTitle(ot.Title());
+
+    QSettings settings("OpenTransactions", "Métier");
+    restoreGeometry(settings.value("geometry").toByteArray());
+    
     auto* quit = imp_.ui_->action_file_quit;
     auto* bc = imp_.ui_->action_settings_blockchain;
     auto* words = imp_.ui_->action_settings_recovery_phrase;
@@ -113,6 +118,9 @@ auto MainWindow::clearActivityThread() -> void
 
 auto MainWindow::closeEvent(QCloseEvent* event) -> void
 {
+    QSettings settings("OpenTransactions", "Métier");
+    settings.setValue("geometry", saveGeometry());
+
     event->ignore();
     imp_.ot_.quit();
 }
