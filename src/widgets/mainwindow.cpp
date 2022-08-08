@@ -42,7 +42,7 @@ MainWindow::MainWindow(QObject* parent, Api& ot) noexcept
 
     QSettings settings("OpenTransactions", "Métier");
     restoreGeometry(settings.value("geometry").toByteArray());
-    
+
     auto* quit = imp_.ui_->action_file_quit;
     auto* bc = imp_.ui_->action_settings_blockchain;
     auto* words = imp_.ui_->action_settings_recovery_phrase;

@@ -37,21 +37,25 @@ PasswordCallback::PasswordCallback(App& app)
 }
 
 auto PasswordCallback::runOne(
-    const char* prompt,
-    opentxs::Secret& out,
-    const std::string& key) const -> void
+    opentxs::Secret& output,
+    std::string_view prompt,
+    std::string_view key) const noexcept -> void
 {
-    const auto data = imp_->app_.getPassword(prompt, key.c_str());
-    out.AssignText(data.toStdString());
+    const auto data = imp_->app_.getPassword(
+        QString::fromStdString(std::string{prompt}),
+        QString::fromStdString(std::string{key}));
+    output.AssignText(data.toStdString());
 }
 
 auto PasswordCallback::runTwo(
-    const char* prompt,
-    opentxs::Secret& out,
-    const std::string& key) const -> void
+    opentxs::Secret& output,
+    std::string_view prompt,
+    std::string_view key) const noexcept -> void
 {
-    const auto data = imp_->app_.confirmPassword(prompt, key.c_str());
-    out.AssignText(data.toStdString());
+    const auto data = imp_->app_.confirmPassword(
+        QString::fromStdString(std::string{prompt}),
+        QString::fromStdString(std::string{key}));
+    output.AssignText(data.toStdString());
 }
 
 PasswordCallback::~PasswordCallback() = default;

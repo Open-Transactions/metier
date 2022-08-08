@@ -7,6 +7,7 @@
 
 #include <opentxs/opentxs.hpp>
 #include <memory>
+#include <string_view>
 
 namespace metier
 {
@@ -18,14 +19,14 @@ namespace metier
 class PasswordCallback final : public opentxs::PasswordCallback
 {
 public:
-    void runOne(
-        const char* szDisplay,
-        opentxs::Secret& theOutput,
-        const std::string& key) const final;
-    void runTwo(
-        const char* szDisplay,
-        opentxs::Secret& theOutput,
-        const std::string& key) const final;
+    auto runOne(
+        opentxs::Secret& output,
+        std::string_view prompt,
+        std::string_view key) const noexcept -> void final;
+    auto runTwo(
+        opentxs::Secret& output,
+        std::string_view prompt,
+        std::string_view key) const noexcept -> void final;
 
     PasswordCallback(App& app);
 
