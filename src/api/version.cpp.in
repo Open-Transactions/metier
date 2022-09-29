@@ -5,37 +5,40 @@
 
 #include "api/api.hpp"  // IWYU pragma: associated
 
+#include <opentxs/opentxs.hpp>
 #include <QString>
 #include <sstream>
 #include <string>
 
 namespace metier
 {
+using namespace opentxs::literals;
+
 auto Api::Domain() noexcept -> QString
 {
     // clang-format off
-    return QString::fromLocal8Bit(u8"@METIER_APP_DOMAIN@");
+    return QString::fromLocal8Bit(u8"@METIER_APP_DOMAIN@"_cstr);
     // clang-format on
 }
 
 auto Api::Name() noexcept -> QString
 {
     // clang-format off
-    return QString::fromLocal8Bit(u8"@PROJECT_NAME@");
+    return QString::fromLocal8Bit(u8"@PROJECT_NAME@"_cstr);
     // clang-format on
 }
 
 auto Api::Title() noexcept -> QString
 {
     // clang-format off
-    return QString::fromLocal8Bit(u8"@METIER_APPSTREAM_NAME@");
+    return QString::fromLocal8Bit(u8"@METIER_APPSTREAM_NAME@"_cstr);
     // clang-format on
 }
 
 auto Api::versionString(int suffix) -> QString
 {
     // clang-format off
-    static constexpr auto name_{u8"@METIER_APPSTREAM_NAME@"};
+    static const auto name_{u8"@METIER_APPSTREAM_NAME@"_sv};
     static constexpr auto major_{@METIER_VERSION_MAJOR@};
     static constexpr auto minor_{@METIER_VERSION_MINOR@};
     static constexpr auto patch_{@METIER_VERSION_PATCH@};

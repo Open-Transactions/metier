@@ -193,9 +193,10 @@ private:
         }
 
         using Model = ot::ui::AccountActivityQt;
-        connect(model, &Model::syncProgressUpdated, [=](int value, int max) {
-            receive_progress_update(chain, value, max);
-        });
+        connect(
+            model, &Model::syncProgressUpdated, [=, this](int value, int max) {
+                receive_progress_update(chain, value, max);
+            });
     }
 };
 }  // namespace metier::widget

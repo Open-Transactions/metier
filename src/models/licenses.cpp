@@ -27,13 +27,19 @@ auto Licenses::data(const QModelIndex& index, int role) const -> QVariant
     switch (role) {
         case Qt::DisplayRole: {
             try {
-                return QString::fromLocal8Bit(data.at(row).first.c_str());
+                const auto& value = data.at(row).first;
+
+                return QString::fromLocal8Bit(
+                    value.data(), static_cast<int>(value.size()));
             } catch (...) {
             }
         } break;
         case Qt::UserRole: {
             try {
-                return QString{data.at(row).second.c_str()};
+                const auto& value = data.at(row).second;
+
+                return QString::fromLocal8Bit(
+                    value.data(), static_cast<int>(value.size()));
             } catch (...) {
             }
         } break;
