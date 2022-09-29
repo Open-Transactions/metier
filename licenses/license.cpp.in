@@ -21,27 +21,34 @@
 #include "qt.h"
 #include "sodium.h"
 
+namespace metier
+{
+using namespace opentxs::literals;
+using namespace std::literals;
+
 auto width_ = std::size_t{0};
 
-auto make_vector() noexcept -> LicenseData;
-auto make_vector() noexcept -> LicenseData
+static auto make_vector() noexcept -> LicenseData
 {
     auto output = LicenseData{
-        {u8"@METIER_APPSTREAM_NAME@",
-         std::string{reinterpret_cast<const char*>(LICENSE), LICENSE_len}},
-        {"Boost",
-         std::string{reinterpret_cast<const char*>(boost_txt), boost_txt_len}},
-        {"libsodium",
-         std::string{
+        {u8"@METIER_APPSTREAM_NAME@"_sv,
+         std::string_view{reinterpret_cast<const char*>(LICENSE), LICENSE_len}},
+        {"Boost"sv,
+         std::string_view{
+             reinterpret_cast<const char*>(boost_txt), boost_txt_len}},
+        {"libsodium"sv,
+         std::string_view{
              reinterpret_cast<const char*>(sodium_txt), sodium_txt_len}},
-        {"LMDB",
-         std::string{reinterpret_cast<const char*>(lmdb_txt), lmdb_txt_len}},
-        {"OpenSSL",
-         std::string{
+        {"LMDB"sv,
+         std::string_view{
+             reinterpret_cast<const char*>(lmdb_txt), lmdb_txt_len}},
+        {"OpenSSL"sv,
+         std::string_view{
              reinterpret_cast<const char*>(openssl_txt), openssl_txt_len}},
-        {"Qt", std::string{reinterpret_cast<const char*>(qt_txt), qt_txt_len}},
-        {"ZeroMQ",
-         std::string{
+        {"Qt"sv,
+         std::string_view{reinterpret_cast<const char*>(qt_txt), qt_txt_len}},
+        {"ZeroMQ"sv,
+         std::string_view{
              reinterpret_cast<const char*>(libzmq_txt), libzmq_txt_len}},
     };
     const auto& ot = opentxs::LicenseData();
@@ -74,3 +81,4 @@ auto MetierLicenseData() noexcept -> const LicenseData&
 
     return data;
 }
+}  // namespace metier

@@ -9,7 +9,7 @@ cmake_policy(
   CMP0091
   NEW
 )
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 11)
 project(metier)
 set(METIER_APPSTREAM_ID "org.opentransactions.metier")
 set(METIER_APPSTREAM_NAME "Métier")
@@ -18,8 +18,8 @@ set(METIER_CLI_COMMAND "metierctl")
 set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 22)
-set(METIER_VERSION_MINOR 5)
-set(METIER_VERSION_PATCH 2)
+set(METIER_VERSION_MINOR 6)
+set(METIER_VERSION_PATCH 0)
 
 execute_process(
   COMMAND
@@ -101,19 +101,10 @@ option(
 
 set(METIER_ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
 set(METIER_ORIGINAL_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set_compiler_flags(17 ${METIER_PEDANTIC_BUILD})
-
-if(${CMAKE_CXX_COMPILER_ID}
-   MATCHES
-   Clang
-)
-  set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -Wno-redundant-parens -Wno-extra-semi-stmt -Wno-reserved-identifier"
-  )
-endif()
+set_compiler_flags(20 ${METIER_PEDANTIC_BUILD})
 
 if(NOT MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept -Wno-c++20-compat")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-extra-semi-stmt -Wno-noexcept -Wno-redundant-parens -Wno-reserved-identifier")
 endif()
 
 # -----------------------------------------------------------------------------

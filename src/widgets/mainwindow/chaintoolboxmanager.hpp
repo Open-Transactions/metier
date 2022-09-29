@@ -199,18 +199,19 @@ private:
         receive->setObjectName(QString::fromUtf8(receiveName.c_str()));
         receive->setText(
             QCoreApplication::translate("MainWindow", "Receive", nullptr));
-        receive->connect(receive.get(), &QPushButton::clicked, [=]() {
+        receive->connect(receive.get(), &QPushButton::clicked, [=, this]() {
             show_receiving(chain);
         });
         send->setObjectName(QString::fromUtf8(sendName.c_str()));
         send->setText(
             QCoreApplication::translate("MainWindow", "Send", nullptr));
-        send->connect(
-            send.get(), &QPushButton::clicked, [=]() { show_send(chain); });
+        send->connect(send.get(), &QPushButton::clicked, [=, this]() {
+            show_send(chain);
+        });
         details->setObjectName(QString::fromUtf8(detailsName.c_str()));
         details->setText(
             QCoreApplication::translate("MainWindow", "Details", nullptr));
-        details->connect(details.get(), &QPushButton::clicked, [=]() {
+        details->connect(details.get(), &QPushButton::clicked, [=, this]() {
             show_details(chain);
         });
         layout->addWidget(view.get(), 0, 0, 1, 2);

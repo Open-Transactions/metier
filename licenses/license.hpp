@@ -6,11 +6,14 @@
 #pragma once
 
 #include <iosfwd>
-#include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
-using LicenseData = std::vector<std::pair<std::string, std::string>>;
+namespace metier
+{
+using LicenseData = std::vector<std::pair<std::string_view, std::string_view>>;
 
 auto LongestLicenseDescription() noexcept -> std::size_t;
 auto MetierLicenseData() noexcept -> const LicenseData&;
+}  // namespace metier
