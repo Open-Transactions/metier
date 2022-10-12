@@ -7,6 +7,7 @@
 
 #include "widgets/blockchainsend.hpp"  // IWYU pragma: associated
 
+#include <opentxs/Qt.hpp>
 #include <opentxs/opentxs.hpp>
 #include <QApplication>
 #include <QLabel>

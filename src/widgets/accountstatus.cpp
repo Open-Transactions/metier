@@ -5,6 +5,7 @@
 
 #include "accountstatus.hpp"  // IWYU pragma: associated
 
+#include <opentxs/Qt.hpp>
 #include <opentxs/opentxs.hpp>
 #include <QPushButton>
 

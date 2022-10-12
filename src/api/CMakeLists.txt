@@ -28,6 +28,7 @@ target_link_libraries(
     Qt::Gui
     opentxs
     qr-code-generator
+    "${METIER_ZMQ_TARGET}"
 )
 
 if(NOT METIER_BUNDLED_OPENTXS)
