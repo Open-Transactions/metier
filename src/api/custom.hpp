@@ -10,9 +10,6 @@
 
 namespace metier
 {
-extern const char* introduction_notary_contract_;
-extern const char* messaging_notary_contract_;
-
 auto SeedEndpoints() noexcept -> const std::vector<const char*>&;
 auto DefaultBlockchains() noexcept
     -> const std::vector<opentxs::blockchain::Type>&;

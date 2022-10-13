@@ -5,6 +5,7 @@
 
 #include "api/api.hpp"  // IWYU pragma: associated
 
+#include <opentxs/Qt.hpp>
 #include <opentxs/opentxs.hpp>
 #include <QDebug>
 #include <QDesktopServices>

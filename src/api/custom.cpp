@@ -9,10 +9,6 @@
 
 namespace metier
 {
-const char* introduction_notary_contract_{nullptr};
-
-const char* messaging_notary_contract_{nullptr};
-
 auto SeedEndpoints() noexcept -> const std::vector<const char*>&
 {
     static const auto data = std::vector<const char*>{};

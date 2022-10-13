@@ -7,19 +7,23 @@
 
 #include "api/api.hpp"  // IWYU pragma: associated
 
+#include <opentxs/Qt.hpp>
 #include <opentxs/opentxs.hpp>
+#include <zmq.h>
 #include <QDebug>
 #include <QDir>
 #include <QGuiApplication>
 #include <QStandardPaths>
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <cstring>
 #include <future>
 #include <map>
 #include <mutex>
 #include <set>
 #include <string>
+#include <thread>
 
 #include "api/custom.hpp"
 #include "api/passwordcallback.hpp"
@@ -36,6 +40,8 @@ namespace ot = opentxs;
 
 namespace metier
 {
+using namespace std::literals;
+
 constexpr auto seed_id_key{"seedid"};
 constexpr auto nym_id_key{"nymid"};
 
@@ -166,11 +172,7 @@ public:
     PasswordCallback callback_;
     opentxs::PasswordCaller caller_;
     const opentxs::api::Context& ot_;
-    const ot::OTZMQListenCallback rpc_cb_;
-    ot::OTZMQRouterSocket rpc_socket_;
     const opentxs::api::session::Client& api_;
-    const ot::identifier::Notary introduction_notary_id_;
-    const ot::identifier::Notary messaging_notary_id_;
     const std::string seed_id_;
     const int longest_seed_word_;
     const SeedLanguageMap seed_language_;
@@ -178,9 +180,12 @@ public:
     mutable std::mutex lock_;
     mutable std::atomic_bool have_nym_;
     mutable std::atomic_bool wait_for_seed_backup_;
+    mutable std::atomic_bool run_zmq_;
     mutable std::atomic<State> state_;
     EnabledChains enabled_chains_;
     std::unique_ptr<model::SeedType> seed_type_;
+    void* zmq_socket_;
+    std::thread zmq_thread_;
 
     template <typename OutputType, typename InputType>
     static auto transform(const InputType& data) noexcept -> OutputType
@@ -255,19 +260,6 @@ public:
             qInfo() << e.what();
         }
     }
-    auto rpc(zmq::Message&& in) const noexcept -> void
-    {
-        const auto body = in.Body();
-
-        if (1u != body.size()) { qInfo() << "Invalid message"; }
-
-        const auto& cmd = body.at(0);
-        auto out = zmq::reply_to_message(std::move(in));
-
-        if (ot_.RPC(cmd.Bytes(), out.AppendBytes())) {
-            rpc_socket_->Send(std::move(out));
-        }
-    }
     auto seedManager() const noexcept -> ot::ui::SeedTreeQt*
     {
         static auto* model = api_.UI().SeedTreeQt();
@@ -282,8 +274,6 @@ public:
         for (const auto chain : api_.Network().Blockchain().EnabledChains()) {
             if (false == make_accounts(chain)) { return false; }
         }
-
-        check_registration();
 
         return true;
     }
@@ -304,17 +294,13 @@ public:
 
         if (have_nym_) { return true; }
 
-        auto id = ot::String::Factory();
-        bool notUsed{false};
-        api_.Config().Check_str(
-            ot::String::Factory(
-                QGuiApplication::applicationName().toStdString()),
-            ot::String::Factory(nym_id_key),
-            id,
-            notUsed);
+        const auto& config = api_.Config();
+        const auto section = QGuiApplication::applicationName().toStdString();
+        auto id = ot::UnallocatedCString{};
+        auto rc = config.ReadString(section, nym_id_key, ot::writer(id));
 
-        if (id->Exists()) {
-            nymID = api_.Factory().NymIDFromBase58(id->Bytes());
+        if (rc && (false == id.empty())) {
+            nymID = api_.Factory().NymIDFromBase58(id);
 
             return true;
         }
@@ -323,17 +309,14 @@ public:
 
         if (1 == nymList.size()) {
             const auto& firstID = *nymList.begin();
-            id->Set(firstID.asBase58(api_.Crypto()).c_str());
-            const auto config = api_.Config().Set_str(
-                ot::String::Factory(
-                    QGuiApplication::applicationName().toStdString()),
-                ot::String::Factory(nym_id_key),
-                id,
-                notUsed);
+            id = firstID.asBase58(api_.Crypto());
+            rc = config.WriteString(section, nym_id_key, id);
 
-            if (false == config) { return false; }
+            if (false == rc) { qFatal("Failed to update configuration"); }
 
-            if (false == api_.Config().Save()) { return false; }
+            if (false == config.Save()) {
+                qFatal("Failed to save config file");
+            }
 
             nymID = firstID;
 
@@ -350,17 +333,13 @@ public:
         if (false == seed_id_.empty()) { return true; }
 
         auto& seed = const_cast<std::string&>(seed_id_);
-        auto id = ot::String::Factory();
-        bool notUsed{false};
-        api_.Config().Check_str(
-            ot::String::Factory(
-                QGuiApplication::applicationName().toStdString()),
-            ot::String::Factory(seed_id_key),
-            id,
-            notUsed);
+        const auto& config = api_.Config();
+        const auto section = QGuiApplication::applicationName().toStdString();
+        auto id = ot::UnallocatedCString{};
+        auto rc = config.ReadString(section, seed_id_key, ot::writer(id));
 
-        if (id->Exists()) {
-            seed = id->Get();
+        if (rc && (false == id.empty())) {
+            seed = id;
 
             return true;
         }
@@ -369,19 +348,16 @@ public:
 
         if (1 == seedList.size()) {
             const auto& firstID = seedList.begin()->first;
-            id->Set(firstID.c_str());
-            const auto config = api_.Config().Set_str(
-                ot::String::Factory(
-                    QGuiApplication::applicationName().toStdString()),
-                ot::String::Factory(seed_id_key),
-                id,
-                notUsed);
+            id = firstID;
+            rc = config.WriteString(section, seed_id_key, id);
 
-            if (false == config) { return false; }
+            if (false == rc) { qFatal("Failed to update configuration"); }
 
-            if (false == api_.Config().Save()) { return false; }
+            if (false == config.Save()) {
+                qFatal("Failed to save config file");
+            }
 
-            seed = id->Get();
+            seed = id;
 
             return true;
         }
@@ -428,18 +404,14 @@ public:
         if (!pNym) { qFatal("Failed to create nym"); }
 
         const auto& nym = *pNym;
-        bool notUsed{false};
-        const auto config = api_.Config().Set_str(
-            ot::String::Factory(
-                QGuiApplication::applicationName().toStdString()),
-            ot::String::Factory(nym_id_key),
-            ot::String::Factory(nym.ID().asBase58(api_.Crypto())),
-            notUsed);
+        const auto& config = api_.Config();
+        const auto section = QGuiApplication::applicationName().toStdString();
+        const auto rc = config.WriteString(
+            section, nym_id_key, nym.ID().asBase58(api_.Crypto()));
 
-        if (false == config) { qFatal("Failed to update configuration"); }
-        if (false == api_.Config().Save()) {
-            qFatal("Failed to save config file");
-        }
+        if (false == rc) { qFatal("Failed to update configuration"); }
+
+        if (false == config.Save()) { qFatal("Failed to save config file"); }
 
         identityManager()->setActiveNym(
             QString::fromStdString(nym.ID().asBase58(api_.Crypto())));
@@ -481,16 +453,13 @@ public:
 
         if (id.empty()) { return {}; }
 
-        auto notUsed{false};
-        const auto config = api_.Config().Set_str(
-            ot::String::Factory(
-                QGuiApplication::applicationName().toStdString()),
-            ot::String::Factory(seed_id_key),
-            ot::String::Factory(id),
-            notUsed);
+        const auto& config = api_.Config();
+        const auto section = QGuiApplication::applicationName().toStdString();
+        const auto rc = config.WriteString(section, seed_id_key, id);
 
-        if (false == config) { return {}; }
-        if (false == api_.Config().Save()) { return {}; }
+        if (false == rc) { qFatal("Failed to update configuration"); }
+
+        if (false == config.Save()) { qFatal("Failed to save config file"); }
 
         success = true;
         const auto words = QString{seeds.Words(id, reason).c_str()};
@@ -540,16 +509,13 @@ public:
 
         if (id.empty()) { return; }
 
-        auto notUsed{false};
-        const auto config = api_.Config().Set_str(
-            ot::String::Factory(
-                QGuiApplication::applicationName().toStdString()),
-            ot::String::Factory(seed_id_key),
-            ot::String::Factory(id),
-            notUsed);
+        const auto& config = api_.Config();
+        const auto section = QGuiApplication::applicationName().toStdString();
+        const auto rc = config.WriteString(section, seed_id_key, id);
 
-        if (false == config) { return; }
-        if (false == api_.Config().Save()) { return; }
+        if (false == rc) { qFatal("Failed to update configuration"); }
+
+        if (false == config.Save()) { qFatal("Failed to save config file"); }
 
         success = true;
     }
@@ -612,49 +578,7 @@ public:
                   caller_.SetCallback(&callback_);
                   return &caller_;
               }()))
-        , rpc_cb_(zmq::ListenCallback::Factory(
-              [this](auto&& in) { rpc(std::move(in)); }))
-        , rpc_socket_([this] {
-            using Dir = zmq::socket::Direction;
-            auto out = ot_.ZMQ().RouterSocket(rpc_cb_, Dir::Bind);
-            const auto endpoint = rpc_endpoint();
-
-            if (out->Start(endpoint)) {
-                qInfo() << QString("RPC socket opened at: %1")
-                               .arg(endpoint.c_str());
-            } else {
-                qFatal("Failed to start RPC socket");
-            }
-
-            return out;
-        }())
         , api_(ot_.StartClientSession(ot_args(), 0))
-        , introduction_notary_id_([&]() -> ot::identifier::Notary {
-            try {
-                const auto contract =
-                    import_contract(introduction_notary_contract_);
-                auto out = ot::identifier::Notary{};
-                out.Assign(contract->ID().Bytes());
-
-                return out;
-            } catch (...) {
-
-                return {};
-            }
-        }())
-        , messaging_notary_id_([&]() -> ot::identifier::Notary {
-            try {
-                const auto contract =
-                    import_contract(messaging_notary_contract_);
-                auto out = ot::identifier::Notary{};
-                out.Assign(contract->ID().Bytes());
-
-                return out;
-            } catch (...) {
-
-                return {};
-            }
-        }())
         , seed_id_()
         , longest_seed_word_([&]() -> auto{
             const auto& api = api_.Crypto().Seed();
@@ -717,6 +641,7 @@ public:
         , lock_()
         , have_nym_(false)
         , wait_for_seed_backup_(false)
+        , run_zmq_(true)
         , state_(State::init)
         , enabled_chains_([&] {
             auto* full =
@@ -742,88 +667,23 @@ public:
               &parent,
               transform<model::SeedType::Data>(
                   api_.Crypto().Seed().AllowedSeedTypes())))
+        , zmq_socket_(::zmq_socket(api_.Network().ZeroMQ(), ZMQ_ROUTER))
+        , zmq_thread_(&Imp::run_zmq, this)
     {
         assert(seed_type_);
 
         Ownership::Claim(seed_type_.get());
-        check_introduction_notary();
         ready(true);
     }
 
-    ~Imp() { rpc_socket_->Close(); }
+    ~Imp()
+    {
+        run_zmq_ = false;
+
+        if (zmq_thread_.joinable()) { zmq_thread_.join(); }
+    }
 
 private:
-    auto check_introduction_notary() const noexcept -> void
-    {
-        if (introduction_notary_id_.empty()) { return; }
-
-        api_.OTX().SetIntroductionServer(
-            api_.Wallet().Server(introduction_notary_id_));
-    }
-
-    auto check_registration() const noexcept -> bool
-    {
-        if (introduction_notary_id_.empty()) { return false; }
-        if (messaging_notary_id_.empty()) { return false; }
-
-        const auto active = identityManager()->getActiveNym();
-
-        if (active.isEmpty()) { return false; }
-
-        const auto nymID = api_.Factory().NymIDFromBase58(active.toStdString());
-
-        {
-            const auto reason = api_.Factory().PasswordPrompt(
-                "Checking or updating public contact data");
-            auto nym = api_.Wallet().mutable_Nym(nymID, reason);
-            const auto notary = nym.PreferredOTServer();
-
-            if (notary.empty()) {
-                nym.AddPreferredOTServer(
-                    messaging_notary_id_.asBase58(api_.Crypto()), true, reason);
-            }
-        }
-
-        const auto isRegistered = [&](const auto& server) {
-            auto context = api_.Wallet().ServerContext(nymID, server);
-
-            if (context) { return (0 != context->Request()); }
-
-            return false;
-        };
-        const auto check = [&](const auto& server) {
-            if (false == isRegistered(server)) {
-                const auto [id, future] = api_.OTX().RegisterNym(nymID, server);
-
-                if (0 > id) { return false; }
-            }
-
-            return true;
-        };
-
-        auto output = check(messaging_notary_id_);
-        output &= check(introduction_notary_id_);
-
-        return output;
-    }
-
-    auto import_contract(const char* text) const noexcept(false)
-        -> ot::OTServerContract
-    {
-        if ((nullptr == text) || (0 == std::strlen(text))) {
-            throw std::runtime_error{"invalid contract"};
-        }
-
-        const auto armored = [&] {
-            auto out = api_.Factory().Armored();
-            out->LoadFromString(ot::String::Factory(text));
-
-            return out;
-        }();
-
-        return api_.Wallet().Server(api_.Factory().Data(armored).Bytes());
-    }
-
     auto make_accounts(const ot::blockchain::Type chain) const noexcept -> bool
     {
         using Chain = ot::blockchain::Type;
@@ -886,6 +746,132 @@ private:
         }
 
         return true;
+    }
+    auto receive_message(
+        void* socket,
+        ot::network::zeromq::Message& message) noexcept -> bool
+    {
+        auto receiving{true};
+
+        while (receiving) {
+            auto& frame = message.AddFrame();
+            const bool received =
+                (-1 != ::zmq_msg_recv(frame, socket, ZMQ_DONTWAIT));
+
+            if (false == received) {
+                auto zerr = ::zmq_errno();
+
+                if (EAGAIN == zerr) {
+                    qInfo() << "zmq_msg_recv returns EAGAIN. This should never "
+                               "happen.";
+                } else {
+                    qInfo() << ::zmq_strerror(::zmq_errno());
+                }
+
+                return false;
+            }
+
+            int option{0};
+            std::size_t optionBytes{sizeof(option)};
+
+            const bool haveOption =
+                (-1 !=
+                 ::zmq_getsockopt(socket, ZMQ_RCVMORE, &option, &optionBytes));
+
+            if (false == haveOption) {
+                qInfo() << "Failed to check socket options error:\n"
+                        << ::zmq_strerror(::zmq_errno());
+
+                return false;
+            }
+
+            if (optionBytes != sizeof(option)) { std::terminate(); }
+
+            if (1 != option) { receiving = false; }
+        }
+
+        return true;
+    }
+    auto rpc(void* socket, zmq::Message&& in) const noexcept -> void
+    {
+        const auto body = in.Body();
+
+        if (1u != body.size()) { qInfo() << "Invalid message"; }
+
+        const auto& cmd = body.at(0);
+        auto out = zmq::reply_to_message(std::move(in));
+
+        if (ot_.RPC(cmd.Bytes(), out.AppendBytes())) {
+            auto sent{true};
+            const auto parts = out.size();
+            auto counter = std::size_t{0};
+
+            for (auto& frame : out) {
+                auto flags{0};
+
+                if (++counter < parts) { flags |= ZMQ_SNDMORE; }
+
+                sent &=
+                    (-1 != ::zmq_msg_send(
+                               const_cast<ot::network::zeromq::Frame&>(frame),
+                               socket,
+                               flags));
+            }
+
+            if (false == sent) {
+                qInfo() << "Send error: \n" << ::zmq_strerror(::zmq_errno());
+            }
+        }
+    }
+    auto run_zmq() noexcept -> void
+    {
+        {
+            const auto endpoint = rpc_endpoint();
+
+            if (0 == ::zmq_bind(zmq_socket_, endpoint.c_str())) {
+                qInfo() << QString("RPC socket opened at: %1")
+                               .arg(endpoint.c_str());
+            } else {
+                qFatal("Failed to start RPC socket");
+            }
+        }
+
+        auto poll = [&] {
+            auto out = ot::Vector<::zmq_pollitem_t>{};
+            auto& item = out.emplace_back();
+            item.socket = zmq_socket_;
+            item.events = ZMQ_POLLIN;
+
+            return out;
+        }();
+
+        while (run_zmq_) {
+            static constexpr auto timeout = 100ms;
+            const auto events = ::zmq_poll(
+                poll.data(), static_cast<int>(poll.size()), timeout.count());
+
+            if (0 > events) {
+                qInfo() << ::zmq_strerror(::zmq_errno());
+
+                continue;
+            } else if (0 == events) {
+
+                continue;
+            } else {
+                for (auto& item : poll) {
+                    if (ZMQ_POLLIN != item.revents) { continue; }
+
+                    const auto& socket = item.socket;
+                    auto message = ot::network::zeromq::Message{};
+
+                    if (receive_message(socket, message)) {
+                        rpc(socket, std::move(message));
+                    }
+                }
+            }
+        }
+
+        ::zmq_close(zmq_socket_);
     }
 };
 }  // namespace metier
