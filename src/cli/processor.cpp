@@ -456,11 +456,12 @@ private:
 
         auto request = Message{};
         auto reply = Message{};
-        in.Serialize([&](const auto bytes) -> ot::WritableView {
+        in.Serialize({[&](const auto bytes) -> ot::WriteBuffer {
             auto& frame = add_frame(request, bytes);
+            auto* p = static_cast<std::byte*>(::zmq_msg_data(frame));
 
-            return {::zmq_msg_data(frame), ::zmq_msg_size(frame)};
-        });
+            return std::span<std::byte>{p, ::zmq_msg_size(frame)};
+        }});
 
         if (false == send(request)) { return Result::send_error; }
 
