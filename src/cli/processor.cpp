@@ -139,7 +139,7 @@ struct Processor::Imp {
                 for (const auto& balance : reply.Balances()) {
                     auto account = json::object{};
                     account["id"] = balance.ID();
-                    account["style"] = ot::print(balance.Type());
+                    account["style"] = print(balance.Type());
                     account["name"] = balance.Name();
                     account["owner"] = balance.Owner();
                     account["issuer"] = balance.Issuer();
@@ -201,46 +201,46 @@ struct Processor::Imp {
 
             if (0 < codes.size()) {
                 const auto& code = codes.front().second;
-                using Code = ot::rpc::ResponseCode;
+                using enum ot::rpc::ResponseCode;
 
                 switch (code) {
-                    case Code::txid: {
+                    case txid: {
                         out["txid"] = reply.Pending().front().second;
                     } break;
-                    case Code::invalid:
-                    case Code::success:
-                    case Code::bad_session:
-                    case Code::none:
-                    case Code::queued:
-                    case Code::unnecessary:
-                    case Code::retry:
-                    case Code::no_path_to_recipient:
-                    case Code::bad_server_argument:
-                    case Code::cheque_not_found:
-                    case Code::payment_not_found:
-                    case Code::start_task_failed:
-                    case Code::nym_not_found:
-                    case Code::add_claim_failed:
-                    case Code::add_contact_failed:
-                    case Code::register_account_failed:
-                    case Code::bad_server_response:
-                    case Code::workflow_not_found:
-                    case Code::unit_definition_not_found:
-                    case Code::session_not_found:
-                    case Code::create_nym_failed:
-                    case Code::create_unit_definition_failed:
-                    case Code::delete_claim_failed:
-                    case Code::account_not_found:
-                    case Code::move_funds_failed:
-                    case Code::register_nym_failed:
-                    case Code::contact_not_found:
-                    case Code::account_owner_not_found:
-                    case Code::send_payment_failed:
-                    case Code::transaction_failed:
-                    case Code::unimplemented:
-                    case Code::error:
+                    case invalid:
+                    case success:
+                    case bad_session:
+                    case none:
+                    case queued:
+                    case unnecessary:
+                    case retry:
+                    case no_path_to_recipient:
+                    case bad_server_argument:
+                    case cheque_not_found:
+                    case payment_not_found:
+                    case start_task_failed:
+                    case nym_not_found:
+                    case add_claim_failed:
+                    case add_contact_failed:
+                    case register_account_failed:
+                    case bad_server_response:
+                    case workflow_not_found:
+                    case unit_definition_not_found:
+                    case session_not_found:
+                    case create_nym_failed:
+                    case create_unit_definition_failed:
+                    case delete_claim_failed:
+                    case account_not_found:
+                    case move_funds_failed:
+                    case register_nym_failed:
+                    case contact_not_found:
+                    case account_owner_not_found:
+                    case send_payment_failed:
+                    case transaction_failed:
+                    case unimplemented:
+                    case error:
                     default: {
-                        out["error"] = ot::print(code).c_str();
+                        out["error"] = print(code);
                     }
                 }
             } else {
