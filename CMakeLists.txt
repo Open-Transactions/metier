@@ -17,9 +17,9 @@ set(METIER_APP_DOMAIN "opentransactions.org")
 set(METIER_CLI_COMMAND "metierctl")
 set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
-set(METIER_VERSION_MAJOR 22)
-set(METIER_VERSION_MINOR 6)
-set(METIER_VERSION_PATCH 2)
+set(METIER_VERSION_MAJOR 23)
+set(METIER_VERSION_MINOR 0)
+set(METIER_VERSION_PATCH 0)
 
 execute_process(
   COMMAND
@@ -200,6 +200,7 @@ if(METIER_BUNDLED_OPENTXS)
       Widgets
     QUIET
   )
+  find_package(TBB QUIET)
 else()
   find_package(opentxs REQUIRED)
   find_package(
@@ -240,7 +241,7 @@ else()
       Widgets
   )
   find_package(SQLite3 QUIET)
-  find_package(opendht QUIET)
+  find_package(TBB QUIET)
 endif()
 
 # -----------------------------------------------------------------------------

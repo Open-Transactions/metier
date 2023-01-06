@@ -794,11 +794,15 @@ private:
     }
     auto rpc(void* socket, zmq::Message&& in) const noexcept -> void
     {
-        const auto body = in.Body();
+        const auto payload = in.Payload();
 
-        if (1u != body.size()) { qInfo() << "Invalid message"; }
+        if (payload.empty()) {
+            qInfo() << "Invalid message";
 
-        const auto& cmd = body.at(0);
+            return;
+        }
+
+        const auto& cmd = payload[0];
         auto out = zmq::reply_to_message(std::move(in));
 
         if (ot_.RPC(cmd.Bytes(), out.AppendBytes())) {
@@ -806,7 +810,7 @@ private:
             const auto parts = out.size();
             auto counter = std::size_t{0};
 
-            for (auto& frame : out) {
+            for (auto& frame : out.get()) {
                 auto flags{0};
 
                 if (++counter < parts) { flags |= ZMQ_SNDMORE; }
