@@ -10,7 +10,7 @@ jobs:
     name: "Flatpak"
     runs-on: ubuntu-latest
     container:
-      image: bilelmoussaoui/flatpak-github-actions:kde-5.15
+      image: bilelmoussaoui/flatpak-github-actions:kde-6.4
       options: --privileged
     steps:
     - name: Get more disk space
@@ -25,11 +25,10 @@ jobs:
       with:
         fetch-depth: '0'
         submodules: 'recursive'
-    - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v3
+    - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v5
       with:
         manifest-path: package/gui.flatpak.json
         bundle: org.opentransactions.metier.flatpak
-        cache-key: flatpak-builder-${{ github.workflow }}-${{ github.ref }}
     - uses: actions/upload-artifact@v2
       with:
         path: org.opentransactions.metier.flatpak

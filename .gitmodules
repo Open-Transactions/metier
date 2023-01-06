@@ -9,7 +9,7 @@
 [submodule "deps/opentxs"]
 	path = deps/opentxs
 	url = https://github.com/open-transactions/opentxs
-	shallow = true
+	shallow = false
 [submodule "deps/vcpkg"]
 	path = deps/vcpkg
 	url = https://github.com/microsoft/vcpkg
