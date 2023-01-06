@@ -1,7 +1,7 @@
 {
   "id": "org.opentransactions.metier",
   "runtime": "org.kde.Platform",
-  "runtime-version": "5.15-21.08",
+  "runtime-version": "6.4",
   "sdk": "org.kde.Sdk",
   "command": "metier",
   "modules": [
@@ -133,7 +133,6 @@
       "name": "tbb",
       "buildsystem": "cmake-ninja",
       "builddir": true,
-      "subdir": "cmake",
       "config-opts": [
         "-DBUILD_SHARED_LIBS=ON",
         "-DTBB_TEST=OFF"
