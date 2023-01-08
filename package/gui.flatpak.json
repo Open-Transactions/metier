@@ -90,8 +90,8 @@
       ],
       "sources": [
         {
-          "url": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v21.12.tar.gz",
-          "sha256": "22fdaf641b31655d4b2297f9981fa5203b2866f8332d3c6333f6b0107bb320de",
+          "url": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.19.1.tar.gz",
+          "sha256": "87407cd28e7a9c95d9f61a098a53cf031109d451a7763e7dd1253abf8b4df422",
           "type": "archive"
         }
       ],
