@@ -252,7 +252,7 @@ auto MainWindow::changeChain() -> void
 {
     const auto chain = imp_.chain_toolbox_.currentChain();
 
-    if (ot::blockchain::Type::Unknown == chain) {
+    if (ot::blockchain::Type::UnknownBlockchain == chain) {
         showBlockchainStatistics();
     } else {
         showAccountActivity(static_cast<int>(chain));

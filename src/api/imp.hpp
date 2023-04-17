@@ -131,8 +131,10 @@ public:
                 copy = enabled_;
             }
             std::transform(
-                std::begin(copy), std::end(copy), std::back_inserter(output), [
-                ](const auto& in) -> auto{ return static_cast<int>(in); });
+                std::begin(copy),
+                std::end(copy),
+                std::back_inserter(output),
+                [](const auto& in) -> auto { return static_cast<int>(in); });
 
             return output;
         }
@@ -192,9 +194,12 @@ public:
     {
         auto output = OutputType{};
         std::transform(
-            data.begin(), data.end(), std::back_inserter(output), [
-            ](const auto& in) -> auto{
-                return std::make_pair(in.second, static_cast<int>(in.first));
+            data.begin(),
+            data.end(),
+            std::back_inserter(output),
+            [](const auto& in) -> auto {
+                return std::make_pair(
+                    std::string{in.second}, static_cast<int>(in.first));
             });
         std::sort(output.begin(), output.end());
 
@@ -435,8 +440,7 @@ public:
         assert(id.empty());
         assert(0 == seeds.DefaultSeed().second);
 
-        const auto invalid = [](const int in) -> auto
-        {
+        const auto invalid = [](const int in) -> auto {
             return (0 > in) || (std::numeric_limits<std::uint8_t>::max() < in);
         };
 
@@ -574,13 +578,13 @@ public:
         , caller_()
         , ot_(ot::InitContext(
               make_args(parent, argc, argv),
-              [this]() -> auto{
+              [this]() -> auto {
                   caller_.SetCallback(&callback_);
                   return &caller_;
               }()))
         , api_(ot_.StartClientSession(ot_args(), 0))
         , seed_id_()
-        , longest_seed_word_([&]() -> auto{
+        , longest_seed_word_([&]() -> auto {
             const auto& api = api_.Crypto().Seed();
             auto output = int{};
             const auto types = api.AllowedSeedTypes();
@@ -675,6 +679,10 @@ public:
         Ownership::Claim(seed_type_.get());
         ready(true);
     }
+    Imp(const Imp&) = delete;
+    Imp(Imp&&) = delete;
+    auto operator=(const Imp&) -> Imp& = delete;
+    auto operator=(Imp&&) -> Imp& = delete;
 
     ~Imp()
     {
