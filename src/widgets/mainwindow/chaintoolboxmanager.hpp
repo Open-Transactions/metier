@@ -43,7 +43,7 @@ struct ChainToolboxManager {
         auto lock = rLock{lock_};
         const auto index = toolbox_->currentIndex();
 
-        if (0 > index) { return ot::blockchain::Type::Unknown; }
+        if (0 > index) { return ot::blockchain::Type::UnknownBlockchain; }
 
         const auto position = static_cast<std::size_t>(index);
 
@@ -56,7 +56,7 @@ struct ChainToolboxManager {
             auto& selection = *accountList.selectionModel();
             selection.clear();
 
-            return ot::blockchain::Type::Unknown;
+            return ot::blockchain::Type::UnknownBlockchain;
         }
 
         return util::convert(items_.at(position));

@@ -5,13 +5,14 @@
 
 #include "app/imp.hpp"  // IWYU pragma: associated
 
-#include <opentxs/opentxs.hpp>
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickView>
 #include <QStringLiteral>
 #include <QUrl>
+#include <opentxs/Qt.hpp>
+#include <opentxs/opentxs.hpp>
 #include <atomic>
 #include <future>
 

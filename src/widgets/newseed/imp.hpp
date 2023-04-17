@@ -39,8 +39,7 @@ struct NewSeed::Imp {
         auto* top = ui_->preGenerate;
         auto* bottom = ui_->postGenerate;
         top->setHidden(true);
-        const auto getData = [](const auto& control) -> auto
-        {
+        const auto getData = [](const auto& control) -> auto {
             auto* model = control->model();
 
             return model
