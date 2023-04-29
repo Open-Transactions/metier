@@ -18,7 +18,7 @@ set(METIER_CLI_COMMAND "metierctl")
 set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 23)
-set(METIER_VERSION_MINOR 1)
+set(METIER_VERSION_MINOR 2)
 set(METIER_VERSION_PATCH 0)
 
 execute_process(
@@ -57,8 +57,12 @@ update_git_submodules()
 # -----------------------------------------------------------------------------
 # Set option defaults
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug"
-   OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"
+if(CMAKE_BUILD_TYPE
+   STREQUAL
+   "Debug"
+   OR CMAKE_BUILD_TYPE
+      STREQUAL
+      "RelWithDebInfo"
 )
   set(METIER_PEDANTIC_DEFAULT ON)
   set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -104,7 +108,9 @@ set(METIER_ORIGINAL_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set_compiler_flags(20 ${METIER_PEDANTIC_BUILD})
 
 if(NOT MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-extra-semi-stmt -Wno-noexcept -Wno-redundant-parens -Wno-reserved-identifier")
+  set(CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} -Wno-extra-semi-stmt -Wno-noexcept -Wno-redundant-parens -Wno-reserved-identifier"
+  )
 endif()
 
 if(CMAKE_CXX_COMPILER_ID
@@ -114,10 +120,16 @@ if(CMAKE_CXX_COMPILER_ID
   # too many false positives, mostly in standard library and third party headers
   # we can't do anything about anyway
   set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -Wno-error=null-dereference -Wno-error=stringop-overflow= -Wno-error=stringop-overread"
+      "${CMAKE_CXX_FLAGS} -Wno-error=null-dereference -Wno-error=stringop-overflow= -Wno-error=stringop-overread -Wno-error=unsafe-buffer-usage"
   )
 endif()
 
+if(CMAKE_CXX_COMPILER_ID
+   MATCHES
+   Clang
+)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=unsafe-buffer-usage")
+endif()
 # -----------------------------------------------------------------------------
 # Print system information and build options
 
@@ -184,6 +196,7 @@ if(METIER_BUNDLED_OPENTXS)
     QUIET
     OPTIONAL_COMPONENTS
       container
+      exception
       filesystem
       iostreams
       json
@@ -220,6 +233,7 @@ else()
     QUIET
     OPTIONAL_COMPONENTS
       container
+      exception
       filesystem
       iostreams
       json
