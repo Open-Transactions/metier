@@ -19,7 +19,7 @@ set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 23)
 set(METIER_VERSION_MINOR 2)
-set(METIER_VERSION_PATCH 0)
+set(METIER_VERSION_PATCH 1)
 
 execute_process(
   COMMAND
@@ -120,7 +120,7 @@ if(CMAKE_CXX_COMPILER_ID
   # too many false positives, mostly in standard library and third party headers
   # we can't do anything about anyway
   set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -Wno-error=null-dereference -Wno-error=stringop-overflow= -Wno-error=stringop-overread -Wno-error=unsafe-buffer-usage"
+      "${CMAKE_CXX_FLAGS} -Wno-error=null-dereference -Wno-error=stringop-overflow= -Wno-error=stringop-overread -Wno-unsafe-buffer-usage"
   )
 endif()
 
