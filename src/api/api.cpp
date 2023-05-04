@@ -40,7 +40,7 @@ Api::Api(QGuiApplication& parent, App& app, int& argc, char** argv)
 auto Api::accountIDtoBlockchainType(const QString& id) -> int
 {
     const auto accountID =
-        imp_.api_.Factory().IdentifierFromBase58(id.toStdString());
+        imp_.api_.Factory().AccountIDFromBase58(id.toStdString());
     const auto [chain, owner] =
         imp_.api_.Crypto().Blockchain().LookupAccount(accountID);
 
