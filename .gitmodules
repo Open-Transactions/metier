@@ -1,5 +1,5 @@
 [submodule "cmake"]
-	path = cmake
+	path = deps/opentxs-cmake
 	url = https://github.com/open-transactions/opentxs-cmake
 	shallow = true
 [submodule "QR-Code-generator"]
@@ -10,7 +10,3 @@
 	path = deps/opentxs
 	url = https://github.com/open-transactions/opentxs
 	shallow = false
-[submodule "deps/vcpkg"]
-	path = deps/vcpkg
-	url = https://github.com/microsoft/vcpkg
-	shallow = true

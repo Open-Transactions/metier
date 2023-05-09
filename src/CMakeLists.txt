@@ -17,6 +17,7 @@ else()
 endif()
 
 add_library(metier-rpc OBJECT "")
+metier_configure_cxx_target(metier-rpc)
 
 add_subdirectory(api)
 add_subdirectory(app)
@@ -45,6 +46,7 @@ set(object-deps
 add_executable(
   "${PROJECT_NAME}" MACOSX_BUNDLE "${object-deps}" "${APP_ICON_RESOURCE}"
 )
+metier_configure_cxx_target("${PROJECT_NAME}")
 
 target_include_directories(
   "${PROJECT_NAME}" PRIVATE "${${PROJECT_NAME}_SOURCE_DIR}"
