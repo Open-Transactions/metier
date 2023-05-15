@@ -19,7 +19,7 @@ set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 23)
 set(METIER_VERSION_MINOR 2)
-set(METIER_VERSION_PATCH 1)
+set(METIER_VERSION_PATCH 2)
 
 execute_process(
   COMMAND
@@ -44,15 +44,16 @@ list(
   APPEND
   CMAKE_MODULE_PATH
   "${${PROJECT_NAME}_SOURCE_DIR}/cmake"
+  "${${PROJECT_NAME}_SOURCE_DIR}/deps/opentxs/deps/opentxs-cmake"
 )
-include(open-transactions-common)
 
 # -----------------------------------------------------------------------------
 # Setup
 
-set_build_type()
-set_out_of_source_build()
-update_git_submodules()
+include(otcommon-cmake)
+otcommon_set_build_type()
+otcommon_require_out_of_source_build()
+otcommon_update_submodules()
 
 # -----------------------------------------------------------------------------
 # Set option defaults
@@ -103,52 +104,27 @@ option(
 # -----------------------------------------------------------------------------
 # Set compiler options
 
-set(METIER_ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
-set(METIER_ORIGINAL_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set_compiler_flags(20 ${METIER_PEDANTIC_BUILD})
-
-if(NOT MSVC)
-  set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -Wno-extra-semi-stmt -Wno-noexcept -Wno-redundant-parens -Wno-reserved-identifier"
-  )
-endif()
-
-if(CMAKE_CXX_COMPILER_ID
-   MATCHES
-   GNU
+include(metier-configure-target)
+otcommon_set_project_language_standard(
+  99
+  20
+  ${METIER_PEDANTIC_BUILD}
 )
-  # too many false positives, mostly in standard library and third party headers
-  # we can't do anything about anyway
-  set(CMAKE_CXX_FLAGS
-      "${CMAKE_CXX_FLAGS} -Wno-error=null-dereference -Wno-error=stringop-overflow= -Wno-error=stringop-overread -Wno-unsafe-buffer-usage"
-  )
-endif()
 
-if(CMAKE_CXX_COMPILER_ID
-   MATCHES
-   Clang
-)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=unsafe-buffer-usage")
-endif()
 # -----------------------------------------------------------------------------
 # Print system information and build options
 
-print_build_details(METIER_PEDANTIC_BUILD METIER_BUILD_TESTS)
-
-if(METIER_QML_INTERFACE)
-  message(STATUS "Interface type:           Qml")
-else()
-  message(STATUS "Interface type:           Widgets")
-endif()
+include(metier-print-build-details)
+metier_print_build_details()
 
 # -----------------------------------------------------------------------------
 # Dependencies
 
-find_system_libraries()
+otcommon_find_system_libraries()
 
 find_package(
   Boost
-  1.75.0
+  1.82.0
   REQUIRED
   COMPONENTS
     date_time
@@ -192,7 +168,7 @@ endif()
 if(METIER_BUNDLED_OPENTXS)
   find_package(
     Boost
-    1.75.0
+    1.82.0
     QUIET
     OPTIONAL_COMPONENTS
       container
@@ -270,15 +246,10 @@ else()
 endif()
 
 # -----------------------------------------------------------------------------
-# Source Definitions
-
-set_common_defines()
-add_definitions("${QT_DEFINITIONS}")
-
-# -----------------------------------------------------------------------------
 # Build source
 
 add_library(metier-common OBJECT "")
+metier_configure_cxx_target(metier-common)
 add_subdirectory(deps)
 add_subdirectory(licenses)
 add_subdirectory(src)

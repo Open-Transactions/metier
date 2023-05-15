@@ -13,6 +13,7 @@ add_executable(
   "processor.hpp"
   $<TARGET_OBJECTS:metier-rpc>
 )
+metier_configure_cxx_target("${METIER_CLI_COMMAND}")
 
 target_link_libraries(
   "${METIER_CLI_COMMAND}"

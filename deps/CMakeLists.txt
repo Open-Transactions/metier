@@ -7,6 +7,7 @@ add_library(
   qr-code-generator OBJECT "QR-Code-generator/cpp/QrCode.hpp"
                            "QR-Code-generator/cpp/QrCode.cpp"
 )
+metier_configure_cxx_target(qr-code-generator)
 
 if(NOT MSVC)
   target_compile_options(
@@ -27,8 +28,6 @@ target_include_directories(
 )
 
 if(METIER_BUNDLED_OPENTXS)
-  set(CMAKE_C_FLAGS "${METIER_ORIGINAL_C_FLAGS}")
-  set(CMAKE_CXX_FLAGS "${METIER_ORIGINAL_CXX_FLAGS}")
   set(OPENTXS_BUILD_TESTS
       OFF
       CACHE
