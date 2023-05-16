@@ -22,14 +22,11 @@ target_link_libraries(
     Boost::program_options
     Boost::date_time
     metier-rpc
-    opentxs
+    opentxs::libopentxs
 )
 
 if(NOT METIER_BUNDLED_OPENTXS)
   target_sources("${METIER_CLI_COMMAND}" PRIVATE "json.cpp")
-  target_include_directories(
-    "${METIER_CLI_COMMAND}" SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
-  )
 endif()
 
 install(TARGETS "${METIER_CLI_COMMAND}" COMPONENT CLI)

@@ -19,13 +19,13 @@ set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
 
 set(METIER_VERSION_MAJOR 23)
 set(METIER_VERSION_MINOR 2)
-set(METIER_VERSION_PATCH 2)
+set(METIER_VERSION_PATCH 3)
 
 execute_process(
   COMMAND
     echo
     release_version=${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}
-  OUTPUT_FILE release_version.txt
+  OUTPUT_FILE ${PROJECT_BINARY_DIR}/release_version.txt
 )
 execute_process(
   COMMAND echo app_name=${METIER_GUI_OUTPUT_NAME}
@@ -44,7 +44,7 @@ list(
   APPEND
   CMAKE_MODULE_PATH
   "${${PROJECT_NAME}_SOURCE_DIR}/cmake"
-  "${${PROJECT_NAME}_SOURCE_DIR}/deps/opentxs/deps/opentxs-cmake"
+  "${${PROJECT_NAME}_SOURCE_DIR}/deps/opentxs-cmake"
 )
 
 # -----------------------------------------------------------------------------
@@ -123,6 +123,18 @@ metier_print_build_details()
 otcommon_find_system_libraries()
 
 find_package(
+  QT
+  REQUIRED
+  NAMES
+  Qt6
+  Qt5
+)
+
+if(NOT METIER_BUNDLED_OPENTXS)
+  find_package(opentxs CONFIG REQUIRED)
+endif()
+
+find_package(
   Boost
   1.82.0
   REQUIRED
@@ -130,30 +142,28 @@ find_package(
     date_time
     json
     program_options
+  CONFIG
 )
 find_package(
-  QT
-  NAMES
-  Qt6
-  Qt5
-  COMPONENTS
-    Core
-    Gui
-    Network
-    Widgets
+  Qt${QT_VERSION_MAJOR}
   REQUIRED
+  COMPONENTS
+  Network
+  Widgets
+  CONFIG
 )
 
 if(METIER_QML_INTERFACE)
   find_package(
     Qt${QT_VERSION_MAJOR}
+    REQUIRED
     COMPONENTS
       Qml
       Quick
       QuickControls2
       QmlImportScanner
       Svg
-    REQUIRED
+    CONFIG
   )
 endif()
 
@@ -165,85 +175,7 @@ else()
   set(METIER_ZMQ_TARGET "libzmq")
 endif()
 
-if(METIER_BUNDLED_OPENTXS)
-  find_package(
-    Boost
-    1.82.0
-    QUIET
-    OPTIONAL_COMPONENTS
-      container
-      exception
-      filesystem
-      iostreams
-      json
-      stacktrace_basic
-      system
-      thread
-  )
-
-  find_package(ZLIB QUIET)
-  find_package("${METIER_ZMQ_PACKAGE}" QUIET)
-  find_package(
-    OpenSSL
-    1.0.1
-    QUIET
-  )
-  find_package(unofficial-sodium QUIET)
-  find_package(Protobuf QUIET)
-  find_package(lmdb QUIET)
-  find_package(
-    Qt${QT_VERSION_MAJOR}
-    COMPONENTS
-      Core
-      Gui
-      Qml
-      Widgets
-    QUIET
-  )
-  find_package(TBB QUIET)
-else()
-  find_package(opentxs REQUIRED)
-  find_package(
-    Boost
-    1.75.0
-    QUIET
-    OPTIONAL_COMPONENTS
-      container
-      exception
-      filesystem
-      iostreams
-      json
-      stacktrace_basic
-      system
-      thread
-  )
-  find_package(ZLIB QUIET)
-  find_package("${METIER_ZMQ_PACKAGE}" QUIET)
-  find_package(
-    OpenSSL
-    1.0.1
-    QUIET
-  )
-
-  if(WIN32)
-    find_package(pthread QUIET)
-  endif()
-
-  find_package(unofficial-secp256k1 QUIET)
-  find_package(unofficial-sodium QUIET)
-  find_package(Protobuf QUIET)
-  find_package(lmdb QUIET)
-  find_package(
-    Qt${QT_VERSION_MAJOR} QUIET
-    COMPONENTS
-      Core
-      Gui
-      Qml
-      Widgets
-  )
-  find_package(SQLite3 QUIET)
-  find_package(TBB QUIET)
-endif()
+find_package("${METIER_ZMQ_PACKAGE}" QUIET)
 
 # -----------------------------------------------------------------------------
 # Build source
