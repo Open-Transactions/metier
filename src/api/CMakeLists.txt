@@ -26,13 +26,7 @@ target_link_libraries(
   PUBLIC
     Qt::Core
     Qt::Gui
-    opentxs
+    opentxs::libopentxs
     qr-code-generator
     "${METIER_ZMQ_TARGET}"
 )
-
-if(NOT METIER_BUNDLED_OPENTXS)
-  target_include_directories(
-    metier-common SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
-  )
-endif()

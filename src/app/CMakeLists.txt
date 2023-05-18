@@ -34,10 +34,5 @@ target_link_libraries(
     Qt::Core
     Qt::Gui
     Qt::Widgets
-    opentxs
+    opentxs::libopentxs
 )
-if(NOT METIER_BUNDLED_OPENTXS)
-  target_include_directories(
-    metier-common SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
-  )
-endif()

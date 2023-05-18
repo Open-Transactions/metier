@@ -26,12 +26,30 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "inherits": "vcpkg"
+    },
+    {
+      "name": "windows",
+      "displayName": "Windows",
+      "description": "Windows",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER:FILEPATH":
+            "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe",
+        "CMAKE_CXX_COMPILER:FILEPATH":
+            "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "CMAKE_MAKE_PROGRAM": "ninja.exe"
+      }
     }
   ],
   "buildPresets": [
     {
       "name": "default",
       "configurePreset": "default"
+    },
+    {
+      "name": "windows",
+      "configurePreset": "windows"
     }
   ]
 }

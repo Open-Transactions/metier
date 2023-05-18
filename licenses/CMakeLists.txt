@@ -23,18 +23,12 @@ target_sources(
     "sodium.h"
 )
 
-target_include_directories(
-  metier-common PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${opentxs_INCLUDE_DIRS}"
-)
-
-target_include_directories(
-  metier-common SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
-)
+target_include_directories(metier-common PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_link_libraries(
   metier-common
   PUBLIC
-    opentxs
+    opentxs::libopentxs
     Qt::Core
     Qt::Gui
 )

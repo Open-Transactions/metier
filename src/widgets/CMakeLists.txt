@@ -53,12 +53,6 @@ target_link_libraries(
     Qt::Core
     Qt::Network
     Qt::Widgets
-    opentxs
+    opentxs::libopentxs
     qr-code-generator
 )
-
-if(NOT METIER_BUNDLED_OPENTXS)
-  target_include_directories(
-    metier-common SYSTEM PRIVATE "${opentxs_INCLUDE_DIRS}"
-  )
-endif()
