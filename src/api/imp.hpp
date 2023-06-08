@@ -404,7 +404,7 @@ public:
         assert(false == seed_id_.empty());
 
         const auto pNym =
-            api_.Wallet().Nym({seed_id_, 0}, reason, alias.toStdString());
+            api_.Wallet().Nym({api_.Factory(), seed_id_, 0}, reason, alias.toStdString());
 
         if (!pNym) { qFatal("Failed to create nym"); }
 
