@@ -61,20 +61,11 @@ otcommon_update_submodules()
 if(CMAKE_BUILD_TYPE
    STREQUAL
    "Debug"
-   OR CMAKE_BUILD_TYPE
-      STREQUAL
-      "RelWithDebInfo"
 )
   set(METIER_PEDANTIC_DEFAULT ON)
   set(CMAKE_VERBOSE_MAKEFILE ON)
 else()
   set(METIER_PEDANTIC_DEFAULT OFF)
-endif()
-
-if(WIN32)
-  set(OT_USE_VCPKG_TARGETS_DEFAULT ON)
-else()
-  set(OT_USE_VCPKG_TARGETS_DEFAULT OFF)
 endif()
 
 # -----------------------------------------------------------------------------
@@ -84,11 +75,6 @@ option(
   METIER_PEDANTIC_BUILD
   "Treat compiler warnings as errors."
   ${METIER_PEDANTIC_DEFAULT}
-)
-option(
-  METIER_BUNDLED_OPENTXS
-  "Use submodule version of libopentxs"
-  ON
 )
 option(
   OT_USE_VCPKG_TARGETS
@@ -123,16 +109,10 @@ metier_print_build_details()
 otcommon_find_system_libraries()
 
 find_package(
-  QT
+  opentxs
+  CONFIG
   REQUIRED
-  NAMES
-  Qt6
-  Qt5
 )
-
-if(NOT METIER_BUNDLED_OPENTXS)
-  find_package(opentxs CONFIG REQUIRED)
-endif()
 
 find_package(
   Boost
@@ -142,40 +122,28 @@ find_package(
     date_time
     json
     program_options
-  CONFIG
+    CONFIG
 )
 find_package(
-  Qt${QT_VERSION_MAJOR}
-  REQUIRED
+  Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS
-  Network
-  Widgets
-  CONFIG
+    Network
+    Widgets
+    CONFIG
 )
 
 if(METIER_QML_INTERFACE)
   find_package(
-    Qt${QT_VERSION_MAJOR}
-    REQUIRED
+    Qt${QT_VERSION_MAJOR} REQUIRED
     COMPONENTS
       Qml
       Quick
       QuickControls2
       QmlImportScanner
       Svg
-    CONFIG
+      CONFIG
   )
 endif()
-
-if(OT_USE_VCPKG_TARGETS)
-  set(METIER_ZMQ_PACKAGE "ZeroMQ")
-  set(METIER_ZMQ_TARGET "libzmq-static")
-else()
-  set(METIER_ZMQ_PACKAGE "unofficial-zeromq")
-  set(METIER_ZMQ_TARGET "libzmq")
-endif()
-
-find_package("${METIER_ZMQ_PACKAGE}" QUIET)
 
 # -----------------------------------------------------------------------------
 # Build source

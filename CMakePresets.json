@@ -1,55 +1,398 @@
 {
-  "version": 6,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 26,
-    "patch": 0
-  },
-  "configurePresets": [
-    {
-      "name": "vcpkg",
-      "hidden": true,
-      "toolchainFile":
-          "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-      "environment": {
-        "VCPKG_OVERLAY_TRIPLETS":
-            "${sourceDir}/deps/vcpkg-overlay/triplets"
-      },
-      "cacheVariables": {
-        "METIER_BUNDLED_OPENTXS": "OFF"
-      }
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 26,
+        "patch": 0
     },
-    {
-      "name": "default",
-      "displayName": "Default",
-      "description": "Default build using Ninja generator",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}",
-      "inherits": "vcpkg"
-    },
-    {
-      "name": "windows",
-      "displayName": "Windows",
-      "description": "Windows",
-      "inherits": "default",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER:FILEPATH":
-            "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe",
-        "CMAKE_CXX_COMPILER:FILEPATH":
-            "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
-        "CMAKE_MAKE_PROGRAM": "ninja.exe"
-      }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "default",
-      "configurePreset": "default"
-    },
-    {
-      "name": "windows",
-      "configurePreset": "windows"
-    }
-  ]
+    "configurePresets": [
+        {
+            "name": "vcpkg",
+            "hidden": true,
+            "toolchainFile":
+                "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+            "environment": {
+                "VCPKG_OVERLAY_TRIPLETS":
+                    "${sourceDir}/deps/vcpkg-overlay/triplets"
+            },
+            "cacheVariables": {
+                "OT_BOOST_JSON_HEADER_ONLY": "OFF",
+                "HAVE_EGL": "ON"
+            }
+        },
+        {
+            "name": "mode-debug",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "mode-release",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "compiler-clang",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "compiler-gcc",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "compiler-msvc",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER:FILEPATH":
+                    "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe",
+                "CMAKE_CXX_COMPILER:FILEPATH":
+                    "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe"
+            }
+        },
+        {
+            "name": "generator-ninja",
+            "displayName": "ninja",
+            "generator": "Ninja"
+        },
+        {
+            "name": "generator-xcode",
+            "displayName": "xcodebuild",
+            "generator": "Xcode",
+            "cacheVariables": {
+                "CMAKE_MAKE_PROGRAM": "xcodebuild"
+            }
+        },
+        {
+            "name": "common",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "inherits": [
+                "generator-ninja"
+            ],
+            "cacheVariables": {
+                "METIER_PEDANTIC_BUILD": "OFF",
+                "CMAKE_UNITY_BUILD": "OFF"
+            }
+        },
+        {
+            "name": "host-Linux",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "inherits": [
+                "common",
+                "compiler-gcc"
+            ]
+        },
+        {
+            "name": "host-Macos",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "inherits": [
+                "common",
+                "compiler-clang"
+            ],
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-osx-11",
+                "CMAKE_MAKE_PROGRAM": "ninja"
+            }
+        },
+        {
+            "name": "host-Macos-M1",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "inherits": [
+                "common",
+                "compiler-clang"
+            ],
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "arm64-osx",
+                "CMAKE_MAKE_PROGRAM": "ninja"
+            }
+        },
+        {
+            "name": "host-Windows",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "inherits": [
+                "common",
+                "compiler-msvc"
+            ],
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+                "CMAKE_MAKE_PROGRAM": "ninja.exe",
+                "CMAKE_EXE_LINKER_FLAGS": "/STACK:8388608"
+            }
+        },
+        {
+            "name": "linux-novcpkg-debug",
+            "displayName": "debug build without vcpkg",
+            "description": "configure debug build without vcpkg",
+            "inherits": [
+                "host-Linux",
+                "mode-debug"
+            ]
+        },
+        {
+            "name": "linux-debug",
+            "displayName": "debug build",
+            "description": "configure debug build",
+            "inherits": [
+                "linux-novcpkg-debug",
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "windows-debug",
+            "displayName": "debug build",
+            "description": "configure debug build",
+            "inherits": [
+                "host-Windows",
+                "mode-debug",
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "windows-release",
+            "displayName": "release build",
+            "description": "configure release build",
+            "inherits": [
+                "host-Windows",
+                "mode-release",
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "macos-debug",
+            "displayName": "debug build",
+            "description": "configure debug build",
+            "inherits": [
+                "host-Macos",
+                "mode-debug",
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "macos-xcode",
+            "displayName": "xcode build",
+            "description": "configure Xcode IDE build",
+            "inherits": [
+                "generator-xcode",
+                "macos-debug"
+            ]
+        },
+        {
+            "name": "macos-release",
+            "displayName": "release build",
+            "description": "configure release build",
+            "inherits": [
+                "host-Macos",
+                "mode-release",
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "macos-m1-debug",
+            "displayName": "debug build",
+            "description": "configure debug build",
+            "inherits": [
+                "host-Macos-M1",
+                "mode-debug",
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "macos-m1-release",
+            "displayName": "release build",
+            "description": "configure release build",
+            "inherits": [
+                "host-Macos-M1",
+                "mode-release",
+                "vcpkg"
+            ]
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "linux-novcpkg-debug",
+            "configurePreset": "linux-novcpkg-debug"
+        },
+        {
+            "name": "linux-debug",
+            "configurePreset": "linux-debug"
+        },
+        {
+            "name": "windows-debug",
+            "configurePreset": "windows-debug"
+        },
+        {
+            "name": "windows-release",
+            "configurePreset": "windows-release"
+        },
+        {
+            "name": "macos-debug",
+            "configurePreset": "macos-debug"
+        },
+        {
+            "name": "macos-xcode",
+            "configurePreset": "macos-xcode"
+        },
+        {
+            "name": "macos-release",
+            "configurePreset": "macos-release"
+        },
+        {
+            "name": "macos-m1-debug",
+            "configurePreset": "macos-m1-debug"
+        },
+        {
+            "name": "macos-m1-release",
+            "configurePreset": "macos-m1-release"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "linux-novcpkg-debug",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "linux-novcpkg-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "linux-novcpkg-debug"
+                }
+            ]
+        },
+        {
+            "name": "linux-debug",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "linux-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "linux-debug"
+                }
+            ]
+        },
+        {
+            "name": "windows-debug",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "windows-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "windows-debug"
+                }
+            ]
+        },
+        {
+            "name": "windows-release",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "windows-release"
+                },
+                {
+                    "type": "build",
+                    "name": "windows-release"
+                }
+            ]
+        },
+        {
+            "name": "macos-debug",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "macos-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "macos-debug"
+                }
+            ]
+        },
+        {
+            "name": "macos-xcode",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "macos-xcode"
+                },
+                {
+                    "type": "build",
+                    "name": "macos-xcode"
+                }
+            ]
+        },
+        {
+            "name": "macos-release",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "macos-release"
+                },
+                {
+                    "type": "build",
+                    "name": "macos-release"
+                }
+            ]
+        },
+        {
+            "name": "macos-m1-debug",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "macos-m1-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "macos-m1-debug"
+                }
+            ]
+        },
+        {
+            "name": "macos-m1-release",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "macos-m1-release"
+                },
+                {
+                    "type": "build",
+                    "name": "macos-m1-release"
+                }
+            ]
+        }
+    ]
 }

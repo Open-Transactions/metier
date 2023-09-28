@@ -1,17 +1,17 @@
 {
-  "default-registry": {
-    "kind": "git",
-    "repository": "https://github.com/microsoft/vcpkg",
-    "baseline": "501db0f17ef6df184fcdbfbe0f87cde2313b6ab1"
-  },
-  "registries": [
-    {
-      "kind": "git",
-      "repository": "https://github.com/Open-Transactions/vcpkg-registry",
-      "baseline": "829279647d14098cfa272afc90eeac1e19ceab58",
-      "packages": [
-        "opentxs"
-      ]
-    }
-  ]
+    "default-registry": {
+        "kind": "git",
+        "repository": "https://github.com/microsoft/vcpkg",
+        "baseline": "9d47b24eacbd1cd94f139457ef6cd35e5d92cc84"
+    },
+    "registries": [
+        {
+            "kind": "git",
+            "repository": "https://github.com/Open-Transactions/vcpkg-registry",
+            "baseline": "94595100a79055944f334540d2eb7f0a08a12121",
+            "packages": [
+                "opentxs"
+            ]
+        }
+    ]
 }

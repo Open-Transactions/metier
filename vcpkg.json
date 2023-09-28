@@ -1,15 +1,17 @@
 {
-  "$schema":
-      "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
-  "name": "metier",
-  "version": "23.2.4",
-  "dependencies": [
-    {
-      "name": "opentxs",
-      "features": [
-        "qt6"
-      ]
-    },
-    "qtsvg"
-  ]
+    "$schema":
+        "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+    "name": "metier",
+    "version": "23.2.4",
+    "dependencies": [
+        "boost",
+        {
+            "name": "opentxs",
+            "features": [
+                "qt6"
+            ]
+        },
+        "qt",
+        "qtsvg"
+    ]
 }
