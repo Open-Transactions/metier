@@ -23,9 +23,9 @@ FirstRun::FirstRun(QObject* parent) noexcept
     connect(this, &FirstRun::wantOld, this, &QDialog::hide);
 }
 
-auto FirstRun::create() -> void { emit wantNew(); }
+auto FirstRun::create() -> void { Q_EMIT wantNew(); }
 
-auto FirstRun::recover() -> void { emit wantOld(); }
+auto FirstRun::recover() -> void { Q_EMIT wantOld(); }
 
 FirstRun::~FirstRun() = default;
 }  // namespace metier::widget

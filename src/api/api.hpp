@@ -52,7 +52,7 @@ class Api final : public QObject
     Q_PROPERTY(QString appName READ Name CONSTANT)
     Q_PROPERTY(QString appTitle READ Title CONSTANT)
 
-signals:
+Q_SIGNALS:
     void chainsChanged(int enabledCount);
 
     void privateNeedBlockchain(QPrivateSignal);
@@ -60,7 +60,7 @@ signals:
     void privateNeedSeed(QPrivateSignal);
     void privateReadyForMainWindow(QPrivateSignal);
 
-public slots:
+public Q_SLOTS:
     void checkAccounts();
     void checkStartupConditions();
     void createNym(QString alias);
@@ -69,7 +69,7 @@ public slots:
     void rescanBlockchain(int chain);
     void seedBackupFinished();
 
-private slots:
+private Q_SLOTS:
     void chainIsDisabled(int chain);
     void chainIsEnabled(int chain);
     void checkChains(int chain);

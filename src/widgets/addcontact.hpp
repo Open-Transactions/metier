@@ -26,10 +26,10 @@ class AddContact final : public QDialog
 {
     Q_OBJECT
 
-public slots:
+public Q_SLOTS:
     void addContact(QString label, QString data);
 
-private slots:
+private Q_SLOTS:
     void addContactPrivate();
 
 public:

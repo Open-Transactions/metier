@@ -150,7 +150,7 @@ auto MainWindow::initModels() -> void { imp_.init_models(this); }
 
 auto MainWindow::sendMessage() -> void
 {
-    using Model = opentxs::ui::ActivityThreadQt;
+    using Model = opentxs::ui::ContactActivityQt;
     auto& view = *imp_.ui_->activityThreadView;
     auto& edit = *imp_.ui_->messageEdit;
 
@@ -165,11 +165,11 @@ auto MainWindow::sendMessage() -> void
     }
 }
 
-auto MainWindow::setProgressMax(int max) -> void { emit progMaxUpdated(max); }
+auto MainWindow::setProgressMax(int max) -> void { Q_EMIT progMaxUpdated(max); }
 
 auto MainWindow::setProgressValue(int value) -> void
 {
-    emit progValueUpdated(value);
+    Q_EMIT progValueUpdated(value);
 }
 
 auto MainWindow::showAddContact() -> void { imp_.showAddContact(); }
@@ -188,7 +188,7 @@ auto MainWindow::showAccountActivity(QString account) -> void
 
 auto MainWindow::showActivityThread(QString contact) -> void
 {
-    using Model = opentxs::ui::ActivityThreadQt;
+    using Model = opentxs::ui::ContactActivityQt;
     auto& view = *imp_.ui_->activityThreadView;
     auto& edit = *imp_.ui_->messageEdit;
     auto& send = *imp_.ui_->sendMessage;
@@ -201,7 +201,7 @@ auto MainWindow::showActivityThread(QString contact) -> void
         dynamic_cast<Model*>(model)->setDraft(edit.toPlainText());
     }
 
-    auto* model = imp_.identity_manager_->getActivityThread(contact);
+    auto* model = imp_.identity_manager_->getContactActivity(contact);
 
     if (nullptr == model) {
         clearActivityThread();

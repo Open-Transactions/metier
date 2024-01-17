@@ -175,7 +175,7 @@ public:
     opentxs::PasswordCaller caller_;
     const opentxs::api::Context& ot_;
     const opentxs::api::session::Client& api_;
-    const std::string seed_id_;
+    const opentxs::crypto::SeedID seed_id_;
     const int longest_seed_word_;
     const SeedLanguageMap seed_language_;
     const SeedSizeMap seed_size_;
@@ -209,7 +209,7 @@ public:
     auto check_chains(int count) const noexcept -> void
     {
         validateBlockchains();
-        emit parent_.chainsChanged(count);
+        Q_EMIT parent_.chainsChanged(count);
     }
     auto enableDefaultChain() const noexcept -> bool
     {
@@ -240,7 +240,7 @@ public:
     {
         static const auto valid = [] {
             auto output = std::set<int>{};
-            const auto& input = ot::blockchain::SupportedChains();
+            const auto& input = ot::blockchain::supported_chains();
             std::transform(
                 input.begin(),
                 input.end(),
@@ -337,14 +337,14 @@ public:
 
         if (false == seed_id_.empty()) { return true; }
 
-        auto& seed = const_cast<std::string&>(seed_id_);
+        auto& seed = const_cast<opentxs::crypto::SeedID&>(seed_id_);
         const auto& config = api_.Config();
         const auto section = QGuiApplication::applicationName().toStdString();
         auto id = ot::UnallocatedCString{};
         auto rc = config.ReadString(section, seed_id_key, ot::writer(id));
 
         if (rc && (false == id.empty())) {
-            seed = id;
+            seed = api_.Factory().SeedIDFromBase58(id);
 
             return true;
         }
@@ -362,7 +362,8 @@ public:
                 qFatal("Failed to save config file");
             }
 
-            seed = id;
+            seed = api_.Factory().SeedIDFromBase58(id);
+            ;
 
             return true;
         }
@@ -403,8 +404,8 @@ public:
 
         assert(false == seed_id_.empty());
 
-        const auto pNym =
-            api_.Wallet().Nym({api_.Factory(), seed_id_, 0}, reason, alias.toStdString());
+        const auto pNym = api_.Wallet().Nym(
+            {api_.Factory(), seed_id_, 0}, reason, alias.toStdString());
 
         if (!pNym) { qFatal("Failed to create nym"); }
 
@@ -431,7 +432,7 @@ public:
         wait_for_seed_backup_ = true;
         auto lock = Lock{lock_};
         auto success{false};
-        auto& id = const_cast<std::string&>(seed_id_);
+        auto& id = const_cast<opentxs::crypto::SeedID&>(seed_id_);
         auto postcondition = ScopeGuard{[&]() {
             if (false == success) { id = {}; }
         }};
@@ -459,7 +460,8 @@ public:
 
         const auto& config = api_.Config();
         const auto section = QGuiApplication::applicationName().toStdString();
-        const auto rc = config.WriteString(section, seed_id_key, id);
+        const auto rc = config.WriteString(
+            section, seed_id_key, id.asBase58(api_.Crypto()));
 
         if (false == rc) { qFatal("Failed to update configuration"); }
 
@@ -490,7 +492,7 @@ public:
         ready().get();
         auto lock = Lock{lock_};
         auto success{false};
-        auto& id = const_cast<std::string&>(seed_id_);
+        auto& id = const_cast<opentxs::crypto::SeedID&>(seed_id_);
         auto postcondition = ScopeGuard{[&]() {
             if (false == success) { id = {}; }
         }};
@@ -515,7 +517,8 @@ public:
 
         const auto& config = api_.Config();
         const auto section = QGuiApplication::applicationName().toStdString();
-        const auto rc = config.WriteString(section, seed_id_key, id);
+        const auto rc = config.WriteString(
+            section, seed_id_key, id.asBase58(api_.Crypto()));
 
         if (false == rc) { qFatal("Failed to update configuration"); }
 
@@ -671,7 +674,8 @@ public:
               &parent,
               transform<model::SeedType::Data>(
                   api_.Crypto().Seed().AllowedSeedTypes())))
-        , zmq_socket_(::zmq_socket(api_.Network().ZeroMQ(), ZMQ_ROUTER))
+        , zmq_socket_(
+              ::zmq_socket(api_.Network().ZeroMQ().Context(), ZMQ_ROUTER))
         , zmq_thread_(&Imp::run_zmq, this)
     {
         assert(seed_type_);
@@ -702,7 +706,7 @@ private:
             auto out = std::set<Protocol>{};
             out.emplace(Protocol::BIP_44);
 
-            if (ot::blockchain::HasSegwit(chain)) {
+            if (ot::blockchain::has_segwit(chain)) {
                 out.emplace(Protocol::BIP_49);
                 out.emplace(Protocol::BIP_84);
             }
@@ -713,9 +717,10 @@ private:
             auto out = std::set<Protocol>{};
             const auto& account =
                 api_.Crypto().Blockchain().Account(nymID, chain);
+            using enum opentxs::blockchain::crypto::SubaccountType;
 
-            for (const auto& hd : account.GetHD()) {
-                out.emplace(hd.Standard());
+            for (const auto& hd : account.GetSubaccounts(HD)) {
+                out.emplace(hd.asDeterministic().asHD().Standard());
             }
 
             return out;

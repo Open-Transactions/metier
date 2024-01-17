@@ -11,26 +11,26 @@ namespace metier
 {
 auto Startup::doDisplayBlockchainChooser() -> void
 {
-    qDebug() << "Emitting startup.displayBlockchainChooser()";
-    emit displayBlockchainChooser();
+    qDebug() << "Q_EMITting startup.displayBlockchainChooser()";
+    Q_EMIT displayBlockchainChooser();
 }
 
 auto Startup::doDisplayFirstRun() -> void
 {
-    qDebug() << "Emitting startup.displayFirstRun()";
-    emit displayFirstRun();
+    qDebug() << "Q_EMITting startup.displayFirstRun()";
+    Q_EMIT displayFirstRun();
 }
 
 auto Startup::doDisplayMainWindow() -> void
 {
-    qDebug() << "Emitting startup.displayMainWindow()";
-    emit displayMainWindow();
+    qDebug() << "Q_EMITting startup.displayMainWindow()";
+    Q_EMIT displayMainWindow();
 }
 
 auto Startup::doDisplayNamePrompt() -> void
 {
-    qDebug() << "Emitting startup.displayNamePrompt()";
-    emit displayNamePrompt();
+    qDebug() << "Q_EMITting startup.displayNamePrompt()";
+    Q_EMIT displayNamePrompt();
 }
 
 Startup::~Startup() = default;

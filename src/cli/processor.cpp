@@ -50,7 +50,7 @@ struct Processor::Imp {
     {
         const auto request =
             ot::rpc::request::GetAccountActivity{session_, {data.account_id_}};
-        auto base = std::unique_ptr<ot::rpc::response::Base>{};
+        auto base = std::unique_ptr<ot::rpc::response::Message>{};
         auto out = json::object{};
         out["command"] = translate(data.command_);
         const auto result = send(request, base);
@@ -67,7 +67,7 @@ struct Processor::Imp {
                 auto tx = json::object{};
                 tx["id"] = event.UUID();
                 tx["time"] = [&] {
-                    auto time = ot::Clock::to_time_t(event.Timestamp());
+                    auto time = *ot::seconds_since_epoch(event.Timestamp());
                     auto ptime = ptime::from_time_t(time);
                     auto facet = std::make_unique<ptime::time_facet>(
                         "%a %b %d %l:%M:%S %p %Y");
@@ -100,7 +100,7 @@ struct Processor::Imp {
             auto ids = [&] {
                 auto val = json::array{};
                 const auto request = ot::rpc::request::ListAccounts{session_};
-                auto base = std::unique_ptr<ot::rpc::response::Base>{};
+                auto base = std::unique_ptr<ot::rpc::response::Message>{};
                 const auto result = send(request, base);
 
                 if (Result::success == result) {
@@ -119,7 +119,7 @@ struct Processor::Imp {
             }();
 
             auto accounts = [&] {
-                auto arg = ot::rpc::request::Base::Identifiers{};
+                auto arg = ot::rpc::request::Message::Identifiers{};
                 std::transform(
                     ids.begin(),
                     ids.end(),
@@ -130,7 +130,7 @@ struct Processor::Imp {
             }();
             const auto request = ot::rpc::request::GetAccountBalance{
                 session_, std::move(accounts)};
-            auto base = std::unique_ptr<ot::rpc::response::Base>{};
+            auto base = std::unique_ptr<ot::rpc::response::Message>{};
             const auto result = send(request, base);
 
             if (Result::success == result) {
@@ -165,7 +165,7 @@ struct Processor::Imp {
     auto list_nyms(const Options& data) noexcept -> std::string
     {
         const auto request = ot::rpc::request::ListNyms{session_};
-        auto base = std::unique_ptr<ot::rpc::response::Base>{};
+        auto base = std::unique_ptr<ot::rpc::response::Message>{};
         auto out = json::object{};
         out["command"] = translate(data.command_);
         const auto result = send(request, base);
@@ -187,7 +187,7 @@ struct Processor::Imp {
     {
         const auto request = ot::rpc::request::SendPayment{
             session_, data.from_, data.to_, data.amount_};
-        auto base = std::unique_ptr<ot::rpc::response::Base>{};
+        auto base = std::unique_ptr<ot::rpc::response::Message>{};
         auto out = json::object{};
         out["command"] = translate(data.command_);
         out["from"] = data.from_;
@@ -450,7 +450,8 @@ private:
         return true;
     }
     template <typename Reply>
-    auto send(const ot::rpc::request::Base& in, Reply& out) noexcept -> Result
+    auto send(const ot::rpc::request::Message& in, Reply& out) noexcept
+        -> Result
     {
         if (false == ready_) { return Result::socket_not_ready; }
 

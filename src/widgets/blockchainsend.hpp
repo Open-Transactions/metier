@@ -32,7 +32,7 @@ public:
     BlockchainSend(QWidget* parent, Model* model);
     ~BlockchainSend() final;
 
-private slots:
+private Q_SLOTS:
     void finished();
     void updateAddress(const QString&);
     void updateAmount(int);

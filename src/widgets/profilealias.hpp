@@ -23,7 +23,7 @@ class ProfileAlias final : public QDialog
 {
     Q_OBJECT
 
-signals:
+Q_SIGNALS:
     void gotAlias(QString alias);
 
 public:

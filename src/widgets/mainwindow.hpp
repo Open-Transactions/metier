@@ -25,15 +25,15 @@ class MainWindow final : public QMainWindow
 {
     Q_OBJECT
 
-signals:
+Q_SIGNALS:
     void progMaxUpdated(int);
     void progValueUpdated(int);
 
-public slots:
+public Q_SLOTS:
     void setProgressMax(int);
     void setProgressValue(int);
 
-private slots:
+private Q_SLOTS:
     void accountListUpdated(
         const QItemSelection& current,
         const QItemSelection& previous);

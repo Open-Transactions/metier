@@ -37,7 +37,7 @@ public:
 
     ~Licenses() final;
 
-private slots:
+private Q_SLOTS:
     void component_changed(
         const QItemSelection& current,
         const QItemSelection& old);

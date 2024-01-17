@@ -45,7 +45,7 @@ auto ProfileAlias::check() noexcept -> void
 
 auto ProfileAlias::confirm() noexcept -> void
 {
-    emit gotAlias(ui_->alias->toPlainText().remove('\n'));
+    Q_EMIT gotAlias(ui_->alias->toPlainText().remove('\n'));
 }
 
 ProfileAlias::~ProfileAlias() = default;

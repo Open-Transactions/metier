@@ -31,7 +31,7 @@ public:
 
     ~EnterPassphrase() final;
 
-private slots:
+private Q_SLOTS:
     void cancel();
     void check_one();
     void check_two();

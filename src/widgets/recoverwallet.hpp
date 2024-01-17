@@ -23,7 +23,7 @@ class RecoverWallet final : public QDialog
 {
     Q_OBJECT
 
-public slots:
+public Q_SLOTS:
     void cancel();
 
 public:

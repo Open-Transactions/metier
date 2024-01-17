@@ -30,7 +30,7 @@ App::App(int& argc, char** argv) noexcept
         ot, &Api::privateNeedBlockchain, this, &App::displayBlockchainChooser);
     connect(ot, &Api::privateReadyForMainWindow, this, &App::displayMainWindow);
     connect(this, &App::startup, ot, &Api::checkStartupConditions);
-    emit startup();
+    Q_EMIT startup();
 }
 
 auto App::Cleanup() noexcept -> void { Imp::singleton_.reset(); }
@@ -70,13 +70,13 @@ auto App::needPasswordPrompt(QString prompt, bool once) -> void
 {
     if (QThread::currentThread() == this->thread()) {
         if (imp_.init_) {
-            emit passwordPrompt(prompt, once);
+            Q_EMIT passwordPrompt(prompt, once);
         } else {
             imp_.displayPasswordPrompt(prompt, once);
         }
     } else {
         imp_.init_future_.get();
-        emit passwordPrompt(prompt, once);
+        Q_EMIT passwordPrompt(prompt, once);
     }
 }
 

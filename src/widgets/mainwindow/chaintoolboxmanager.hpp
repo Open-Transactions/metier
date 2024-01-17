@@ -188,7 +188,7 @@ private:
             send.release();
             details.release();
         }};
-        const auto widgetName = ot::blockchain::TickerSymbol(chain) + "Tab";
+        const auto widgetName = ot::blockchain::ticker_symbol(chain) + "Tab";
         const auto layoutName = widgetName + "Layout";
         const auto viewName = widgetName + "AccountSummary";
         const auto receiveName = widgetName + "Receive";

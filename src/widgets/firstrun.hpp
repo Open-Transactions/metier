@@ -23,7 +23,7 @@ class FirstRun final : public QDialog
 {
     Q_OBJECT
 
-signals:
+Q_SIGNALS:
     void wantNew();
     void wantOld();
 

@@ -13,7 +13,7 @@ class Startup final : public QObject
 {
     Q_OBJECT
 
-signals:
+Q_SIGNALS:
     void displayBlockchainChooser();
     void displayFirstRun();
     void displayMainWindow();

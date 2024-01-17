@@ -108,21 +108,21 @@ auto Api::checkStartupConditions() -> void
                 }
 
                 imp_.state_.store(Imp::State::run);
-                emit privateReadyForMainWindow({});
+                Q_EMIT privateReadyForMainWindow(QPrivateSignal{});
             } else if (1 > model->enabledCount()) {
-                emit privateNeedBlockchain({});
+                Q_EMIT privateNeedBlockchain(QPrivateSignal{});
             } else {
                 if (false == imp_.validateBlockchains()) {
                     qFatal("Unable to initialize blockchains");
                 }
 
                 imp_.state_.store(Imp::State::run);
-                emit privateReadyForMainWindow({});
+                Q_EMIT privateReadyForMainWindow(QPrivateSignal{});
             }
         } break;
         case Imp::State::run:
         default: {
-            emit privateReadyForMainWindow({});
+            Q_EMIT privateReadyForMainWindow(QPrivateSignal{});
         }
     }
 }
@@ -150,7 +150,7 @@ auto Api::doNeedNym() -> void
 
             if (nym.empty()) {
                 if (false == imp_.wait_for_seed_backup_) {
-                    emit privateNeedProfileName({});
+                    Q_EMIT privateNeedProfileName(QPrivateSignal{});
                 }
             } else {
                 if (false == imp_.validateNym()) {
@@ -158,7 +158,7 @@ auto Api::doNeedNym() -> void
                 }
 
                 imp_.state_.store(Imp::State::have_nym);
-                emit checkStartupConditions();
+                Q_EMIT checkStartupConditions();
             }
         } break;
         case Imp::State::have_nym:
@@ -175,14 +175,14 @@ auto Api::doNeedSeed() -> void
             const auto [seed, count] = imp_.api_.Crypto().Seed().DefaultSeed();
 
             if (seed.empty() && (0u == count)) {
-                emit privateNeedSeed({});
+                Q_EMIT privateNeedSeed(QPrivateSignal{});
             } else {
                 if (false == imp_.validateSeed()) {
                     qFatal("Unable to initialize wallet seed");
                 }
 
                 imp_.state_.store(Imp::State::have_seed);
-                emit checkStartupConditions();
+                Q_EMIT checkStartupConditions();
             }
         } break;
         case Imp::State::have_seed:
@@ -231,7 +231,7 @@ auto Api::longestBlockchainName() -> int
     static const auto length = [&] {
         auto out = std::size_t{0};
 
-        for (const auto chain : ot::blockchain::DefinedChains()) {
+        for (const auto chain : ot::blockchain::defined_chains()) {
             out = std::max(out, print(chain).size());
         }
 
@@ -255,7 +255,7 @@ auto Api::rescanBlockchain(int chain) -> void { imp_.rescanBlockchain(chain); }
 auto Api::seedBackupFinished() -> void
 {
     imp_.wait_for_seed_backup_ = false;
-    emit checkStartupConditions();
+    Q_EMIT checkStartupConditions();
 }
 
 auto Api::seedLanguageModel(const int type) -> model::SeedLanguage*
@@ -304,7 +304,7 @@ auto Api::seedWordValidatorQML(const int type, const int lang) -> QObject*
 auto Api::validBlockchains() -> BlockchainList
 {
     auto output = BlockchainList{};
-    const auto& input = ot::blockchain::SupportedChains();
+    const auto& input = ot::blockchain::supported_chains();
     std::transform(
         input.begin(),
         input.end(),
