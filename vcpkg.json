@@ -5,13 +5,22 @@
     "version": "23.2.4",
     "dependencies": [
         "boost",
+        "cmakerc",
         {
             "name": "opentxs",
             "features": [
                 "qt6"
             ]
         },
-        "qt",
+        {
+            "name": "qtbase",
+            "default-features": false,
+            "features": [
+                "gui",
+                "widgets"
+            ]
+        },
+        "qtdeclarative",
         "qtsvg"
     ]
 }
