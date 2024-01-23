@@ -2,14 +2,18 @@ import QtQuick 2.0
 
 Rectangle {
     id: page
-    width: 320; height: 480
+
     color: "lightgray"
+    height: 480
+    width: 320
 
     Text {
         id: helloText
+
+        anchors.horizontalCenter: page.horizontalCenter
+        font.bold: true
+        font.pointSize: 24
         text: "Hello world!"
         y: 30
-        anchors.horizontalCenter: page.horizontalCenter
-        font.pointSize: 24; font.bold: true
     }
 }
