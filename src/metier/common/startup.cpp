@@ -6,6 +6,7 @@
 #include "metier/common/startup.hpp"  // IWYU pragma: associated
 
 #include <QDebug>
+#include <QtLogging>
 
 namespace metier::common
 {

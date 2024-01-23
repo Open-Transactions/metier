@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <QObject>
+#include <QMetaObject>
 #include <QSize>
 #include <QString>
 #include <QToolButton>

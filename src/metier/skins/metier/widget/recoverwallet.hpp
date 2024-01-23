@@ -6,9 +6,10 @@
 #pragma once
 
 #include <QDialog>
-#include <QObject>
-#include <QString>
+#include <QMetaObject>
 #include <memory>
+
+class QObject;
 
 namespace metier
 {
@@ -17,8 +18,6 @@ namespace common
 class Api;
 }  // namespace common
 }  // namespace metier
-
-class QLineEdit;
 
 namespace metier::skins::metier::widget
 {

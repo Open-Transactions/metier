@@ -6,6 +6,7 @@
 #include "firstrun.hpp"  // IWYU pragma: associated
 
 #include <ui_firstrun.h>
+#include <QObject>
 #include <QPushButton>
 
 namespace metier::skins::metier::widget

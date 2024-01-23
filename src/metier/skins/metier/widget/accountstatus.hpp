@@ -6,9 +6,10 @@
 #pragma once
 
 #include <QDialog>
-#include <QObject>
-#include <QString>
+#include <QMetaObject>
 #include <memory>
+
+class QWidget;
 
 namespace metier
 {
@@ -17,11 +18,6 @@ namespace common
 class Api;
 }  // namespace common
 }  // namespace metier
-
-namespace Ui
-{
-class accountStatus;
-}
 
 namespace metier::skins::metier::widget
 {

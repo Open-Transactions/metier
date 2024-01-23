@@ -6,11 +6,10 @@
 #pragma once
 
 #include <QDialog>
-#include <QObject>
-#include <QString>
+#include <QMetaObject>
 #include <memory>
 
-class QWidget;
+class QObject;
 
 namespace Ui
 {

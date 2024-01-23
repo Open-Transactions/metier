@@ -6,9 +6,11 @@
 #pragma once
 
 #include <QDialog>
-#include <QObject>
+#include <QMetaObject>
 #include <QString>
 #include <memory>
+
+class QObject;
 
 namespace metier
 {

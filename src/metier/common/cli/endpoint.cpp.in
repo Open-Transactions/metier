@@ -7,6 +7,8 @@
 
 #include <QDir>
 #include <QStandardPaths>
+#include <QString>
+#include <QtLogging>
 
 namespace metier::common::cli
 {
@@ -21,7 +23,9 @@ auto rpc_endpoint() noexcept -> std::string
         qFatal("Failed to create RPC socket folder");
     }
 
+    // clang-format off
     const auto filename = std::string{"@base_name@"} + ".sock";
+    // clang-format on
 
     return std::string{"ipc://"} +
            QDir{absolute}.filePath(filename.c_str()).toStdString();

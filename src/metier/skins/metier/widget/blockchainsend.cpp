@@ -6,11 +6,11 @@
 #include "blockchainsend.hpp"  // IWYU pragma: associated
 
 #include <opentxs/Qt.hpp>
-#include <opentxs/opentxs.hpp>
 #include <ui_blockchainsend.h>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QLineEdit>
+#include <QOverload>
 #include <QPushButton>
 #include <QWidget>
 #include <cassert>

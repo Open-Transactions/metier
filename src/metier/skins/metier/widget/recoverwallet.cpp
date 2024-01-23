@@ -5,6 +5,8 @@
 
 #include "metier/skins/metier/widget/recoverwallet.hpp"  // IWYU pragma: associated
 
+#include <QObject>
+
 #include "metier/skins/metier/widget/recoverwallet/imp.hpp"
 
 namespace metier::skins::metier::widget

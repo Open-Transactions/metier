@@ -5,8 +5,7 @@
 
 #include "metier/common/claim.hpp"  // IWYU pragma: associated
 
-#include <QObject>
-#include <QQmlApplicationEngine>
+#include <QQmlEngine>
 
 namespace metier::common
 {

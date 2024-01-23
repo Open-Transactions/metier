@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <QMetaObject>
 #include <QObject>
 
 namespace metier::common

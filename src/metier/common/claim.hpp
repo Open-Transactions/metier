@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <QObject>
+class QObject;
 
 namespace metier::common
 {

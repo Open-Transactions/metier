@@ -236,44 +236,100 @@
                 "mode-release",
                 "vcpkg"
             ]
+        },
+        {
+            "name": "iwyu",
+            "displayName": "iwyu",
+            "description": "configure build for include-what-you-use ci check",
+            "inherits": "linux-novcpkg-debug",
+            "cacheVariables": {
+                "BUILD_SHARED_LIBS": "ON",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_UNITY_BUILD": "OFF",
+                "METIER_PEDANTIC_BUILD": "OFF",
+                "METIER_IWYU": "ON"
+            }
         }
     ],
     "buildPresets": [
         {
+            "hidden": true,
+            "name": "ninja",
+            "nativeToolOptions": [
+                "-k 0"
+            ]
+        },
+        {
             "name": "linux-novcpkg-debug",
-            "configurePreset": "linux-novcpkg-debug"
+            "configurePreset": "linux-novcpkg-debug",
+            "inherits": [
+                "ninja"
+            ]
         },
         {
             "name": "linux-debug",
-            "configurePreset": "linux-debug"
+            "configurePreset": "linux-debug",
+            "inherits": [
+                "ninja"
+            ]
         },
         {
             "name": "windows-debug",
-            "configurePreset": "windows-debug"
+            "configurePreset": "windows-debug",
+            "inherits": [
+                "ninja"
+            ]
         },
         {
             "name": "windows-release",
-            "configurePreset": "windows-release"
+            "configurePreset": "windows-release",
+            "inherits": [
+                "ninja"
+            ]
         },
         {
             "name": "macos-debug",
-            "configurePreset": "macos-debug"
+            "configurePreset": "macos-debug",
+            "inherits": [
+                "ninja"
+            ]
         },
         {
             "name": "macos-xcode",
-            "configurePreset": "macos-xcode"
+            "configurePreset": "macos-xcode",
+            "inherits": [
+                "ninja"
+            ]
         },
         {
             "name": "macos-release",
-            "configurePreset": "macos-release"
+            "configurePreset": "macos-release",
+            "inherits": [
+                "ninja"
+            ]
         },
         {
             "name": "macos-m1-debug",
-            "configurePreset": "macos-m1-debug"
+            "configurePreset": "macos-m1-debug",
+            "inherits": [
+                "ninja"
+            ]
         },
         {
             "name": "macos-m1-release",
-            "configurePreset": "macos-m1-release"
+            "configurePreset": "macos-m1-release",
+            "inherits": [
+                "ninja"
+            ]
+        },
+        {
+            "name": "iwyu",
+            "configurePreset": "iwyu",
+            "inherits": [
+                "ninja"
+            ]
         }
     ],
     "workflowPresets": [

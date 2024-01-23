@@ -5,8 +5,9 @@
 
 #include "metier/common/model/seedlang.hpp"  // IWYU pragma: associated
 
-#include <iostream>
-#include <memory>
+#include <QObject>
+#include <QString>
+#include <cstddef>
 #include <numeric>
 #include <string>
 #include <vector>

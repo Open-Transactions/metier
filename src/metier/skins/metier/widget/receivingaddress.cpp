@@ -10,11 +10,11 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QEvent>
-#include <QKeyEvent>
+#include <QKeyEvent>  // IWYU pragma: keep
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QObject>
 #include <QToolButton>
-#include <string>
 
 #include "metier/skins/metier/util/resizer.hpp"
 #include "qrtoolbutton.hpp"

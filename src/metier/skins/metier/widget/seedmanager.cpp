@@ -6,9 +6,10 @@
 #include "seedmanager.hpp"  // IWYU pragma: associated
 
 #include <opentxs/Qt.hpp>
-#include <opentxs/opentxs.hpp>
 #include <ui_seedmanager.h>
+#include <QDialogButtonBox>
 #include <QPushButton>
+#include <QTreeView>
 
 #include "metier/common/api.hpp"
 #include "metier/skins/metier/util/resizer.hpp"

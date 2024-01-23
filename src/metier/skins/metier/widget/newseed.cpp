@@ -5,6 +5,8 @@
 
 #include "newseed.hpp"  // IWYU pragma: associated
 
+#include <QObject>
+
 #include "metier/skins/metier/widget/newseed/imp.hpp"
 
 namespace metier::skins::metier::widget

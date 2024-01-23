@@ -7,6 +7,7 @@
 
 #include <opentxs/opentxs.hpp>
 #include <QString>
+#include <cassert>
 
 #include "metier/common/app.hpp"
 

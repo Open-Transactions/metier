@@ -5,7 +5,6 @@
 
 #include "metier/common/api.hpp"  // IWYU pragma: associated
 
-#include <opentxs/opentxs.hpp>
 #include <QString>
 #include <sstream>
 #include <string>

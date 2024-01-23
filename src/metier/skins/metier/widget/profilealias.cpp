@@ -6,6 +6,7 @@
 #include "profilealias.hpp"  // IWYU pragma: associated
 
 #include <ui_profilealias.h>
+#include <QObject>
 #include <QPlainTextEdit>
 #include <QToolButton>
 

@@ -6,13 +6,13 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QObject>
+#include <QMetaObject>
 #include <QString>
 #include <memory>
 
 class QCloseEvent;
 class QItemSelection;
-class QWidget;
+class QObject;
 
 namespace metier
 {

@@ -5,11 +5,10 @@
 
 #pragma once
 
+#include <QMetaObject>
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <QVariant>
-#include <QVector>
 #include <memory>
 
 class QAbstractItemModel;
@@ -19,7 +18,6 @@ namespace opentxs
 {
 namespace ui
 {
-class IdentityManager;
 class IdentityManagerQt;
 class SeedTreeQt;
 class SeedValidator;

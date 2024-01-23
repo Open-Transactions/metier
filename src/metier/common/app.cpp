@@ -5,9 +5,8 @@
 
 #include "metier/common/app.hpp"  // IWYU pragma: associated
 
-#include <QGuiApplication>
 #include <QThread>
-#include <iostream>
+#include <future>
 #include <mutex>
 
 #include "metier/common/api.hpp"

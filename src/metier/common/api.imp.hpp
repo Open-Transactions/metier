@@ -5,26 +5,50 @@
 
 #pragma once
 
-#include <opentxs/Qt.hpp>
 #include <opentxs/opentxs.hpp>
-#include <zmq.h>
-#include <QDebug>
-#include <QDir>
-#include <QGuiApplication>
-#include <QStandardPaths>
+#include <QList>
+#include <QString>
+#include <QStringList>
 #include <algorithm>
 #include <atomic>
-#include <chrono>
-#include <cstring>
+#include <functional>
 #include <future>
-#include <map>
+#include <iterator>
+#include <memory>
 #include <mutex>
-#include <set>
-#include <string>
+#include <string_view>
 #include <thread>
+#include <utility>
 
 #include "metier/common/api.hpp"
+#include "metier/common/model/seedlang.hpp"
+#include "metier/common/model/seedsize.hpp"
 #include "metier/common/passwordcallback.hpp"
+
+class QGuiApplication;
+
+namespace metier
+{
+namespace common
+{
+namespace model
+{
+class SeedType;
+}  // namespace model
+
+class App;
+}  // namespace common
+}  // namespace metier
+
+namespace opentxs
+{
+namespace ui
+{
+class IdentityManagerQt;
+class SeedTreeQt;
+class SeedValidator;
+}  // namespace ui
+}  // namespace opentxs
 
 namespace ot = opentxs;
 

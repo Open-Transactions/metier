@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <iostream>
+#include <string>
 
 #include "metier/common/cli/parser.hpp"
 #include "metier/common/cli/processor.hpp"

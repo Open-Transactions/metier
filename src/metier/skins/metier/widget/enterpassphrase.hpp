@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include <opentxs/opentxs.hpp>
 #include <QDialog>
+#include <QMetaObject>
+#include <QString>
 #include <memory>
-
-class QWidget;
 
 namespace metier::skins::metier::widget
 {

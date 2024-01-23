@@ -8,13 +8,21 @@
 #include <QR-Code-generator/cpp/QrCode.hpp>
 #include <opentxs/Qt.hpp>
 #include <opentxs/opentxs.hpp>
-#include <QDebug>
+#include <QAbstractItemModel>
+#include <QByteArray>
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QGuiApplication>
-#include <QNetworkReply>
+#include <QList>
 #include <QUrl>
+#include <QtLogging>
 #include <algorithm>
-#include <utility>
+#include <atomic>
+#include <chrono>
+#include <compare>
+#include <cstddef>
+#include <iterator>
+#include <span>
 
 #include "metier/common/api.imp.hpp"
 #include "metier/common/convertblockchain.hpp"

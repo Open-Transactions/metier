@@ -6,13 +6,25 @@
 #include "metier/common/cli/processor.hpp"  // IWYU pragma: associated
 
 #include <boost/container/flat_map.hpp>
+#include <boost/container/vector.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/json.hpp>
+#include <boost/move/algo/move.hpp>
 #include <opentxs/opentxs.hpp>
 #include <zmq.h>
+#include <algorithm>
+#include <array>
 #include <chrono>
+#include <cstddef>
+#include <cstring>
+#include <functional>
+#include <iterator>
+#include <locale>
+#include <optional>
+#include <span>
 #include <sstream>
-#include <vector>
+#include <stdexcept>
+#include <utility>
 
 #include "metier/common/cli/endpoint.hpp"
 #include "metier/common/cli/parser.hpp"

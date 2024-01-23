@@ -5,13 +5,12 @@
 
 #include "blockchainchooser.hpp"  // IWYU pragma: associated
 
-#include <opentxs/opentxs.hpp>
 #include <ui_blockchainchooser.h>
 #include <QCheckBox>
 #include <QDialogButtonBox>
+#include <QObject>
 #include <QPushButton>
 #include <QTableView>
-#include <iostream>
 
 #include "metier/common/api.hpp"
 #include "metier/skins/metier/util/resizer.hpp"

@@ -6,12 +6,13 @@
 #pragma once
 
 #include <QAbstractItemModel>
-#include <QObject>
-#include <QString>
+#include <QMetaObject>
 #include <QVariant>
 #include <string>
 #include <utility>
 #include <vector>
+
+class QObject;
 
 namespace metier::common::model
 {

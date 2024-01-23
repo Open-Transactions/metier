@@ -6,9 +6,14 @@
 #include "metier/common/cli/parser.hpp"  // IWYU pragma: associated
 
 #include <boost/container/flat_map.hpp>
+#include <boost/container/vector.hpp>
+#include <boost/move/algo/move.hpp>
 #include <boost/program_options.hpp>
+#include <functional>
 #include <iostream>
+#include <map>
 #include <sstream>
+#include <utility>
 
 namespace po = boost::program_options;
 

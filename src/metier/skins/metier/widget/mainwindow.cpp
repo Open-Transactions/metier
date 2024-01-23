@@ -8,19 +8,26 @@
 #include <opentxs/Qt.hpp>
 #include <opentxs/opentxs.hpp>
 #include <ui_mainwindow.h>
+#include <QAbstractButton>
+#include <QAbstractItemModel>
 #include <QAction>
 #include <QCoreApplication>
+#include <QEvent>
 #include <QItemSelectionModel>
-#include <QList>
 #include <QListView>
+#include <QObject>
+#include <QPlainTextEdit>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>
+#include <QStringList>
 #include <QTableView>
 #include <QToolBox>
 #include <QVariant>
 
 #include "mainwindow/imp.hpp"
 #include "metier/common/api.hpp"
+#include "metier/common/scopeguard.hpp"
 #include "metier/skins/metier/util/focuser.hpp"
 #include "metier/skins/metier/widget/blockchainchooser.hpp"
 #include "metier/skins/metier/widget/licenses.hpp"

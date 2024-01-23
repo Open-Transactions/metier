@@ -90,6 +90,15 @@ option(
   "Build metier skins"
   ON
 )
+option(
+  METIER_IWYU
+  "Enable include-what-you-use static analysis"
+  OFF
+)
+
+if(METIER_IWYU)
+  otcommon_make_iwyu_target()
+endif()
 
 if(METIER_ENABLE_SKIN_PROVIDER_METIER)
   list(

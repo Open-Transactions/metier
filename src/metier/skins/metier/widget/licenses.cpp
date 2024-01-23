@@ -6,10 +6,12 @@
 #include "licenses.hpp"  // IWYU pragma: associated
 
 #include <ui_licenses.h>
+#include <QAbstractItemModel>
 #include <QFont>
+#include <QFontDatabase>
 #include <QItemSelectionModel>
-#include <QList>
 #include <QListView>
+#include <QObject>
 #include <QPlainTextEdit>
 #include <QVariant>
 

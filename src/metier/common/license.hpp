@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include <opentxs/opentxs.hpp>
+#include <cstddef>
 #include <filesystem>
-#include <iosfwd>
 #include <string_view>
 #include <utility>
 #include <vector>

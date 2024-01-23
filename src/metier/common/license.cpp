@@ -8,11 +8,8 @@
 #include <opentxs/opentxs.hpp>
 #include <algorithm>
 #include <cctype>
+#include <functional>
 #include <iterator>
-#include <map>
-#include <ranges>
-#include <string>
-#include <type_traits>
 
 #include "metier/external/cmrc.hpp"
 

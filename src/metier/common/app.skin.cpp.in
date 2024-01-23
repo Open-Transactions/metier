@@ -7,8 +7,6 @@
 
 #include <opentxs/opentxs.hpp>
 #include <QString>
-#include <sstream>
-#include <string>
 
 namespace metier::common
 {

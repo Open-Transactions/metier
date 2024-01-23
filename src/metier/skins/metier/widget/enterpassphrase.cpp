@@ -6,9 +6,10 @@
 #include "enterpassphrase.hpp"  // IWYU pragma: associated
 
 #include <ui_enterpassphrase.h>
+#include <QDialogButtonBox>
 #include <QLineEdit>
+#include <QObject>  // IWYU pragma: keep
 #include <QPushButton>
-#include <QWidget>
 #include <cassert>
 
 #include "metier/skins/metier/widget/enterpassphrase/imp.hpp"

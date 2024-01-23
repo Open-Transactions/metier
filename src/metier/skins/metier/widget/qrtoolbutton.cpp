@@ -8,12 +8,12 @@
 #include <ui_qrtoolbutton.h>
 #include <QColor>
 #include <QImage>
+#include <QObject>
 #include <QPainter>
 #include <QRect>
 #include <QStyle>
 #include <QStyleOption>
 #include <QStylePainter>
-#include <string>
 
 #include "QR-Code-generator/cpp/QrCode.hpp"
 

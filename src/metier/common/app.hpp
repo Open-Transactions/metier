@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <QMetaObject>
 #include <QObject>
 #include <QString>
 #include <memory>

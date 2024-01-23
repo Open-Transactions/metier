@@ -6,9 +6,11 @@
 #include "addcontact.hpp"  // IWYU pragma: associated
 
 #include <ui_addcontact.h>
-#include <QPlainTextEdit>
+#include <QDialogButtonBox>
+#include <QLineEdit>
+#include <QObject>
 #include <QPushButton>
-#include <QToolButton>
+#include <utility>
 
 #include "metier/common/api.hpp"
 #include "metier/skins/metier/util/resizer.hpp"

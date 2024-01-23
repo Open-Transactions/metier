@@ -8,11 +8,21 @@ add_library(
                            "QR-Code-generator/cpp/QrCode.cpp"
 )
 metier_configure_cxx_target(qr-code-generator)
+set_target_properties(
+  qr-code-generator
+  PROPERTIES
+    CXX_INCLUDE_WHAT_YOU_USE ""
+    CXX_CLANG_TIDY ""
+    UNITY_BUILD OFF
+)
 
 if(NOT MSVC)
   target_compile_options(
-    qr-code-generator PRIVATE "-Wno-ctor-dtor-privacy"
-                              "-Wno-shadow-field-in-constructor"
+    qr-code-generator
+    PRIVATE
+      "-Wno-ctor-dtor-privacy"
+      "-Wno-shadow-field-in-constructor"
+      "-Wno-unsafe-buffer-usage"
   )
 
   if(${CMAKE_CXX_COMPILER_ID}

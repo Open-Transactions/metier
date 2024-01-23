@@ -5,10 +5,11 @@
 
 #include "metier/common/model/licenses.hpp"  // IWYU pragma: associated
 
-#include <iostream>
-#include <memory>
-#include <string>
-#include <vector>
+#include <QObject>
+#include <QString>
+#include <cstddef>
+#include <string_view>
+#include <utility>
 
 #include "metier/common/license.hpp"
 
