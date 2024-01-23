@@ -11,7 +11,12 @@ function(metier_configure_cxx_target target_name)
   otcommon_define_signed_overflow(${target_name})
   target_compile_definitions(metier-common PUBLIC "${QT_DEFINITIONS}")
 
-  if(NOT MSVC)
+  if(MSVC)
+    target_compile_options(${target_name} PRIVATE "/EHsc")
+    target_compile_definitions(
+      ${target_name} PRIVATE "_ALLOW_COROUTINE_ABI_MISMATCH"
+    )
+  else()
     target_compile_options(
       ${target_name}
       PRIVATE
@@ -46,4 +51,12 @@ function(metier_configure_cxx_target target_name)
       ${target_name} PRIVATE "-Wno-error=unsafe-buffer-usage"
     )
   endif()
+
+  set_target_properties(
+    "${target_name}"
+    PROPERTIES
+      AUTOMOC ON
+      AUTOUIC ON
+      AUTORCC ON
+  )
 endfunction()

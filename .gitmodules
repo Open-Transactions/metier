@@ -1,5 +1,5 @@
 [submodule "QR-Code-generator"]
-	path = deps/QR-Code-generator
+	path = external/QR-Code-generator
 	url = https://github.com/nayuki/QR-Code-generator.git
 	shallow = true
 [submodule "vcpkg-overlay"]

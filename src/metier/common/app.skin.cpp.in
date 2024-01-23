@@ -1,0 +1,37 @@
+// Copyright (c) 2019-2022 The Open-Transactions developers
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include "metier/common/api.hpp"  // IWYU pragma: associated
+
+#include <opentxs/opentxs.hpp>
+#include <QString>
+#include <sstream>
+#include <string>
+
+namespace metier::common
+{
+using namespace opentxs::literals;
+
+auto Api::Domain() noexcept -> QString
+{
+    // clang-format off
+    return QString::fromLocal8Bit(u8"@METIER_APP_DOMAIN@");
+    // clang-format on
+}
+
+auto Api::Name() noexcept -> QString
+{
+    // clang-format off
+    return QString::fromLocal8Bit(u8"@METIER_BASE_NAME@");
+    // clang-format on
+}
+
+auto Api::Title() noexcept -> QString
+{
+    // clang-format off
+    return QString::fromLocal8Bit(u8"@METIER_APPSTREAM_NAME@");
+    // clang-format on
+}
+}  // namespace metier::common

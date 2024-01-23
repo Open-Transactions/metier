@@ -1,4 +1,4 @@
 .git
 build
-deps/QR-Code-generator
-deps/vcpkg-overlay
+external/QR-Code-generator
+external/vcpkg-overlay

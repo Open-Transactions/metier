@@ -1,0 +1,44 @@
+// Copyright (c) 2019-2022 The Open-Transactions developers
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include "metier/common/api.hpp"  // IWYU pragma: associated
+
+#include <opentxs/opentxs.hpp>
+#include <QString>
+#include <sstream>
+#include <string>
+
+namespace metier::common
+{
+auto Api::versionString(int suffix) -> QString
+{
+    // clang-format off
+    static const auto name_{u8"@METIER_APPSTREAM_NAME@"};
+    static constexpr auto major_{@METIER_VERSION_MAJOR@};
+    static constexpr auto minor_{@METIER_VERSION_MINOR@};
+    static constexpr auto patch_{@METIER_VERSION_PATCH@};
+    // clang-format on
+
+    static const auto version = [&]() -> QString {
+        auto out = std::stringstream{};
+        out << name_;
+        out << ' ';
+        out << std::to_string(major_);
+        out << '.';
+        out << std::to_string(minor_);
+        out << '.';
+        out << std::to_string(patch_);
+
+        if (0 < suffix) {
+            out << '-';
+            out << std::to_string(suffix);
+        }
+
+        return QString::fromUtf8(out.str().c_str());
+    }();
+
+    return version;
+}
+}  // namespace metier::common
