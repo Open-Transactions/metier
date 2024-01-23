@@ -1,5 +1,4 @@
 .git
 build
-deps/opentxs-cmake
 deps/QR-Code-generator
 deps/vcpkg-overlay

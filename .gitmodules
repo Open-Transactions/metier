@@ -1,7 +1,3 @@
-[submodule "cmake"]
-	path = deps/opentxs-cmake
-	url = https://github.com/open-transactions/opentxs-cmake
-	shallow = true
 [submodule "QR-Code-generator"]
 	path = deps/QR-Code-generator
 	url = https://github.com/nayuki/QR-Code-generator.git

@@ -31,7 +31,7 @@ auto width_ = std::size_t{0};
 static auto make_vector() noexcept -> LicenseData
 {
     auto output = LicenseData{
-        {u8"@METIER_APPSTREAM_NAME@"_sv,
+        {u8"@METIER_APPSTREAM_NAME@"sv,
          std::string_view{reinterpret_cast<const char*>(LICENSE), LICENSE_len}},
         {"Boost"sv,
          std::string_view{

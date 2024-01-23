@@ -44,13 +44,17 @@ list(
   APPEND
   CMAKE_MODULE_PATH
   "${${PROJECT_NAME}_SOURCE_DIR}/cmake"
-  "${${PROJECT_NAME}_SOURCE_DIR}/deps/opentxs-cmake"
 )
 
 # -----------------------------------------------------------------------------
 # Setup
 
-include(otcommon-cmake)
+find_package(
+  otcommon
+  2
+  CONFIG
+  REQUIRED
+)
 otcommon_set_build_type()
 otcommon_require_out_of_source_build()
 otcommon_update_submodules()
