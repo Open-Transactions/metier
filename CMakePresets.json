@@ -57,7 +57,8 @@
                 "CMAKE_C_COMPILER:FILEPATH":
                     "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe",
                 "CMAKE_CXX_COMPILER:FILEPATH":
-                    "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe"
+                    "$env{VSINSTALLDIR}VC/Tools/MSVC/$env{VCToolsVersion}/bin/Host$env{VSCMD_ARG_HOST_ARCH}/$env{VSCMD_ARG_TGT_ARCH}/cl.exe",
+                "CMAKE_CXX_FLAGS": "-Zc:__cplusplus"
             }
         },
         {
@@ -86,7 +87,7 @@
             }
         },
         {
-            "name": "host-Linux",
+            "name": "host-linux",
             "hidden": true,
             "condition": {
                 "type": "equals",
@@ -99,7 +100,7 @@
             ]
         },
         {
-            "name": "host-Macos",
+            "name": "host-macos-intel",
             "hidden": true,
             "condition": {
                 "type": "equals",
@@ -111,12 +112,13 @@
                 "compiler-clang"
             ],
             "cacheVariables": {
-                "VCPKG_TARGET_TRIPLET": "x64-osx-11",
-                "CMAKE_MAKE_PROGRAM": "ninja"
+                "VCPKG_TARGET_TRIPLET": "x64-osx-14",
+                "CMAKE_MAKE_PROGRAM": "ninja",
+                "CMAKE_OSX_ARCHITECTURES": "x86_64"
             }
         },
         {
-            "name": "host-Macos-M1",
+            "name": "host-macos-arm",
             "hidden": true,
             "condition": {
                 "type": "equals",
@@ -129,11 +131,12 @@
             ],
             "cacheVariables": {
                 "VCPKG_TARGET_TRIPLET": "arm64-osx",
-                "CMAKE_MAKE_PROGRAM": "ninja"
+                "CMAKE_MAKE_PROGRAM": "ninja",
+                "CMAKE_OSX_ARCHITECTURES": "arm64"
             }
         },
         {
-            "name": "host-Windows",
+            "name": "host-windows",
             "hidden": true,
             "condition": {
                 "type": "equals",
@@ -155,7 +158,7 @@
             "displayName": "debug build without vcpkg",
             "description": "configure debug build without vcpkg",
             "inherits": [
-                "host-Linux",
+                "host-linux",
                 "mode-debug"
             ]
         },
@@ -173,7 +176,7 @@
             "displayName": "debug build",
             "description": "configure debug build",
             "inherits": [
-                "host-Windows",
+                "host-windows",
                 "mode-debug",
                 "vcpkg"
             ]
@@ -183,58 +186,67 @@
             "displayName": "release build",
             "description": "configure release build",
             "inherits": [
-                "host-Windows",
+                "host-windows",
                 "mode-release",
                 "vcpkg"
             ]
         },
         {
-            "name": "macos-debug",
+            "name": "macos-intel-debug",
             "displayName": "debug build",
             "description": "configure debug build",
             "inherits": [
-                "host-Macos",
+                "host-macos-intel",
                 "mode-debug",
                 "vcpkg"
             ]
         },
         {
-            "name": "macos-xcode",
+            "name": "macos-intel-release",
+            "displayName": "release build",
+            "description": "configure release build",
+            "inherits": [
+                "host-macos-intel",
+                "mode-release",
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "macos-intel-xcode",
             "displayName": "xcode build",
             "description": "configure Xcode IDE build",
             "inherits": [
                 "generator-xcode",
-                "macos-debug"
+                "macos-intel-debug"
             ]
         },
         {
-            "name": "macos-release",
-            "displayName": "release build",
-            "description": "configure release build",
-            "inherits": [
-                "host-Macos",
-                "mode-release",
-                "vcpkg"
-            ]
-        },
-        {
-            "name": "macos-m1-debug",
+            "name": "macos-arm-debug",
             "displayName": "debug build",
             "description": "configure debug build",
             "inherits": [
-                "host-Macos-M1",
+                "host-macos-arm",
                 "mode-debug",
                 "vcpkg"
             ]
         },
         {
-            "name": "macos-m1-release",
+            "name": "macos-arm-release",
             "displayName": "release build",
             "description": "configure release build",
             "inherits": [
-                "host-Macos-M1",
+                "host-macos-arm",
                 "mode-release",
                 "vcpkg"
+            ]
+        },
+        {
+            "name": "macos-arm-xcode",
+            "displayName": "xcode build",
+            "description": "configure Xcode IDE build",
+            "inherits": [
+                "generator-xcode",
+                "macos-arm-debug"
             ]
         },
         {
@@ -290,36 +302,43 @@
             ]
         },
         {
-            "name": "macos-debug",
-            "configurePreset": "macos-debug",
+            "name": "macos-intel-debug",
+            "configurePreset": "macos-intel-debug",
             "inherits": [
                 "ninja"
             ]
         },
         {
-            "name": "macos-xcode",
-            "configurePreset": "macos-xcode",
+            "name": "macos-intel-xcode",
+            "configurePreset": "macos-intel-xcode",
             "inherits": [
                 "ninja"
             ]
         },
         {
-            "name": "macos-release",
-            "configurePreset": "macos-release",
+            "name": "macos-intel-release",
+            "configurePreset": "macos-intel-release",
             "inherits": [
                 "ninja"
             ]
         },
         {
-            "name": "macos-m1-debug",
-            "configurePreset": "macos-m1-debug",
+            "name": "macos-arm-debug",
+            "configurePreset": "macos-arm-debug",
             "inherits": [
                 "ninja"
             ]
         },
         {
-            "name": "macos-m1-release",
-            "configurePreset": "macos-m1-release",
+            "name": "macos-arm-release",
+            "configurePreset": "macos-arm-release",
+            "inherits": [
+                "ninja"
+            ]
+        },
+        {
+            "name": "macos-arm-xcode",
+            "configurePreset": "macos-arm-xcode",
             "inherits": [
                 "ninja"
             ]
@@ -386,67 +405,80 @@
             ]
         },
         {
-            "name": "macos-debug",
+            "name": "macos-intel-debug",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "macos-debug"
+                    "name": "macos-intel-debug"
                 },
                 {
                     "type": "build",
-                    "name": "macos-debug"
+                    "name": "macos-intel-debug"
                 }
             ]
         },
         {
-            "name": "macos-xcode",
+            "name": "macos-intel-release",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "macos-xcode"
+                    "name": "macos-intel-release"
                 },
                 {
                     "type": "build",
-                    "name": "macos-xcode"
+                    "name": "macos-intel-release"
                 }
             ]
         },
         {
-            "name": "macos-release",
+            "name": "macos-intel-xcode",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "macos-release"
+                    "name": "macos-intel-xcode"
                 },
                 {
                     "type": "build",
-                    "name": "macos-release"
+                    "name": "macos-intel-xcode"
                 }
             ]
         },
         {
-            "name": "macos-m1-debug",
+            "name": "macos-arm-debug",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "macos-m1-debug"
+                    "name": "macos-arm-debug"
                 },
                 {
                     "type": "build",
-                    "name": "macos-m1-debug"
+                    "name": "macos-arm-debug"
                 }
             ]
         },
         {
-            "name": "macos-m1-release",
+            "name": "macos-arm-release",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "macos-m1-release"
+                    "name": "macos-arm-release"
                 },
                 {
                     "type": "build",
-                    "name": "macos-m1-release"
+                    "name": "macos-arm-release"
+                }
+            ]
+        },
+        {
+            "name": "macos-arm-xcode",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "macos-arm-xcode"
+                },
+                {
+                    "type": "build",
+                    "name": "macos-arm-xcode"
                 }
             ]
         }
