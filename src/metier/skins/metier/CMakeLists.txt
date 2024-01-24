@@ -94,3 +94,6 @@ metier_package_metadata(
   "metier"
   "metier"
 )
+metier_generate_macos_packaging_files(
+  "${METIER_APPSTREAM_ID}" "${METIER_GUI_OUTPUT_NAME}"
+)
