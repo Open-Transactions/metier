@@ -30,7 +30,7 @@ macro(metier_generate_cpack)
 
     set(CPACK_PACKAGE_NAME "${METIER_BASE_NAME}")
     set(CPACK_PACKAGE_VERSION
-        ${{PROJECT_NAME}_VERSION_MAJOR}.${{PROJECT_NAME}_VERSION_MINOR}.${{PROJECT_NAME}_VERSION_PATCH}
+        ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}
     )
     # This sets the folder name displayed when the .dmg file is opened.
     set(CPACK_PACKAGE_FILE_NAME

@@ -5,26 +5,23 @@
 
 function(
   metier_generate_target_cli
-  base_name
   target_name
   exe_name
-  windows_icon
-  apple_icon_path
-  apple_icon_name
-  copyright_string
-  appstring_id
 )
-  include(metier-generate-target-exe)
-  metier_generate_target_exe(
-    "${base_name}"
+
+  configure_file(
+    "${${PROJECT_NAME}_SOURCE_DIR}/src/metier/common/cli/endpoint.cpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/skin/cli_endpoint.cpp"
+    @ONLY
+  )
+
+  add_executable(
     "${target_name}"
-    "${exe_name}"
-    "${windows_icon}"
-    "${apple_icon_path}"
-    "${apple_icon_name}"
-    "${copyright_string}"
-    "${appstring_id}"
-    metier-cli-common
+    "${target_name}.cpp"
+    "${CMAKE_CURRENT_BINARY_DIR}/skin/cli_endpoint.cpp"
     $<TARGET_OBJECTS:metier-cli-common>
   )
+  metier_configure_cxx_target("${target_name}")
+  target_link_libraries("${target_name}" PUBLIC metier-cli-common)
+  set_target_properties("${target_name}" PROPERTIES OUTPUT_NAME "${exe_name}")
 endfunction()

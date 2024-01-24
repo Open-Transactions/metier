@@ -38,16 +38,7 @@ metier_generate_target_gui(
   "${METIER_COPYRIGHT_STRING}"
   "${METIER_APPSTREAM_ID}"
 )
-metier_generate_target_cli(
-  "${METIER_BASE_NAME}"
-  "metierctl"
-  "${METIER_CLI_OUTPUT_NAME}"
-  "${${METIER_BASE_NAME}_SOURCE_DIR}/data/metier/skins/metier/package/windows/app.rc"
-  "${${METIER_BASE_NAME}_SOURCE_DIR}/data/metier/skins/metier/package/icons"
-  "app-1024.icns"
-  "${METIER_COPYRIGHT_STRING}"
-  "${METIER_APPSTREAM_ID}"
-)
+metier_generate_target_cli("metierctl" "${METIER_CLI_OUTPUT_NAME}")
 
 add_subdirectory(util)
 add_subdirectory(widget)
