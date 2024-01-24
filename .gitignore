@@ -1,0 +1,7 @@
+build/
+CMakeSettings.json
+CMakeUserPresets.json
+.clang-format
+.clang-format.backup
+.cmake-format.py
+.cmake-format.py.backup

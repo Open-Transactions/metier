@@ -1,0 +1,33 @@
+// Copyright (c) 2019-2024 The Open-Transactions developers
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include "metier/common/cli/endpoint.hpp"  // IWYU pragma: associated
+
+#include <QDir>
+#include <QStandardPaths>
+#include <QString>
+#include <QtLogging>
+
+namespace metier::common::cli
+{
+auto rpc_endpoint() noexcept -> std::string
+{
+    auto base =
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    const auto folder = QDir{base.append("/otrpc/")};
+    const auto absolute = folder.absolutePath();
+
+    if (false == folder.mkpath(absolute)) {
+        qFatal("Failed to create RPC socket folder");
+    }
+
+    // clang-format off
+    const auto filename = std::string{"@base_name@"} + ".sock";
+    // clang-format on
+
+    return std::string{"ipc://"} +
+           QDir{absolute}.filePath(filename.c_str()).toStdString();
+}
+}  // namespace metier::common::cli

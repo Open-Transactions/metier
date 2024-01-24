@@ -1,1 +1,0 @@
-deps/opentxs/deps/opentxs-cmake/.cmake-format.py

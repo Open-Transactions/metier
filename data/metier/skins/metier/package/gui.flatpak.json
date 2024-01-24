@@ -1,0 +1,189 @@
+{
+    "id": "org.opentransactions.metier",
+    "runtime": "org.kde.Platform",
+    "runtime-version": "6.4",
+    "sdk": "org.kde.Sdk",
+    "command": "metier",
+    "modules": [
+        {
+            "name": "boost",
+            "buildsystem": "simple",
+            "sources": [
+                {
+                    "url":
+                        "https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.bz2",
+                    "sha256":
+                        "a6e1ab9b0860e6a2881dd7b21fe9f737a095e5f33a3a874afc6a345228597ee6",
+                    "type": "archive"
+                }
+            ],
+            "cleanup": [
+                "*.a",
+                "/include",
+                "/lib/cmake",
+                "/lib/debug"
+            ],
+            "build-commands": [
+                "./bootstrap.sh --prefix=/app --without-libraries=python",
+                "./b2 --prefix=/app --build-type=minimal --layout=system variant=release link=shared threading=multi runtime-link=shared",
+                "./b2 --prefix=/app --build-type=minimal --layout=system variant=release link=shared threading=multi runtime-link=shared install"
+            ]
+        },
+        {
+            "name": "sodium",
+            "buildsystem": "autotools",
+            "config-opts": [
+                "--enable-shared",
+                "--disable-static"
+            ],
+            "sources": [
+                {
+                    "url":
+                        "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz",
+                    "sha256":
+                        "6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1",
+                    "type": "archive"
+                }
+            ],
+            "cleanup": [
+                "*.la",
+                "/include",
+                "/lib/debug",
+                "/lib/pkgconfig"
+            ]
+        },
+        {
+            "name": "zeromq",
+            "buildsystem": "cmake-ninja",
+            "builddir": true,
+            "config-opts": [
+                "-DENABLE_DRAFTS=ON",
+                "-DWITH_LIBSODIUM=ON",
+                "-DWITH_LIBSODIUM_STATIC=OFF",
+                "-DENABLE_CURVE=ON",
+                "-DWITH_DOCS=OFF",
+                "-DBUILD_SHARED=ON",
+                "-DBUILD_STATIC=OFF",
+                "-DBUILD_TESTS=OFF"
+            ],
+            "sources": [
+                {
+                    "url":
+                        "https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz",
+                    "sha1": "47277a64749049123d1401600e8cfbab10a3ae28",
+                    "type": "archive"
+                }
+            ],
+            "cleanup": [
+                "/bin",
+                "/include",
+                "/lib/cmake",
+                "/lib/debug",
+                "/lib/pkgconfig",
+                "/share"
+            ]
+        },
+        {
+            "name": "protobuf",
+            "buildsystem": "cmake-ninja",
+            "builddir": true,
+            "subdir": "cmake",
+            "config-opts": [
+                "-Dprotobuf_BUILD_TESTS=OFF",
+                "-Dprotobuf_BUILD_SHARED_LIBS=ON",
+                "-Dprotobuf_WITH_ZLIB=ON"
+            ],
+            "sources": [
+                {
+                    "url":
+                        "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.19.1.tar.gz",
+                    "sha256":
+                        "87407cd28e7a9c95d9f61a098a53cf031109d451a7763e7dd1253abf8b4df422",
+                    "type": "archive"
+                }
+            ],
+            "cleanup": [
+                "/bin",
+                "/include",
+                "/lib/cmake",
+                "/lib/debug",
+                "/lib/pkgconfig",
+                "libprotoc*"
+            ]
+        },
+        {
+            "name": "lmdb",
+            "buildsystem": "simple",
+            "subdir": "libraries/liblmdb",
+            "build-commands": [
+                "sed -i s~/usr/local~/app~ Makefile",
+                "make -j $FLATPAK_BUILDER_N_JOBS",
+                "make install",
+                "rm /app/lib/liblmdb.a"
+            ],
+            "sources": [
+                {
+                    "url": "https://github.com/LMDB/lmdb",
+                    "tag": "LMDB_0.9.29",
+                    "commit": "8ad7be2510414b9506ec9f9e24f24d04d9b04a1a",
+                    "type": "git"
+                }
+            ],
+            "cleanup": [
+                "/bin",
+                "/include",
+                "/lib/debug",
+                "/share"
+            ]
+        },
+        {
+            "name": "tbb",
+            "buildsystem": "cmake-ninja",
+            "builddir": true,
+            "config-opts": [
+                "-DBUILD_SHARED_LIBS=ON",
+                "-DTBB_TEST=OFF"
+            ],
+            "sources": [
+                {
+                    "url":
+                        "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2021.7.0.tar.gz",
+                    "sha256":
+                        "2cae2a80cda7d45dc7c072e4295c675fff5ad8316691f26f40539f7e7e54c0cc",
+                    "type": "archive"
+                }
+            ],
+            "cleanup": [
+                "/bin",
+                "/include",
+                "/lib/cmake",
+                "/lib/debug",
+                "/lib/pkgconfig",
+                "/share"
+            ]
+        },
+        {
+            "name": "metier",
+            "buildsystem": "cmake-ninja",
+            "builddir": true,
+            "config-opts": [
+                "-DCMAKE_UNITY_BUILD=ON"
+            ],
+            "sources": [
+                {
+                    "url": "https://github.com/Open-Transactions/metier",
+                    "branch": "develop",
+                    "type": "git",
+                    "disable-shallow-clone": true
+                }
+            ]
+        }
+    ],
+    "finish-args": [
+        "--share=network",
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--socket=wayland",
+        "--device=dri"
+    ]
+}

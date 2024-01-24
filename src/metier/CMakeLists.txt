@@ -3,9 +3,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+add_subdirectory(common)
+add_subdirectory(external)
 
-add_library(metier-cli-common OBJECT)
-metier_configure_cxx_target(metier-cli-common)
-
-add_subdirectory(metier)
+if(METIER_ENABLE_SKIN_PROVIDER_METIER)
+  add_subdirectory(skins)
+endif()

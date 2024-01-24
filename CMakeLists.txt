@@ -1,56 +1,39 @@
-# Copyright (c) 2019-2022 The Open-Transactions developers
+# Copyright (c) 2019-2024 The Open-Transactions developers
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-cmake_minimum_required(VERSION 3.21.0)
+cmake_minimum_required(VERSION 3.26.0)
 cmake_policy(
   SET
   CMP0091
   NEW
 )
-set(CMAKE_OSX_DEPLOYMENT_TARGET 11)
-project(metier)
-set(METIER_APPSTREAM_ID "org.opentransactions.metier")
-set(METIER_APPSTREAM_NAME "Métier")
-set(METIER_APP_DOMAIN "opentransactions.org")
-set(METIER_CLI_COMMAND "metierctl")
-set(METIER_GUI_OUTPUT_NAME ${PROJECT_NAME})
-
-set(METIER_VERSION_MAJOR 23)
-set(METIER_VERSION_MINOR 2)
-set(METIER_VERSION_PATCH 4)
-
-execute_process(
-  COMMAND
-    echo
-    release_version=${METIER_VERSION_MAJOR}.${METIER_VERSION_MINOR}.${METIER_VERSION_PATCH}
-  OUTPUT_FILE ${PROJECT_BINARY_DIR}/release_version.txt
-)
-execute_process(
-  COMMAND echo app_name=${METIER_GUI_OUTPUT_NAME}
-  OUTPUT_FILE ${PROJECT_BINARY_DIR}/app_name.txt
-)
-execute_process(
-  COMMAND echo cli_name=${METIER_CLI_COMMAND}
-  OUTPUT_FILE ${PROJECT_BINARY_DIR}/cli_name.txt
-)
-execute_process(
-  COMMAND echo bundle_id=${METIER_APPSTREAM_ID}
-  OUTPUT_FILE ${PROJECT_BINARY_DIR}/bundle_id.txt
+cmake_policy(
+  SET
+  CMP0126
+  NEW
 )
 
 list(
   APPEND
   CMAKE_MODULE_PATH
-  "${${PROJECT_NAME}_SOURCE_DIR}/cmake"
-  "${${PROJECT_NAME}_SOURCE_DIR}/deps/opentxs-cmake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake"
 )
+
+project(metier)
 
 # -----------------------------------------------------------------------------
 # Setup
 
-include(otcommon-cmake)
+find_package(
+  otcommon
+  2
+  CONFIG
+  REQUIRED
+)
+include(metier-cmake-helpers)
+otcommon_set_version_from_git()
 otcommon_set_build_type()
 otcommon_require_out_of_source_build()
 otcommon_update_submodules()
@@ -61,9 +44,6 @@ otcommon_update_submodules()
 if(CMAKE_BUILD_TYPE
    STREQUAL
    "Debug"
-   OR CMAKE_BUILD_TYPE
-      STREQUAL
-      "RelWithDebInfo"
 )
   set(METIER_PEDANTIC_DEFAULT ON)
   set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -71,10 +51,20 @@ else()
   set(METIER_PEDANTIC_DEFAULT OFF)
 endif()
 
-if(WIN32)
-  set(OT_USE_VCPKG_TARGETS_DEFAULT ON)
+if(DEFINED VCPKG_TARGET_TRIPLET)
+  set(METIER_USE_VCPKG_TARGETS_DEFAULT ON)
+
+  if(VCPKG_LIBRARY_LINKAGE
+     STREQUAL
+     "static"
+  )
+    set(METIER_STATIC_DEPENDENCIES_DEFAULT ON)
+  else()
+    set(METIER_STATIC_DEPENDENCIES_DEFAULT OFF)
+  endif()
 else()
-  set(OT_USE_VCPKG_TARGETS_DEFAULT OFF)
+  set(METIER_USE_VCPKG_TARGETS_DEFAULT OFF)
+  set(METIER_STATIC_DEPENDENCIES_DEFAULT OFF)
 endif()
 
 # -----------------------------------------------------------------------------
@@ -86,25 +76,42 @@ option(
   ${METIER_PEDANTIC_DEFAULT}
 )
 option(
-  METIER_BUNDLED_OPENTXS
-  "Use submodule version of libopentxs"
+  METIER_USE_VCPKG_TARGETS
+  "Assume vcpkg style names for FindPackage and target_link_libraries invocations"
+  ${METIER_USE_VCPKG_TARGETS_DEFAULT}
+)
+option(
+  METIER_STATIC_DEPENDENCIES
+  "Assume dependencies are static libraries for FindPackage and target_link_libraries invocations"
+  ${METIER_STATIC_DEPENDENCIES_DEFAULT}
+)
+option(
+  METIER_ENABLE_SKIN_PROVIDER_METIER
+  "Build metier skins"
   ON
 )
 option(
-  OT_USE_VCPKG_TARGETS
-  "Assume dependencies are managed by vcpkg"
-  ${OT_USE_VCPKG_TARGETS_DEFAULT}
-)
-option(
-  METIER_QML_INTERFACE
-  "Use Qt Quick interface instead of Qt Widgets"
+  METIER_IWYU
+  "Enable include-what-you-use static analysis"
   OFF
 )
+
+if(METIER_IWYU)
+  otcommon_make_iwyu_target()
+endif()
+
+if(METIER_ENABLE_SKIN_PROVIDER_METIER)
+  list(
+    APPEND
+    CMAKE_MODULE_PATH
+    "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake/metier"
+  )
+  include(metier-configure-skin-provider-metier)
+endif()
 
 # -----------------------------------------------------------------------------
 # Set compiler options
 
-include(metier-configure-target)
 otcommon_set_project_language_standard(
   99
   20
@@ -114,7 +121,6 @@ otcommon_set_project_language_standard(
 # -----------------------------------------------------------------------------
 # Print system information and build options
 
-include(metier-print-build-details)
 metier_print_build_details()
 
 # -----------------------------------------------------------------------------
@@ -123,66 +129,38 @@ metier_print_build_details()
 otcommon_find_system_libraries()
 
 find_package(
-  QT
-  REQUIRED
-  NAMES
-  Qt6
-  Qt5
-)
-
-if(NOT METIER_BUNDLED_OPENTXS)
-  find_package(opentxs CONFIG REQUIRED)
-endif()
-
-find_package(
-  Boost
-  1.82.0
-  REQUIRED
-  COMPONENTS
-    date_time
-    json
-    program_options
+  opentxs
   CONFIG
-)
-find_package(
-  Qt${QT_VERSION_MAJOR}
   REQUIRED
-  COMPONENTS
-  Network
-  Widgets
-  CONFIG
 )
 
-if(METIER_QML_INTERFACE)
-  find_package(
-    Qt${QT_VERSION_MAJOR}
-    REQUIRED
-    COMPONENTS
-      Qml
-      Quick
-      QuickControls2
-      QmlImportScanner
-      Svg
-    CONFIG
-  )
-endif()
-
-if(OT_USE_VCPKG_TARGETS)
-  set(METIER_ZMQ_PACKAGE "ZeroMQ")
+if(METIER_STATIC_DEPENDENCIES)
   set(METIER_ZMQ_TARGET "libzmq-static")
 else()
-  set(METIER_ZMQ_PACKAGE "unofficial-zeromq")
   set(METIER_ZMQ_TARGET "libzmq")
 endif()
 
-find_package("${METIER_ZMQ_PACKAGE}" QUIET)
+if(METIER_USE_VCPKG_TARGETS)
+  find_package(
+    ZeroMQ
+    CONFIG
+    REQUIRED
+  )
+else()
+  find_package(unofficial-zeromq REQUIRED)
+endif()
 
 # -----------------------------------------------------------------------------
 # Build source
 
-add_library(metier-common OBJECT "")
+add_library(metier-common OBJECT)
+target_include_directories(
+  metier-common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
+target_link_libraries(metier-common PUBLIC opentxs::libopentxs)
 metier_configure_cxx_target(metier-common)
-add_subdirectory(deps)
-add_subdirectory(licenses)
-add_subdirectory(src)
-add_subdirectory(package)
+metier_generate_cmrc_target()
+
+add_subdirectory("data")
+add_subdirectory("external")
+add_subdirectory("src")

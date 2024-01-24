@@ -1,0 +1,4 @@
+.git
+build
+external/QR-Code-generator
+external/vcpkg-overlay

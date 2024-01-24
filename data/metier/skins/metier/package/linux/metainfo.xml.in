@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2024 The Open-Transactions developers -->
+<component type="desktop-application">
+  <id>@METIER_APPSTREAM_ID@</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>@METIER_APPSTREAM_NAME@</name>
+  <summary>Multi-currency blockchain wallet and Open-Transactions client</summary>
+  <description>
+    <p>Métier is the reference GUI client for the Open-Transactions library, supporting native on-blockchain transactions and off-chain accounts.</p>
+  </description>
+  <url type="homepage">https://www.opentransactions.org</url>
+  <url type="bugtracker">https://github.com/Open-Transactions/metier/issues</url>
+  <launchable type="desktop-id">@METIER_APPSTREAM_ID@.desktop</launchable>
+  <releases>
+    <release version="23.2" date="2023-04-29" />
+    <release version="23.1" date="2023-04-17" />
+    <release version="22.4" date="2022-05-11" />
+  </releases>
+  <provides>
+    <binary>@METIER_GUI_OUTPUT_NAME@</binary>
+  </provides>
+  <project_license>MPL-2.0</project_license>
+  <developer_name>The Open-Transactions Developers</developer_name>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The Métier main window</caption>
+      <image type="source" width="1920" height="1080">http://opentransactions.org/wiki/images/b/b9/Metier-screenshot.png</image>
+    </screenshot>
+ </screenshots>
+ <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+ </content_rating>
+</component>
