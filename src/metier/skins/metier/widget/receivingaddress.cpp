@@ -3,7 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "receivingaddress.hpp"  // IWYU pragma: associated
+#include "metier/skins/metier/widget/receivingaddress.hpp"  // IWYU pragma: associated
 
 #include <ui_receivingaddress.h>
 #include <QAction>  // IWYU pragma: keep
@@ -17,7 +17,7 @@
 #include <QToolButton>
 
 #include "metier/skins/metier/util/resizer.hpp"
-#include "qrtoolbutton.hpp"
+#include "metier/skins/metier/widget/qrtoolbutton.hpp"
 
 namespace metier::skins::metier::widget
 {

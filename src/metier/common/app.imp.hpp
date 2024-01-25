@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "app.hpp"  // IWYU pragma: associated
+#include "metier/common/app.hpp"  // IWYU pragma: associated
 
 #include <future>
 
