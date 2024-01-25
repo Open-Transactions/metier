@@ -156,6 +156,7 @@ endif()
 add_library(metier-common OBJECT)
 target_include_directories(
   metier-common PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src"
+                       "${CMAKE_CURRENT_BINARY_DIR}/src"
 )
 target_link_libraries(metier-common PUBLIC opentxs::libopentxs)
 metier_configure_cxx_target(metier-common)

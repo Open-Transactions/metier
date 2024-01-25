@@ -5,6 +5,7 @@
 
 add_subdirectory(cli)
 add_subdirectory(model)
+add_subdirectory(otproto)
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Qml)
 

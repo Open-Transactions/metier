@@ -130,7 +130,7 @@
                 "compiler-clang"
             ],
             "cacheVariables": {
-                "VCPKG_TARGET_TRIPLET": "arm64-osx",
+                "VCPKG_TARGET_TRIPLET": "arm64-osx-14",
                 "CMAKE_MAKE_PROGRAM": "ninja",
                 "CMAKE_OSX_ARCHITECTURES": "arm64"
             }

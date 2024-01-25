@@ -33,7 +33,7 @@ private:
 public:
     static std::unique_ptr<common::App> singleton_;
 
-    App& parent_;
+    common::App& parent_;
     std::unique_ptr<common::Api> ot_;
     QQuickView qml_;
     common::Startup startup_;
@@ -108,7 +108,7 @@ public:
 
     auto init(int& argc, char** argv) noexcept -> void final
     {
-        ot_ = std::make_unique<Api>(*this, parent_, argc, argv);
+        ot_ = std::make_unique<common::Api>(*this, parent_, argc, argv);
 
         {
             auto* ot = ot_.get();
@@ -119,7 +119,7 @@ public:
                 &IdentityManager::activeNymChanged,
                 this,
                 &QmlApp::nymReady);
-            Ownership::Claim(ot);
+            common::Ownership::Claim(ot);
             qml_.rootContext()->setContextProperty("api", ot);
         }
 
@@ -130,9 +130,9 @@ public:
         if (qml_.status() == QQuickView::Error) { abort(); }
 
         qml_.setResizeMode(QQuickView::SizeRootObjectToView);
-        const auto dSize = qml_default_size();
-        const auto mSize = qml_minimum_size();
-        const auto xSize = qml_maximum_size();
+        const auto dSize = common::qml_default_size();
+        const auto mSize = common::qml_minimum_size();
+        const auto xSize = common::qml_maximum_size();
 
         if ((0 != dSize.first) && (0 != dSize.second)) {
             qml_.resize(dSize.first, dSize.second);
@@ -156,9 +156,9 @@ public:
         return exec();
     }
 
-    auto otwrap() noexcept -> Api* final { return ot_.get(); }
+    auto otwrap() noexcept -> common::Api* final { return ot_.get(); }
 
-    QmlApp(App& parent, int& argc, char** argv) noexcept
+    QmlApp(common::App& parent, int& argc, char** argv) noexcept
         : QApplication(argc, argv)
         , model_promise_()
         , parent_(parent)
@@ -170,11 +170,11 @@ public:
     {
         {
             auto* app = &startup_;
-            Ownership::Claim(app);
+            common::Ownership::Claim(app);
             qml_.rootContext()->setContextProperty("startup", app);
         }
 
-        Ownership::Claim(this);
+        common::Ownership::Claim(this);
         qml_.rootContext()->setContextProperty("metier", this);
     }
 
