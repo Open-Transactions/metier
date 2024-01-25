@@ -3,8 +3,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "qrtoolbutton.hpp"  // IWYU pragma: associated
+#include "metier/skins/metier/widget/qrtoolbutton.hpp"  // IWYU pragma: associated
 
+#include <QR-Code-generator/cpp/QrCode.hpp>
 #include <ui_qrtoolbutton.h>
 #include <QColor>
 #include <QImage>
@@ -14,8 +15,6 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <QStylePainter>
-
-#include "QR-Code-generator/cpp/QrCode.hpp"
 
 namespace qr = qrcodegen;
 

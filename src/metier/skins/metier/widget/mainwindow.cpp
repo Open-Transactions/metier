@@ -3,7 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "mainwindow.hpp"  // IWYU pragma: associated
+#include "metier/skins/metier/widget/mainwindow.hpp"  // IWYU pragma: associated
 
 #include <opentxs/Qt.hpp>
 #include <opentxs/opentxs.hpp>
@@ -25,13 +25,13 @@
 #include <QToolBox>
 #include <QVariant>
 
-#include "mainwindow/imp.hpp"
 #include "metier/common/api.hpp"
 #include "metier/common/scopeguard.hpp"
 #include "metier/skins/metier/util/focuser.hpp"
 #include "metier/skins/metier/widget/blockchainchooser.hpp"
 #include "metier/skins/metier/widget/licenses.hpp"
 #include "metier/skins/metier/widget/mainwindow/chaintoolboxmanager.hpp"
+#include "metier/skins/metier/widget/mainwindow/imp.hpp"
 #include "metier/skins/metier/widget/seedmanager.hpp"
 #include "metier/skins/metier/widget/showseed.hpp"
 
