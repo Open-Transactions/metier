@@ -20,6 +20,8 @@ list(
   CMAKE_MODULE_PATH
   "${CMAKE_CURRENT_SOURCE_DIR}/tools/cmake"
 )
+include(metier-set-osx-deployment-target)
+metier_set_osx_deployment_target(14)
 
 project(metier)
 
