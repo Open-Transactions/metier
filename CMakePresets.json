@@ -22,6 +22,15 @@
             }
         },
         {
+            "name": "vcpkg-windows",
+            "hidden": true,
+            "inherits": "vcpkg",
+            "cacheVariables": {
+                "VCPKG_INSTALL_OPTIONS":
+                    "--x-buildtrees-root=$env{VCPKG_WINDOWS_MAX_PATH_HACK}"
+            }
+        },
+        {
             "name": "mode-debug",
             "hidden": true,
             "cacheVariables": {
@@ -179,7 +188,7 @@
             "inherits": [
                 "host-windows",
                 "mode-debug",
-                "vcpkg"
+                "vcpkg-windows"
             ]
         },
         {
@@ -189,7 +198,7 @@
             "inherits": [
                 "host-windows",
                 "mode-release",
-                "vcpkg"
+                "vcpkg-windows"
             ]
         },
         {
