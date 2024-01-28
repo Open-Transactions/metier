@@ -16,6 +16,7 @@
                     "${sourceDir}/external/vcpkg-overlay/triplets"
             },
             "cacheVariables": {
+                "VCPKG_MANIFEST_FEATURES": "qt",
                 "OT_BOOST_JSON_HEADER_ONLY": "OFF",
                 "HAVE_EGL": "ON"
             }

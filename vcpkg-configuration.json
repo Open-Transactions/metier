@@ -2,7 +2,7 @@
     "default-registry": {
         "kind": "git",
         "repository": "https://github.com/microsoft/vcpkg",
-        "baseline": "c8696863d371ab7f46e213d8f5ca923c4aef2a00"
+        "baseline": "8ccb84df727bdf83045e53c319af05c554838b80"
     },
     "registries": [
         {
@@ -10,7 +10,6 @@
             "repository": "https://github.com/Open-Transactions/vcpkg-registry",
             "baseline": "8cf52482da31f31cf86588f09e1e10af834439bd",
             "packages": [
-                "boost-beast",
                 "opentxs",
                 "otcommon"
             ]
