@@ -122,6 +122,7 @@
                 "compiler-clang"
             ],
             "cacheVariables": {
+                "VCPKG_HOST_TRIPLET": "x64-osx-14",
                 "VCPKG_TARGET_TRIPLET": "x64-osx-14",
                 "CMAKE_MAKE_PROGRAM": "ninja",
                 "CMAKE_OSX_ARCHITECTURES": "x86_64"
@@ -140,6 +141,7 @@
                 "compiler-clang"
             ],
             "cacheVariables": {
+                "VCPKG_HOST_TRIPLET": "arm64-osx-14",
                 "VCPKG_TARGET_TRIPLET": "arm64-osx-14",
                 "CMAKE_MAKE_PROGRAM": "ninja",
                 "CMAKE_OSX_ARCHITECTURES": "arm64"
@@ -158,6 +160,7 @@
                 "compiler-msvc"
             ],
             "cacheVariables": {
+                "VCPKG_HOST_TRIPLET": "x64-windows-static",
                 "VCPKG_TARGET_TRIPLET": "x64-windows-static",
                 "CMAKE_MAKE_PROGRAM": "ninja.exe",
                 "CMAKE_EXE_LINKER_FLAGS": "/STACK:8388608"
