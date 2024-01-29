@@ -3,24 +3,32 @@
         "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
     "name": "metier",
     "version": "23.2.4",
+    "features": {
+        "qt": {
+            "description": "Use Qt provided by vcpkg",
+            "dependencies": [
+                {
+                    "name": "opentxs",
+                    "features": [
+                        "qt6"
+                    ]
+                },
+                {
+                    "name": "qtbase",
+                    "default-features": false,
+                    "features": [
+                        "gui",
+                        "widgets"
+                    ]
+                },
+                "qtdeclarative",
+                "qtsvg"
+            ]
+        }
+    },
     "dependencies": [
         "boost",
         "cmakerc",
-        {
-            "name": "opentxs",
-            "features": [
-                "qt6"
-            ]
-        },
-        {
-            "name": "qtbase",
-            "default-features": false,
-            "features": [
-                "gui",
-                "widgets"
-            ]
-        },
-        "qtdeclarative",
-        "qtsvg"
+        "opentxs"
     ]
 }

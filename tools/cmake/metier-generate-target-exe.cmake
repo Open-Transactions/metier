@@ -20,6 +20,10 @@ function(
     set(APP_ICON_RESOURCE "${windows_icon}")
   elseif(APPLE)
     set(APP_ICON_RESOURCE "${apple_icon_path}/${apple_icon_name}")
+    file(
+      COPY ${APP_ICON_RESOURCE}
+      DESTINATION "${METIER_APPSTREAM_NAME}.app/Contents/Resources"
+    )
   else()
     set(APP_ICON_RESOURCE "")
   endif()

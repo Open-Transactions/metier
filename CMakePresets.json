@@ -16,8 +16,18 @@
                     "${sourceDir}/external/vcpkg-overlay/triplets"
             },
             "cacheVariables": {
+                "VCPKG_MANIFEST_FEATURES": "qt",
                 "OT_BOOST_JSON_HEADER_ONLY": "OFF",
                 "HAVE_EGL": "ON"
+            }
+        },
+        {
+            "name": "vcpkg-windows",
+            "hidden": true,
+            "inherits": "vcpkg",
+            "cacheVariables": {
+                "VCPKG_INSTALL_OPTIONS":
+                    "--x-buildtrees-root=$env{VCPKG_WINDOWS_MAX_PATH_HACK}"
             }
         },
         {
@@ -112,6 +122,7 @@
                 "compiler-clang"
             ],
             "cacheVariables": {
+                "VCPKG_HOST_TRIPLET": "x64-osx-14",
                 "VCPKG_TARGET_TRIPLET": "x64-osx-14",
                 "CMAKE_MAKE_PROGRAM": "ninja",
                 "CMAKE_OSX_ARCHITECTURES": "x86_64"
@@ -130,6 +141,7 @@
                 "compiler-clang"
             ],
             "cacheVariables": {
+                "VCPKG_HOST_TRIPLET": "arm64-osx-14",
                 "VCPKG_TARGET_TRIPLET": "arm64-osx-14",
                 "CMAKE_MAKE_PROGRAM": "ninja",
                 "CMAKE_OSX_ARCHITECTURES": "arm64"
@@ -148,6 +160,7 @@
                 "compiler-msvc"
             ],
             "cacheVariables": {
+                "VCPKG_HOST_TRIPLET": "x64-windows-static",
                 "VCPKG_TARGET_TRIPLET": "x64-windows-static",
                 "CMAKE_MAKE_PROGRAM": "ninja.exe",
                 "CMAKE_EXE_LINKER_FLAGS": "/STACK:8388608"
@@ -178,7 +191,7 @@
             "inherits": [
                 "host-windows",
                 "mode-debug",
-                "vcpkg"
+                "vcpkg-windows"
             ]
         },
         {
@@ -188,7 +201,7 @@
             "inherits": [
                 "host-windows",
                 "mode-release",
-                "vcpkg"
+                "vcpkg-windows"
             ]
         },
         {
