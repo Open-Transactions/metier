@@ -31,17 +31,7 @@ function(metier_generate_cmrc_target)
     "license/metier"
     "LICENSE"
   )
-  set_target_properties(
-    metier-cmrc
-    PROPERTIES
-      CXX_INCLUDE_WHAT_YOU_USE ""
-      CXX_CLANG_TIDY ""
-      CXX_STANDARD 20
-      CXX_EXTENSIONS OFF
-      CXX_STANDARD_REQUIRED ON
-      POSITION_INDEPENDENT_CODE ON
-      UNITY_BUILD OFF
-  )
+  otcommon_configure_target_external(metier-cmrc)
   target_link_libraries(metier-common PUBLIC metier-cmrc)
   target_sources(metier-common PUBLIC $<TARGET_OBJECTS:metier-cmrc>)
 endfunction()

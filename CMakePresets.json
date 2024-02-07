@@ -26,8 +26,10 @@
             "hidden": true,
             "inherits": "vcpkg",
             "cacheVariables": {
+                "VCPKG_INSTALLED_DIR":
+                    "$env{VCPKG_WINDOWS_MAX_PATH_HACK}/ot/i/${presetName}",
                 "VCPKG_INSTALL_OPTIONS":
-                    "--x-buildtrees-root=$env{VCPKG_WINDOWS_MAX_PATH_HACK}"
+                    "--x-buildtrees-root=$env{VCPKG_WINDOWS_MAX_PATH_HACK}/ot/b/${presetName};--x-packages-root=$env{VCPKG_WINDOWS_MAX_PATH_HACK}/ot/p/${presetName}"
             }
         },
         {

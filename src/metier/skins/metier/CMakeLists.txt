@@ -47,7 +47,7 @@ set_target_properties(
   metier PROPERTIES AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/ui"
 )
 
-target_sources(metier PRIVATE "skin/app.imp.widgets.cpp")
+target_sources(metier PRIVATE "skin/app.imp.factory_advanced.cpp")
 
 if(METIER_QML_INTERFACE)
   metier_link_external_target(metier Qt::Qml)
@@ -64,9 +64,9 @@ if(METIER_QML_INTERFACE)
   endif()
 
   qt_import_qml_plugins("${METIER_BASE_NAME}")
-  target_sources(metier PRIVATE "skin/app.imp.qml.cpp")
+  target_sources(metier PRIVATE "skin/app.imp.factory_standard.qml.cpp")
 else()
-  target_sources(metier PRIVATE "skin/app.imp.no-qml.cpp")
+  target_sources(metier PRIVATE "skin/app.imp.factory_standard.no-qml.cpp")
 endif()
 
 if(APPLE)

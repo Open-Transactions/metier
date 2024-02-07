@@ -36,8 +36,11 @@ function(
     "${target_name}"
     PRIVATE
       "${CMAKE_CURRENT_BINARY_DIR}/skin/app.skin.cpp"
-      "skin/app.imp.factory.cpp"
       "skin/custom.cpp"
       "skin/size.cpp"
   )
+
+  if(EXISTS "skin/app.imp.choose_interface.cpp")
+    target_sources("${target_name}" PRIVATE "skin/app.imp.choose_interface.cpp")
+  endif()
 endfunction()
