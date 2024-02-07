@@ -11,6 +11,7 @@
 #include <QStringList>
 #include <algorithm>
 #include <atomic>
+#include <cstddef>
 #include <functional>
 #include <future>
 #include <iterator>
@@ -69,11 +70,74 @@ namespace zmq = opentxs::network::zeromq;
 
 struct Api::Imp {
 private:
-    Api& parent_;
+    Api* parent_;
     QGuiApplication& qt_parent_;
+    PasswordCallback callback_;
+    opentxs::PasswordCaller caller_;
 
 public:
     enum class State { init, have_seed, have_nym, run };
+
+    using SeedLanguageMap =
+        std::map<ot::crypto::SeedStyle, std::unique_ptr<model::SeedLanguage>>;
+    using SeedSizeMap =
+        std::map<ot::crypto::SeedStyle, std::unique_ptr<model::SeedSize>>;
+
+    const opentxs::api::Context& ot_;
+    const opentxs::api::session::Client& api_;
+    const opentxs::crypto::SeedID seed_id_;
+    const int longest_seed_word_;
+    const SeedLanguageMap seed_language_;
+    const SeedSizeMap seed_size_;
+
+    virtual auto check_chains(int count) const noexcept -> void;
+    virtual auto enableDefaultChain() const noexcept -> bool;
+    virtual auto enabledChainCount() const noexcept -> std::size_t;
+    virtual auto enabledChainList() const noexcept -> BlockchainList;
+    virtual auto identityManager() const noexcept -> ot::ui::IdentityManagerQt*;
+    virtual auto needNym() const noexcept -> bool;
+    virtual auto rescanBlockchain(int chain) -> void;
+    virtual auto seedManager() const noexcept -> ot::ui::SeedTreeQt*;
+    virtual auto seedTypeModel() const -> model::SeedType*;
+    virtual auto state(State value) noexcept -> void;
+    virtual auto validateBlockchains() const noexcept -> bool;
+    virtual auto validateNym() const noexcept -> bool;
+    virtual auto validateSeed() const noexcept -> bool;
+    virtual auto waitForSeedBackup() const noexcept -> bool;
+
+    virtual auto blockchainTypeToAccountID(int chain) noexcept -> QString;
+    virtual auto chain_is_disabled(int chain) noexcept -> void;
+    virtual auto chain_is_enabled(int chain) noexcept -> void;
+    virtual auto createNym(QString alias) noexcept -> void;
+    virtual auto createNewSeed(
+        const int type,
+        const int lang,
+        const int strength) noexcept -> QStringList;
+    virtual auto getRecoveryWords() -> QStringList;
+    virtual auto importSeed(
+        int type,
+        int lang,
+        const QString& input,
+        const QString& password) -> void;
+    virtual auto init(Api* me) -> void;
+    virtual auto seedLanguageModel(const int type) -> model::SeedLanguage*;
+    virtual auto seedSizeModel(const int type) -> model::SeedSize*;
+    virtual auto seedWordValidator(const int type, const int lang)
+        -> const opentxs::ui::SeedValidator*;
+    virtual auto state() const noexcept -> State;
+    virtual auto waitForSeedBackup(bool value) noexcept -> void;
+    virtual auto wordCount(const int type, const int strength) -> int;
+
+    Imp(QGuiApplication& parent, App& app, int& argc, char** argv);
+    Imp(const Imp&) = delete;
+    Imp(Imp&&) = delete;
+    auto operator=(const Imp&) -> Imp& = delete;
+    auto operator=(Imp&&) -> Imp& = delete;
+
+    virtual ~Imp();
+
+private:
+    using Lock = std::unique_lock<std::mutex>;
 
     struct EnabledChains {
         using Vector = opentxs::Set<ot::blockchain::Type>;
@@ -128,20 +192,6 @@ public:
         Vector enabled_{};
     };
 
-    using SeedLanguageMap =
-        std::map<ot::crypto::SeedStyle, std::unique_ptr<model::SeedLanguage>>;
-    using SeedSizeMap =
-        std::map<ot::crypto::SeedStyle, std::unique_ptr<model::SeedSize>>;
-    using Lock = std::unique_lock<std::mutex>;
-
-    PasswordCallback callback_;
-    opentxs::PasswordCaller caller_;
-    const opentxs::api::Context& ot_;
-    const opentxs::api::session::Client& api_;
-    const opentxs::crypto::SeedID seed_id_;
-    const int longest_seed_word_;
-    const SeedLanguageMap seed_language_;
-    const SeedSizeMap seed_size_;
     mutable std::mutex lock_;
     mutable std::atomic_bool have_nym_;
     mutable std::atomic_bool wait_for_seed_backup_;
@@ -155,46 +205,8 @@ public:
     template <typename OutputType, typename InputType>
     static auto transform(const InputType& data) noexcept -> OutputType;
 
-    auto check_chains(int count) const noexcept -> void;
-    auto enableDefaultChain() const noexcept -> bool;
-    auto identityManager() const noexcept -> ot::ui::IdentityManagerQt*;
-    auto needNym() const noexcept;
-    auto rescanBlockchain(int chain) -> void;
-    auto seedManager() const noexcept -> ot::ui::SeedTreeQt*;
-    auto validateBlockchains() const noexcept -> bool;
-    auto validateNym() const noexcept -> bool;
-    auto validateSeed() const noexcept -> bool;
-
-    auto blockchainTypeToAccountID(int chain) noexcept -> QString;
-    auto chain_is_disabled(int chain) noexcept -> void;
-    auto chain_is_enabled(int chain) noexcept -> void;
-    auto createNym(QString alias) noexcept -> void;
-    auto createNewSeed(
-        const int type,
-        const int lang,
-        const int strength) noexcept -> QStringList;
-    auto getRecoveryWords() -> QStringList;
-    auto importSeed(
-        int type,
-        int lang,
-        const QString& input,
-        const QString& password) -> void;
-    auto seedLanguageModel(const int type) -> model::SeedLanguage*;
-    auto seedSizeModel(const int type) -> model::SeedSize*;
-    auto seedWordValidator(const int type, const int lang)
-        -> const opentxs::ui::SeedValidator*;
-    auto wordCount(const int type, const int strength) -> int;
-
-    Imp(QGuiApplication& parent, App& app, Api& me, int& argc, char** argv);
-    Imp(const Imp&) = delete;
-    Imp(Imp&&) = delete;
-    auto operator=(const Imp&) -> Imp& = delete;
-    auto operator=(Imp&&) -> Imp& = delete;
-
-    ~Imp();
-
-private:
-    auto make_accounts(const ot::blockchain::Type chain) const noexcept -> bool;
+    virtual auto make_accounts(const ot::blockchain::Type chain) const noexcept
+        -> bool;
     auto receive_message(
         void* socket,
         ot::network::zeromq::Message& message) noexcept -> bool;

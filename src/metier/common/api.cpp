@@ -17,12 +17,12 @@
 #include <QUrl>
 #include <QtLogging>
 #include <algorithm>
-#include <atomic>
 #include <chrono>
 #include <compare>
 #include <cstddef>
 #include <iterator>
 #include <span>
+#include <utility>
 
 #include "metier/common/api.imp.hpp"
 #include "metier/common/convertblockchain.hpp"
@@ -34,11 +34,12 @@ namespace qr = qrcodegen;
 
 namespace metier::common
 {
-Api::Api(QGuiApplication& parent, App& app, int& argc, char** argv)
+Api::Api(QGuiApplication& parent, std::shared_ptr<Imp> imp)
     : QObject(&parent)
-    , imp_p_(std::make_unique<Imp>(parent, app, *this, argc, argv))
+    , imp_p_(std::move(imp))
     , imp_(*imp_p_)
 {
+    imp_.init(this);
     using Seed = opentxs::ui::SeedTreeQt;
     auto* seed = imp_.seedManager();
     connect(seed, &Seed::defaultSeedChanged, this, &Api::doNeedSeed);
@@ -99,7 +100,7 @@ auto Api::checkChains(int chain) -> void { imp_.check_chains(chain); }
 
 auto Api::checkStartupConditions() -> void
 {
-    switch (imp_.state_.load()) {
+    switch (imp_.state()) {
         case Imp::State::init:
         case Imp::State::have_seed: {
             imp_.seedManager()->check();
@@ -118,7 +119,7 @@ auto Api::checkStartupConditions() -> void
                     }
                 }
 
-                imp_.state_.store(Imp::State::run);
+                imp_.state(Imp::State::run);
                 Q_EMIT privateReadyForMainWindow(QPrivateSignal{});
             } else if (1 > model->enabledCount()) {
                 Q_EMIT privateNeedBlockchain(QPrivateSignal{});
@@ -127,7 +128,7 @@ auto Api::checkStartupConditions() -> void
                     qFatal("Unable to initialize blockchains");
                 }
 
-                imp_.state_.store(Imp::State::run);
+                imp_.state(Imp::State::run);
                 Q_EMIT privateReadyForMainWindow(QPrivateSignal{});
             }
         } break;
@@ -152,7 +153,7 @@ auto Api::createNym(QString alias) -> void { imp_.createNym(alias); }
 
 auto Api::doNeedNym() -> void
 {
-    switch (imp_.state_.load()) {
+    switch (imp_.state()) {
         case Imp::State::init: {
             doNeedSeed();
         } break;
@@ -160,7 +161,7 @@ auto Api::doNeedNym() -> void
             const auto [nym, count] = imp_.api_.Wallet().DefaultNym();
 
             if (nym.empty()) {
-                if (false == imp_.wait_for_seed_backup_) {
+                if (false == imp_.waitForSeedBackup()) {
                     Q_EMIT privateNeedProfileName(QPrivateSignal{});
                 }
             } else {
@@ -168,7 +169,7 @@ auto Api::doNeedNym() -> void
                     qFatal("Unable to initialize identity");
                 }
 
-                imp_.state_.store(Imp::State::have_nym);
+                imp_.state(Imp::State::have_nym);
                 Q_EMIT checkStartupConditions();
             }
         } break;
@@ -181,7 +182,7 @@ auto Api::doNeedNym() -> void
 
 auto Api::doNeedSeed() -> void
 {
-    switch (imp_.state_.load()) {
+    switch (imp_.state()) {
         case Imp::State::init: {
             const auto [seed, count] = imp_.api_.Crypto().Seed().DefaultSeed();
 
@@ -192,7 +193,7 @@ auto Api::doNeedSeed() -> void
                     qFatal("Unable to initialize wallet seed");
                 }
 
-                imp_.state_.store(Imp::State::have_seed);
+                imp_.state(Imp::State::have_seed);
                 Q_EMIT checkStartupConditions();
             }
         } break;
@@ -206,12 +207,18 @@ auto Api::doNeedSeed() -> void
 
 auto Api::enabledBlockchains() -> BlockchainList
 {
-    return imp_.enabled_chains_.get();
+    return imp_.enabledChainList();
 }
 
 auto Api::enabledCurrencyCount() -> int
 {
-    return static_cast<int>(imp_.enabled_chains_.count());
+    return static_cast<int>(imp_.enabledChainCount());
+}
+
+auto Api::Factory(QGuiApplication& parent, App& app, int& argc, char** argv)
+    -> std::shared_ptr<Imp>
+{
+    return std::make_shared<Imp>(parent, app, argc, argv);
 }
 
 auto Api::getQRcodeBase64(const QString input_string) -> QString
@@ -265,7 +272,7 @@ auto Api::rescanBlockchain(int chain) -> void { imp_.rescanBlockchain(chain); }
 
 auto Api::seedBackupFinished() -> void
 {
-    imp_.wait_for_seed_backup_ = false;
+    imp_.waitForSeedBackup(false);
     Q_EMIT checkStartupConditions();
 }
 
@@ -296,7 +303,7 @@ auto Api::seedSizeModelQML(const int type) -> QObject*
     return seedSizeModel(type);
 }
 
-auto Api::seedTypeModel() -> model::SeedType* { return imp_.seed_type_.get(); }
+auto Api::seedTypeModel() -> model::SeedType* { return imp_.seedTypeModel(); }
 
 auto Api::seedTypeModelQML() -> QObject* { return seedTypeModel(); }
 

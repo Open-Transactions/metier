@@ -33,9 +33,9 @@ struct App::Imp {
         bool advanced) noexcept -> std::unique_ptr<Imp>;
     static auto factory(App& parent, int& argc, char** argv) noexcept
         -> std::unique_ptr<Imp>;
-    static auto factory_qml(App& parent, int& argc, char** argv) noexcept
+    static auto factory_standard(App& parent, int& argc, char** argv) noexcept
         -> std::unique_ptr<Imp>;
-    static auto factory_widgets(App& parent, int& argc, char** argv) noexcept
+    static auto factory_advanced(App& parent, int& argc, char** argv) noexcept
         -> std::unique_ptr<Imp>;
 
     virtual auto displayBlockchainChooser() -> void = 0;

@@ -41,7 +41,7 @@ class App;
 
 namespace metier::common
 {
-class Api final : public QObject
+class Api : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int enabledCurrencyCount READ enabledCurrencyCount)
@@ -62,74 +62,90 @@ Q_SIGNALS:
     void privateReadyForMainWindow(QPrivateSignal);
 
 public Q_SLOTS:
-    void checkAccounts();
-    void checkStartupConditions();
-    void createNym(QString alias);
-    void importSeed(int type, int lang, QString words, QString password);
-    void quit();
-    void rescanBlockchain(int chain);
-    void seedBackupFinished();
+    virtual void checkAccounts();
+    virtual void checkStartupConditions();
+    virtual void createNym(QString alias);
+    virtual void importSeed(
+        int type,
+        int lang,
+        QString words,
+        QString password);
+    virtual void quit();
+    virtual void rescanBlockchain(int chain);
+    virtual void seedBackupFinished();
 
 private Q_SLOTS:
-    void chainIsDisabled(int chain);
-    void chainIsEnabled(int chain);
-    void checkChains(int chain);
-    void doNeedNym();
-    void doNeedSeed();
+    virtual void chainIsDisabled(int chain);
+    virtual void chainIsEnabled(int chain);
+    virtual void checkChains(int chain);
+    virtual void doNeedNym();
+    virtual void doNeedSeed();
 
 public:
+    struct Imp;
+
     using BlockchainList = QVector<int>;
+
+    static auto Factory(
+        QGuiApplication& parent,
+        App& app,
+        int& argc,
+        char** argv) -> std::shared_ptr<Imp>;
 
     static auto Cleanup() noexcept -> void;
     static auto Domain() noexcept -> QString;
     static auto Name() noexcept -> QString;
     static auto Title() noexcept -> QString;
 
-    auto blockchainChooserModel(const bool testnet) -> QAbstractItemModel*;
-    auto blockchainStatisticsModel() -> QAbstractItemModel*;
-    auto identityManager() noexcept -> opentxs::ui::IdentityManagerQt*;
-    auto seedLanguageModel(const int type) -> model::SeedLanguage*;
-    auto seedManager() noexcept -> opentxs::ui::SeedTreeQt*;
-    auto seedSizeModel(const int type) -> model::SeedSize*;
-    auto seedTypeModel() -> model::SeedType*;
-    auto seedWordValidator(const int type, const int lang)
+    virtual auto blockchainChooserModel(const bool testnet)
+        -> QAbstractItemModel*;
+    virtual auto blockchainStatisticsModel() -> QAbstractItemModel*;
+    virtual auto identityManager() noexcept -> opentxs::ui::IdentityManagerQt*;
+    virtual auto seedLanguageModel(const int type) -> model::SeedLanguage*;
+    virtual auto seedManager() noexcept -> opentxs::ui::SeedTreeQt*;
+    virtual auto seedSizeModel(const int type) -> model::SeedSize*;
+    virtual auto seedTypeModel() -> model::SeedType*;
+    virtual auto seedWordValidator(const int type, const int lang)
         -> const opentxs::ui::SeedValidator*;
+    virtual auto enabledBlockchains() -> BlockchainList;
+    virtual auto validBlockchains() -> BlockchainList;
 
-    Q_INVOKABLE QObject* blockchainChooserModelQML(bool testnet);
-    Q_INVOKABLE QObject* blockchainStatisticsModelQML();
-    Q_INVOKABLE QObject* identityManagerQML();
-    Q_INVOKABLE QObject* seedLanguageModelQML(const int type);
-    Q_INVOKABLE QObject* seedManagerQML();
-    Q_INVOKABLE QObject* seedSizeModelQML(const int type);
-    Q_INVOKABLE QObject* seedTypeModelQML();
-    Q_INVOKABLE QObject* seedWordValidatorQML(const int type, const int lang);
+    virtual Q_INVOKABLE QObject* blockchainChooserModelQML(bool testnet);
+    virtual Q_INVOKABLE QObject* blockchainStatisticsModelQML();
+    virtual Q_INVOKABLE QObject* identityManagerQML();
+    virtual Q_INVOKABLE QObject* seedLanguageModelQML(const int type);
+    virtual Q_INVOKABLE QObject* seedManagerQML();
+    virtual Q_INVOKABLE QObject* seedSizeModelQML(const int type);
+    virtual Q_INVOKABLE QObject* seedTypeModelQML();
+    virtual Q_INVOKABLE QObject* seedWordValidatorQML(
+        const int type,
+        const int lang);
 
-    Q_INVOKABLE int accountIDtoBlockchainType(const QString& id);
-    Q_INVOKABLE QString addContact(QString label, QString id);
-    Q_INVOKABLE QString blockchainTypeToAccountID(int type);
-    Q_INVOKABLE QStringList
+    virtual Q_INVOKABLE int accountIDtoBlockchainType(const QString& id);
+    virtual Q_INVOKABLE QString addContact(QString label, QString id);
+    virtual Q_INVOKABLE QString blockchainTypeToAccountID(int type);
+    virtual Q_INVOKABLE QStringList
     createNewSeed(const int type, const int lang, const int strength);
-    Q_INVOKABLE QStringList getRecoveryWords();
-    Q_INVOKABLE int wordCount(const int type, const int strength);
-    Q_INVOKABLE int enabledCurrencyCount();
-    BlockchainList enabledBlockchains();
-    Q_INVOKABLE QString getQRcodeBase64(const QString input_string);
-    Q_INVOKABLE int longestBlockchainName();
-    Q_INVOKABLE int longestSeedWord();
-    Q_INVOKABLE void openSystemBrowserLink(QString url_link);
-    BlockchainList validBlockchains();
-    Q_INVOKABLE QString versionString(int suffix = 0);
+    virtual Q_INVOKABLE QStringList getRecoveryWords();
+    virtual Q_INVOKABLE int wordCount(const int type, const int strength);
+    virtual Q_INVOKABLE int enabledCurrencyCount();
+    virtual Q_INVOKABLE QString getQRcodeBase64(const QString input_string);
+    virtual Q_INVOKABLE int longestBlockchainName();
+    virtual Q_INVOKABLE int longestSeedWord();
+    virtual Q_INVOKABLE void openSystemBrowserLink(QString url_link);
+    virtual Q_INVOKABLE QString versionString(int suffix = 0);
 
-    explicit Api(QGuiApplication& parent, App& app, int& argc, char** argv);
-
-    ~Api() final;
-
-private:
-    struct Imp;
-
-    std::unique_ptr<Imp> imp_p_;
-    Imp& imp_;
-
+    explicit Api(QGuiApplication& parent, std::shared_ptr<Imp> imp);
     Api() = delete;
+    Api(const Api&) = delete;
+    Api(Api&&) = delete;
+    auto operator=(const Api&) -> Api& = delete;
+    auto operator=(Api&&) -> Api& = delete;
+
+    ~Api() override;
+
+protected:
+    std::shared_ptr<Imp> imp_p_;
+    Imp& imp_;
 };
 }  // namespace metier::common

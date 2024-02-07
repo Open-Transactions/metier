@@ -108,7 +108,8 @@ struct LegacyApp final : public common::App::Imp, public QApplication {
 
     auto init(int& argc, char** argv) noexcept -> void final
     {
-        ot_ = std::make_unique<common::Api>(*this, parent_, argc, argv);
+        auto api = common::Api::Factory(*this, parent_, argc, argv);
+        ot_ = std::make_unique<common::Api>(*this, api);
         first_run_ = std::make_unique<widget::FirstRun>(this);
         new_seed_ = std::make_unique<widget::NewSeed>(this, *ot_);
         recover_wallet_ = std::make_unique<widget::RecoverWallet>(this, *ot_);
@@ -169,7 +170,7 @@ struct LegacyApp final : public common::App::Imp, public QApplication {
 
 namespace metier::common
 {
-auto App::Imp::factory_widgets(App& parent, int& argc, char** argv) noexcept
+auto App::Imp::factory_advanced(App& parent, int& argc, char** argv) noexcept
     -> std::unique_ptr<Imp>
 {
     return std::make_unique<skins::metier::LegacyApp>(parent, argc, argv);

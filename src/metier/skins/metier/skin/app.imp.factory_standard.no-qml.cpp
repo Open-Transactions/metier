@@ -13,6 +13,6 @@ auto App::Imp::choose_interface(
     char** argv,
     bool) noexcept -> std::unique_ptr<Imp>
 {
-    return factory_widgets(parent, argc, argv);
+    return factory_advanced(parent, argc, argv);
 }
 }  // namespace metier::common

@@ -108,7 +108,8 @@ public:
 
     auto init(int& argc, char** argv) noexcept -> void final
     {
-        ot_ = std::make_unique<common::Api>(*this, parent_, argc, argv);
+        auto api = common::Api::Factory(*this, parent_, argc, argv);
+        ot_ = std::make_unique<common::Api>(*this, api);
 
         {
             auto* ot = ot_.get();
@@ -194,7 +195,7 @@ private:
 
 namespace metier::common
 {
-auto App::Imp::factory_qml(App& parent, int& argc, char** argv) noexcept
+auto App::Imp::factory_standard(App& parent, int& argc, char** argv) noexcept
     -> std::unique_ptr<Imp>
 {
     return std::make_unique<skins::metier::QmlApp>(parent, argc, argv);
@@ -208,10 +209,10 @@ auto App::Imp::choose_interface(
 {
     if (advanced) {
 
-        return factory_widgets(parent, argc, argv);
+        return factory_advanced(parent, argc, argv);
     } else {
 
-        return factory_qml(parent, argc, argv);
+        return factory_standard(parent, argc, argv);
     }
 }
 }  // namespace metier::common

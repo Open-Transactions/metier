@@ -20,7 +20,6 @@
 #include <cerrno>
 #include <chrono>
 #include <cstdint>
-#include <cstring>
 #include <exception>
 #include <filesystem>
 #include <future>
@@ -121,13 +120,8 @@ auto Api::Imp::transform(const InputType& data) noexcept -> OutputType
 
 namespace metier::common
 {
-Api::Imp::Imp(
-    QGuiApplication& parent,
-    App& app,
-    Api& me,
-    int& argc,
-    char** argv)
-    : parent_(me)
+Api::Imp::Imp(QGuiApplication& parent, App& app, int& argc, char** argv)
+    : parent_(nullptr)
     , qt_parent_(parent)
     , callback_(app)
     , caller_()
@@ -211,11 +205,6 @@ Api::Imp::Imp(
         assert(nullptr != main);
         assert(nullptr != test);
 
-        using Model = ot::ui::BlockchainSelectionQt;
-        connect(full, &Model::enabledChanged, &parent_, &Api::checkChains);
-        connect(full, &Model::chainEnabled, &parent_, &Api::chainIsEnabled);
-        connect(full, &Model::chainDisabled, &parent_, &Api::chainIsDisabled);
-
         return api_.Network().Blockchain().EnabledChains();
     }())
     , seed_type_(std::make_unique<model::SeedType>(
@@ -260,7 +249,7 @@ auto Api::Imp::chain_is_enabled(int chain) noexcept -> void
 auto Api::Imp::check_chains(int count) const noexcept -> void
 {
     validateBlockchains();
-    Q_EMIT parent_.chainsChanged(count);
+    Q_EMIT parent_->chainsChanged(count);
 }
 
 auto Api::Imp::createNym(QString alias) noexcept -> void
@@ -342,6 +331,16 @@ auto Api::Imp::createNewSeed(
     return words.split(' ', Qt::SkipEmptyParts);
 }
 
+auto Api::Imp::enabledChainCount() const noexcept -> std::size_t
+{
+    return enabled_chains_.count();
+}
+
+auto Api::Imp::enabledChainList() const noexcept -> BlockchainList
+{
+    return enabled_chains_.get();
+}
+
 auto Api::Imp::getRecoveryWords() -> QStringList
 {
     ready().get();
@@ -418,6 +417,19 @@ auto Api::Imp::identityManager() const noexcept -> ot::ui::IdentityManagerQt*
     return model;
 }
 
+auto Api::Imp::init(Api* me) -> void
+{
+    parent_ = me;
+    auto* full = api_.UI().BlockchainSelectionQt(ot::ui::Blockchains::All);
+
+    assert(nullptr != full);
+
+    using Model = ot::ui::BlockchainSelectionQt;
+    connect(full, &Model::enabledChanged, parent_, &Api::checkChains);
+    connect(full, &Model::chainEnabled, parent_, &Api::chainIsEnabled);
+    connect(full, &Model::chainDisabled, parent_, &Api::chainIsDisabled);
+}
+
 auto Api::Imp::make_accounts(const ot::blockchain::Type chain) const noexcept
     -> bool
 {
@@ -483,7 +495,7 @@ auto Api::Imp::make_accounts(const ot::blockchain::Type chain) const noexcept
     return true;
 }
 
-auto Api::Imp::needNym() const noexcept
+auto Api::Imp::needNym() const noexcept -> bool
 {
     ready().get();
 
@@ -687,6 +699,11 @@ auto Api::Imp::seedSizeModel(const int type) -> model::SeedSize*
     }
 }
 
+auto Api::Imp::seedTypeModel() const -> model::SeedType*
+{
+    return seed_type_.get();
+}
+
 auto Api::Imp::seedWordValidator(const int type, const int lang)
     -> const opentxs::ui::SeedValidator*
 {
@@ -698,6 +715,13 @@ auto Api::Imp::seedWordValidator(const int type, const int lang)
 
     return api_.UI().SeedValidator(style, language);
 }
+
+auto Api::Imp::state(State value) noexcept -> void
+{
+    return state_.store(value);
+}
+
+auto Api::Imp::state() const noexcept -> State { return state_.load(); }
 
 auto Api::Imp::validateBlockchains() const noexcept -> bool
 {
@@ -795,6 +819,16 @@ auto Api::Imp::validateSeed() const noexcept -> bool
     }
 
     return false;
+}
+
+auto Api::Imp::waitForSeedBackup() const noexcept -> bool
+{
+    return wait_for_seed_backup_;
+}
+
+auto Api::Imp::waitForSeedBackup(bool value) noexcept -> void
+{
+    wait_for_seed_backup_.store(value);
 }
 
 auto Api::Imp::wordCount(const int type, const int strength) -> int
